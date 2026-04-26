@@ -78,7 +78,7 @@ See **[docs/adoption-checklist.md](docs/adoption-checklist.md)** — includes ti
 
 The CLI is free forever (Apache 2.0). The premium tier adds hosted infrastructure, a multi-tenant auditor portal, GRC platform integrations, and human services (white-glove onboarding, training, quarterly review, advisory). Enterprise-grade features (liability cover, cryptographic notarization, WORM evidence retention) are on the roadmap but not yet offered — see `docs/premium.md` for the honest status.
 
-See **[docs/premium.md](docs/premium.md)** for the full tier breakdown, pricing matrix, feature list, and what stays free forever. First 3 customers in each tier get founder-rate pricing — contact `chu@stillnotbald.com`.
+See **[docs/premium.md](docs/premium.md)** for the full tier breakdown, pricing matrix, feature list, and what stays free forever. First 3 customers in each tier get founder-rate pricing — contact `ccling1998@gmail.com`.
 
 ---
 
@@ -367,7 +367,7 @@ points where we'd love collaboration with Anthropic:
   pattern for AI-generated content in regulated contexts.
 
 **If you're at Anthropic** (Claude Code team, MCP team, applied AI
-engineering): reach out at `chu@stillnotbald.com`. We'd love a 30-min
+engineering): reach out at `ccling1998@gmail.com`. We'd love a 30-min
 conversation about official integration paths. No expectations — just
 genuinely useful conversations.
 
@@ -387,3 +387,11 @@ SKILL keeps getting sharper.
 Apache 2.0. See [LICENSE](LICENSE).
 
 "TestNUX™" is a trademark of Chu Ling. See [NOTICE](NOTICE) for trademark terms. The Apache 2.0 license covers the code; the trademark covers the name.
+
+---
+
+## Contact
+
+Single point of contact for all matters (security, premium, partnerships, contributions): **ccling1998@gmail.com**
+
+For security vulnerabilities, please use [GitHub Private Vulnerability Reporting](https://github.com/StillNotBald/testnux/security/advisories/new) (preferred — gives us a private collaboration channel + CVE assignment workflow). Email is the fallback.
