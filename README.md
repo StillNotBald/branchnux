@@ -16,13 +16,20 @@ No SaaS dependency. No CI lock-in. Output lives in your repo, versioned with you
 
 ## TL;DR
 
-TestNUX is a CLI that generates auditor-ready test artifacts from markdown test plans and Playwright evidence. The pipeline is **deterministic first, AI-accelerated second** — the core `report` command needs no LLM and produces the same output every run.
+TestNUX serves **two audiences at once**:
 
-Target audience: regulated-fintech engineering leads and compliance leads who need evidence packages that survive SOC 2 / NYDFS / OWASP audits.
+- **Operators (engineering / QA leads)** install and run the CLI. They get the deterministic pipeline, the LLM accelerators, and the version-control discipline.
+- **Consumers (compliance officers, audit committees, legal counsel, UAT reviewers, external auditors, regulators)** read the artifacts the CLI produces — without ever installing anything. They get a self-contained HTML report, a signed PDF, an XLSX with Pass/Fail dropdowns, an SCA, and an OSCAL JSON for GRC ingestion.
 
-Think of TestNUX as a multi-phase test discipline — not just a report generator. The six-phase pipeline (DISCOVER → PLAN → CODIFY → EXECUTE → REPORT → DOC) guides your team through the full testing journey, from cataloguing page state to generating regulator-ready evidence. The tool handles the administrative half of regulated testing work: test-plan scaffolding, traceability matrix maintenance, evidence collation, standards alignment, OSCAL export, signoff ledger, and regression diffing across environments. That frees your engineers and QA analysts to focus on what automation cannot replace: judging whether a test actually exercises the control it claims to, deciding which edge cases warrant a TC, and determining whether a signoff carries the legal weight the situation requires.
+The first audience is small. The second is everyone in your audit chain. **Most TestNUX users don't run the CLI — they read what the CLI produced.** See [Which output do I read?](#which-output-do-i-read) below for the full audience-to-artifact map.
 
-TestNUX reduces the headcount required for the administrative half of regulated testing (matrix bookkeeping, screenshot pasting, format conversion for auditors, regenerating reports each release). It does not reduce the headcount required for actual QA exploration or compliance interpretation.
+### What makes TestNUX different from the dozen test-report generators that already exist:
+
+1. **Three-track discipline** — `requirements/` (what you said you'd build) + `sprint-log/` (what was built) + `testing-log/` (what was tested). One traceable graph, all in your repo, with date-stamped audit snapshots.
+2. **`[VERIFY]` markers on every LLM-drafted cell** — explicit "no human has attested this yet" annotation. AI accelerates authoring; humans gate evidence. Removing a `[VERIFY]` without reading the underlying content is the one thing that makes your evidence package fail under audit.
+3. **HMAC-chained signoff ledger** — tamper-evident attestation. The signoff PDF carries a hash-chain verification badge that auditors can confirm independently of the tool.
+
+The `report` command is fully deterministic — no LLM required, same output every run. AI features (`discover`/`plan`/`codify`/`enrich`/`batch-plan`) are opt-in accelerators with explicit cost gates (`--max-spend`, `--dry-run`). Target buyer: engineering lead at a regulated fintech (SOC 2 / NYDFS / OWASP audit cycle) who wants test evidence in **git, not a vendor cloud** — and whose compliance / audit / legal counterparts will be reading the output.
 
 ---
 
@@ -50,25 +57,29 @@ License: Apache 2.0. No warranty, express or implied. See LICENSE.
 
 ## Prerequisites
 
-**Minimum (deterministic core — `report`, `validate`, `rtm`, `sca`, `run`/`compare`, `visual`, `sign`):** Node.js 20+, npm 10+, a git repo. No LLM access required.
+**Deterministic core** (`report`, `validate`, `rtm`, `sca`, `run`/`compare`, `visual`, `sign`): Node.js 20+, npm 10+, a git repo. No LLM access required.
 
-**Recommended (full v0.2 pipeline including LLM agents `discover`/`plan`/`codify`/`enrich`/`batch-plan`):** **Claude Max 5x (~$100/mo)** with **Opus 4.7 (extra-high effort)** as primary + **Sonnet** as subagent. Plus gstack for multi-agent dispatch and `/browse`, claude-in-chrome MCP for testing authenticated flows. Realistic burn: ~1-2 hours of focused work to consume the 5-hour quota window — see [docs/costs.md](docs/costs.md).
+**LLM agent commands** (`discover`/`plan`/`codify`/`enrich`/`batch-plan`): a Claude API key and the SDK.
 
-See [docs/prerequisites.md](docs/prerequisites.md) for the full setup guide including install commands, `testnux doctor --check` flags, and the hybrid browser policy (claude-in-chrome vs gstack `/browse`).
+```bash
+export CLAUDE_API_KEY=sk-ant-...
+npm install @anthropic-ai/sdk
+```
+
+Use `--dry-run` to see the prompt + cost estimate before any API call. Set `--max-spend` to cap a batch run. See [docs/costs.md](docs/costs.md) for empirical per-page burn rates if you're scoping a budget.
+
+See [docs/prerequisites.md](docs/prerequisites.md) for `testnux doctor --check` flags and the optional hybrid browser policy.
 
 ---
 
 ## Install
 
 ```bash
-# v0.2.0 stable — full pipeline including LLM agents, signoff, per-env, and visual regression
-npm install -g testnux
-testnux --version
+npm install -g testnux       # v0.2.1 — full pipeline
+testnux --version             # 0.2.1
 ```
 
-Available on npm: [npmjs.com/package/testnux](https://www.npmjs.com/package/testnux). One-shot via `npx testnux <command>` works too — no install needed.
-
-> **v0.2.0 is current** (released 2026-04-27). `npm install -g testnux` (no tag) gets you 0.2.0. See [CHANGELOG.md](CHANGELOG.md) for what shipped.
+One-shot via `npx testnux <command>` works without install. Available on npm: [npmjs.com/package/testnux](https://www.npmjs.com/package/testnux). See [CHANGELOG.md](CHANGELOG.md) for what shipped.
 
 ---
 
@@ -88,6 +99,18 @@ Open `examples/demo-dashboard/output/login-execution-report.html` in your browse
 ---
 
 ## Which output do I read?
+
+> ### For compliance, audit, legal, UAT — you don't install TestNUX
+>
+> If you're a **compliance officer, audit committee member, legal counsel, UAT reviewer, internal auditor, or external auditor**, you read TestNUX outputs without ever running the CLI. Your engineering or QA team operates TestNUX; you receive the artifacts:
+>
+> - **HTML execution report** — opens in any browser, no SaaS login, no plugin. TOC sidebar, status tabs, embedded screenshots, standards-alignment matrix.
+> - **XLSX test plan** — Excel-friendly, Pass/Fail dropdowns, colour-coded priority. UAT reviewers can edit directly.
+> - **Signoff PDF** — your formal attestation document with hash-chain verification badge. Tamper-evident.
+> - **SCA markdown / PDF** — 8-section Security Control Assessment for audit submission and vendor due-diligence.
+> - **OSCAL JSON** — machine-readable assessment that ingests directly into Vanta, Drata, Secureframe, RegScale.
+>
+> If you're evaluating TestNUX as a procurement decision, the questions that matter to you are: *Can I read the artifacts in the tools I already have? Can my auditors read them without a vendor login? Does the evidence survive when we change CLI tooling?* The answer to all three is **yes** — every output is a self-contained file in standard formats (HTML, Excel, PDF, JSON, Markdown) that your team can open today.
 
 TestNUX produces a family of artifacts from the same underlying data. Different people on your team need different views.
 
@@ -132,14 +155,6 @@ The `demo` command downloads a prebuilt fixture, generates the HTML + XLSX, and 
 
 ---
 
-## Premium tier (planned v0.4+)
-
-The CLI is free forever (Apache 2.0). The premium tier adds hosted infrastructure, a multi-tenant auditor portal, GRC platform integrations, and human services (white-glove onboarding, training, quarterly review, advisory). Enterprise-grade features (liability cover, cryptographic notarization, WORM evidence retention) are on the roadmap but not yet offered — see `docs/premium.md` for the honest status.
-
-See **[docs/premium.md](docs/premium.md)** for the full tier breakdown, pricing matrix, feature list, and what stays free forever. First 3 customers in each tier get founder-rate pricing — contact `ccling1998@gmail.com`.
-
----
-
 ## How TestNUX compares to alternatives
 
 |  | TestNUX | Vanta / Drata / Secureframe | Comp AI / Delve |
@@ -152,7 +167,7 @@ See **[docs/premium.md](docs/premium.md)** for the full tier breakdown, pricing 
 | **AI-assisted plan/test authoring** | v0.2 (opt-in, BYO Claude API key) | No (focus on policy + evidence) | Yes (core feature) |
 | **Federal compliance (OSCAL)** | v0.2 emit-native | Partial via integrations | Limited |
 | **Lock-in risk** | None (your data, your repo, exit anytime) | High (data lives in their DB) | Medium |
-| **Best fit** | Engineering-led teams that want git-native evidence + want to keep their auditor relationship | Teams that want a turnkey GRC dashboard for their CISO | Teams that want AI to write their policies for them |
+| **Best fit** | Engineering / QA leads who run the CLI **and** the compliance / audit / legal / UAT consumers who read the artifacts. Teams that want git-native evidence + plain-format outputs (HTML / Excel / PDF / JSON / Markdown) every audience can open without a vendor login. | Teams that want a turnkey GRC dashboard for their CISO | Teams that want AI to write their policies for them |
 
 **Where TestNUX feeds into the others:** v0.2 will export your evidence package as OSCAL JSON (NIST 1.1.2) which Vanta/Drata/Secureframe/RegScale all import. TestNUX is the eng-side authoring layer; GRC platforms are the CISO dashboard layer. They're complementary, not competitive — pick TestNUX if you want git-native authorship; pick a GRC platform on TOP if you want a hosted dashboard for your CISO.
 
@@ -371,17 +386,16 @@ The date-prefix on test-pass folders creates audit snapshots — every engagemen
 - `testnux mcp` — stdio MCP server for Claude Code integration (mount via `.claude/settings.json`)
 - `testnux report` is **no longer a stub** — full XLSX + self-contained HTML (TOC sidebar, status tabs, embedded screenshots, standards alignment matrix, threat coverage, base64-inlined assets)
 
-**Tests:** 152 → 365 (all green). 0 lint errors.
+**Tests:** 152 → 370 (all green). 0 lint errors.
 
-> v0.2.0 is the first version where the LLM agents are wired into the pipeline. Eval-set regression testing is in place (3 fixture pages with golden outputs) but coverage will expand in 0.2.x patch releases as the tool soaks against more real-world surfaces. Expect prompt-quality iteration during the 0.2.x cycle.
+> v0.2.0 introduced the LLM agents; v0.2.1 (current) added smoke-test polish and bumped four major dependencies. Eval-set regression testing is in place (3 fixture pages with golden outputs) but coverage will expand in 0.2.x patch releases as the tool soaks against more real-world surfaces. Expect prompt-quality iteration during the 0.2.x cycle.
 
 ### v0.3 (next; needs traction + founder full-time decision)
 
-- gstack `/testnux` skill bundle published to the official catalog (slash-command-callable from any Claude Code session)
-- Cypress + Vitest adapter support
 - Eval harness expansion: 10+ real customer pages, regression CI gate before any LLM prompt change ships
-- Additional `--industry` bundles for emerging regulatory jurisdictions
-- Premium tier launch: hosted multi-tenant auditor portal, GRC platform integrations, white-glove onboarding
+- Cypress + Vitest adapter support (today: Playwright only)
+- Additional `--industry` bundles for emerging regulatory jurisdictions (UK FCA, EU DORA, India RBI candidates)
+- Optional `/testnux` skill for the gstack catalog — one distribution channel for users already on gstack; the underlying CLI is unchanged
 
 ---
 
@@ -391,12 +405,10 @@ The date-prefix on test-pass folders creates audit snapshots — every engagemen
 No. Every TestNUX output — LLM-drafted test plans, codified Playwright specs, signoff PDFs, SCAs, OSCAL exports — is a starting point for human review, not a final answer. The disclaimer block near the top of this README covers this in detail. The short version: `[VERIFY]` markers are not decoration; they mean a qualified human has not yet attested to that content. Removing a `[VERIFY]` marker without reading and validating the underlying content is the one thing that will make your evidence package fail under audit.
 
 **Does TestNUX cost anything?**  
-The CLI is free (Apache 2.0). The v0.2 LLM agents use Claude's API — approximately **$0.30–$0.50 per page** for a full AI pass (Sonnet-class). On a Claude Max subscription (recommended: **5x tier ~$100/mo** with Opus 4.7 + Sonnet subagents), heavy multi-agent dispatch consumes a fresh 5-hour quota window in **~1-2 hours of focused work**. Plan two 5-hour blocks per day max. See [docs/costs.md](docs/costs.md) for the empirical burn rates + recommended working patterns.
+The CLI is free (Apache 2.0). The v0.2 LLM agents call Claude's API — approximately **$0.30–$0.50 per page** for a full pass (Sonnet-class) with `--max-spend` to cap a batch. See [docs/costs.md](docs/costs.md) for empirical per-page burn rates and recommended working patterns.
 
-OSS = self-serve via markdown docs. Premium tier (v0.4+) = white-glove onboarding + consulting + auditor facilitation. See [docs/adoption-checklist.md](docs/adoption-checklist.md) for what's included.
-
-**Do I need Claude Max or an Anthropic API key?**  
-Not for the deterministic core. `testnux report`, `testnux validate`, `testnux rtm`, `testnux sca`, `testnux run`/`compare`, `testnux visual baseline`/`compare`, and the entire signoff suite work without any LLM. Claude API access is required only for the v0.2 LLM agents (`discover`, `plan`, `codify`, `enrich`, `batch-plan`, optional `sign --justify-with-llm`).
+**Do I need an Anthropic API key?**  
+Not for the deterministic core. `testnux report`, `testnux validate`, `testnux rtm`, `testnux sca`, `testnux run`/`compare`, `testnux visual baseline`/`compare`, and the entire signoff suite work without any LLM. A `CLAUDE_API_KEY` is required only for the v0.2 LLM agents (`discover`, `plan`, `codify`, `enrich`, `batch-plan`, and the optional `sign --justify-with-llm`).
 
 ---
 
@@ -413,71 +425,7 @@ Quick version:
 
 ## Credits
 
-TestNUX's three-track discipline, multi-agent dispatch workflow, and slash-command integration patterns derive directly from **gstack** (https://github.com/garrytan/gstack) by Garry Tan. gstack is the OSS solo-builder framework that TestNUX's methodology is built on. TestNUX adds a deterministic CLI artifact pipeline on top of gstack's structural and methodological foundations.
-
-Other credits: Playwright (evidence capture), IBM Trestle (OSCAL validation), NIST OSCAL (standards schema), Anthropic Claude (v0.2 LLM agents), Apache Software Foundation (license framework).
-
-See [docs/credit.md](docs/credit.md) for the full attribution breakdown and citation format.
-
----
-
-## Contributing back to the ecosystem
-
-TestNUX exists because of two ecosystems we depend on. We want to feed both.
-
-### → gstack (the methodological foundation)
-
-[gstack](https://github.com/garrytan/gstack) by Garry Tan is the OSS framework
-TestNUX's discipline derives from. We're committed to upstreaming patterns that
-benefit gstack core, not just TestNUX:
-
-- **Marker convention for human-edits-survive-regeneration** — The
-  `<!-- testnux:row R-XX begin/end -->` pattern is gstack-shaped. We'd like
-  to propose a `gstack-marker` helper module in gstack core so other gstack
-  skills (e.g., `/plan-ceo-review`, `/design-review`) can reuse it.
-- **Per-test rate-limit isolation pattern** — The XFF approach in
-  `templates/spec.ts` (proven against production rate limiters) is universal
-  enough to land in gstack's `/qa` skill, not just TestNUX.
-- **Hash-chained sign-off log (HMAC-SHA256 + JSONL)** — `src/lib/uat-log.mjs`
-  could become a gstack utility for any skill that needs tamper-evident
-  attestation (e.g., `/ship` could sign release approvals).
-
-**If you're a gstack maintainer or contributor:** open an issue here
-referencing what you'd like to upstream — we'll co-write the PR.
-
-The gstack `/testnux` skill bundle is on the v0.3 roadmap — planned for inclusion
-in the official gstack skill catalog once shipped.
-
-### → Anthropic / Claude Code native team
-
-TestNUX is designed to be Claude-Code-friendly from day one. Three integration
-points where we'd love collaboration with Anthropic:
-
-- **MCP server registration** — v0.3 will ship a stdio MCP server exposing
-  TestNUX's commands as Claude Code tools. We'd like TestNUX listed in the
-  official Anthropic MCP server directory once it ships.
-- **Native skill catalog** — Once gstack's `/testnux` skill is upstream,
-  TestNUX commands become slash-command-callable in any Claude Code session.
-  An official cross-listing in Anthropic's skill marketplace (when it exists)
-  would amplify reach.
-- **Verified evidence chain pattern** — The `[VERIFY]` confidence marker
-  convention TestNUX uses for LLM-generated cells is generalizable to any
-  Claude-output workflow. We'd like to propose it as an Anthropic-blessed
-  pattern for AI-generated content in regulated contexts.
-
-**If you're at Anthropic** (Claude Code team, MCP team, applied AI
-engineering): reach out at `ccling1998@gmail.com`. We'd love a 30-min
-conversation about official integration paths. No expectations — just
-genuinely useful conversations.
-
-### → Everyone else
-
-Standard OSS contribution: see `CONTRIBUTING.md` for the DCO sign-off
-process. Issues + PRs welcome. First-time contributors: look for
-`good-first-issue` labels (we're seeding these as the project ages).
-
-The OSS gives users the SKILL. Co-developing the ecosystem is how the
-SKILL keeps getting sharper.
+The three-track discipline (`requirements/` + `sprint-log/` + `testing-log/`) and the multi-agent dispatch patterns are inspired by [gstack](https://github.com/garrytan/gstack) by Garry Tan. TestNUX is a standalone CLI — gstack is not a runtime dependency, just an inspiration for the workflow shape. Other credits: Playwright (evidence capture), IBM Trestle (OSCAL validation), NIST OSCAL (standards schema), Anthropic Claude (v0.2 LLM agents). Full attribution at [docs/credit.md](docs/credit.md). Upstream patterns we plan to contribute back live in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
