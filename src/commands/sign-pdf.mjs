@@ -64,7 +64,7 @@ export async function runSignPdf(surface, opts = {}) {
 
   // ── 3. Verify chain integrity ────────────────────────────────────────────
   const secret = process.env.UAT_SECRET;
-  let chainResult = { valid: true, brokenAt: null, errors: [] };
+  let chainResult;
 
   if (!secret) {
     // No secret: skip verification but note it

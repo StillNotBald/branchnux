@@ -276,7 +276,7 @@ function parseScaMarkdown(raw, surface, filePath) {
   const lines = body.split('\n');
 
   let currentControlId = null;
-  let currentControlTitle = null;
+  let currentControlTitle;
   let inDeclinedSection = false;
   let inSignOffSection  = false;
 
