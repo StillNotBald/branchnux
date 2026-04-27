@@ -157,19 +157,56 @@ The `demo` command downloads a prebuilt fixture, generates the HTML + XLSX, and 
 
 ## How TestNUX compares to alternatives
 
+TestNUX sits in the overlap of three established lanes. Honest comparisons against each:
+
+### vs. GRC compliance platforms
+
 |  | TestNUX | Vanta / Drata / Secureframe | Comp AI / Delve |
 |---|---|---|---|
 | **Distribution** | OSS CLI (Apache 2.0); local-first | Hosted SaaS, per-seat | Hosted SaaS / OSS hybrid |
 | **Where evidence lives** | Your git repo (markdown + screenshots + OSCAL JSON) | Vendor's cloud (lock-in) | Vendor's cloud |
-| **What it produces** | Test plans + RTM + SCA + UAT log | Continuous evidence collection + auditor portal | AI-drafted policies + auto-screenshot |
-| **Auditor handoff** | Export package (markdown + OSCAL); auditor reads in any tool | Auditor logs into their platform | Auditor logs into their platform |
-| **Pricing** | Free OSS forever; paid SaaS layer (planned v0.4+) | $8K-$50K+/yr per company | $$ per company |
-| **AI-assisted plan/test authoring** | v0.2 (opt-in, BYO Claude API key) | No (focus on policy + evidence) | Yes (core feature) |
-| **Federal compliance (OSCAL)** | v0.2 emit-native | Partial via integrations | Limited |
+| **What it produces** | Test plans + execution reports + RTM + SCA + signed UAT ledger | Continuous evidence collection + auditor portal | AI-drafted policies + auto-screenshot |
+| **Auditor handoff** | Export package (HTML + Excel + PDF + Markdown + OSCAL); auditor reads in any tool | Auditor logs into their platform | Auditor logs into their platform |
+| **Pricing** | Free OSS forever | $8K–$50K+/yr per company | $$ per company |
+| **AI-assisted plan/spec authoring** | Yes (opt-in, BYO Claude API key, [VERIFY] markers) | No (focus on policy + evidence) | Yes (core feature) |
+| **Federal compliance (OSCAL)** | Native emit (NIST 1.1.2) | Partial via integrations | Limited |
 | **Lock-in risk** | None (your data, your repo, exit anytime) | High (data lives in their DB) | Medium |
-| **Best fit** | Engineering / QA leads who run the CLI **and** the compliance / audit / legal / UAT consumers who read the artifacts. Teams that want git-native evidence + plain-format outputs (HTML / Excel / PDF / JSON / Markdown) every audience can open without a vendor login. | Teams that want a turnkey GRC dashboard for their CISO | Teams that want AI to write their policies for them |
+| **Best fit** | Engineering-led teams + their compliance/audit/legal/UAT counterparts who want plain-format outputs everyone can open without a vendor login | Teams that want a turnkey GRC dashboard for their CISO | Teams that want AI to write their policies for them |
 
-**Where TestNUX feeds into the others:** v0.2 will export your evidence package as OSCAL JSON (NIST 1.1.2) which Vanta/Drata/Secureframe/RegScale all import. TestNUX is the eng-side authoring layer; GRC platforms are the CISO dashboard layer. They're complementary, not competitive — pick TestNUX if you want git-native authorship; pick a GRC platform on TOP if you want a hosted dashboard for your CISO.
+### vs. test-management platforms
+
+|  | TestNUX | TestRail / Xray / Zephyr / qTest |
+|---|---|---|
+| **Distribution** | OSS CLI; data in your git repo | Hosted SaaS; data in vendor cloud |
+| **Test plan authoring** | Markdown + frontmatter (any editor, any IDE, any AI assistant) | Vendor UI required |
+| **Standards alignment built-in** | Yes — 7 industry bundles ship today (`general` / `ecommerce` / `edu` / `fintech` / `gov` / `healthcare` / `malaysia-banking`) | No (manual mapping required) |
+| **Traceability (R-XX → TC-XX → evidence → signoff)** | Deterministic generator (`testnux rtm`) | Manual matrix maintenance |
+| **AI plan/spec authoring** | Yes (Claude API, opt-in, [VERIFY] markers) | Some vendors are rolling out; quality varies |
+| **Audit-ready evidence package** | Yes — HMAC-chained signoff + OSCAL JSON + standards-alignment table baked in | No — they export TC results; you assemble the audit package separately |
+| **Pricing** | Free OSS | $20–50/user/month typical |
+| **Best fit** | Teams that already work in git and want tests + evidence + traceability in the same repo | Teams that need a multi-tenant test-management UI for non-technical testers without git access |
+
+### vs. OSS test-report generators
+
+|  | TestNUX | Allure / Playwright HTML reporter / Cucumber Reports / Mochawesome |
+|---|---|---|
+| **What it produces** | Audit-ready evidence package: HTML + XLSX + RTM + SCA + signoff PDF + OSCAL JSON | HTML pass/fail report from a test run |
+| **Standards alignment** | OWASP / WCAG / HIPAA / PCI / NIST / FedRAMP / BNM RMiT / etc. baked in | None — pure pass/fail rendering |
+| **Traceability matrix** | Generated from `REQUIREMENTS.md` + test plans | Not in scope |
+| **Signoff / attestation layer** | HMAC-chained ledger + tamper-evident PDF | Not in scope |
+| **AI-drafted plans / specs** | Yes (opt-in) | Not in scope |
+| **Pricing** | Free OSS | Free OSS |
+| **Best fit** | Teams that need regulator-ready evidence, not just test results | Teams that just want a pretty test-results page in CI |
+
+### Where TestNUX feeds into the others
+
+TestNUX is **complementary, not competitive**, with most of these:
+
+- **GRC platforms (Vanta / Drata / Secureframe / RegScale)** ingest TestNUX's OSCAL 1.1.2 JSON output. Pick TestNUX for engineering-side authorship; layer a GRC platform on TOP if your CISO wants a hosted dashboard.
+- **Test-management platforms (TestRail / Xray)** can ingest TestNUX's XLSX exports for non-technical reviewer flows. Or run TestNUX standalone and skip them.
+- **OSS test reporters (Allure / Playwright HTML)** can run alongside TestNUX in the same Playwright pipeline — TestNUX writes its evidence in `evidence/`, your reporter writes its HTML in `playwright-report/`. They don't conflict.
+
+What makes TestNUX different from any of them is the **combination**: git-native + standards-aligned + LLM-augmented + signoff-chained + audit-package-output. Each individual feature has a competitor; the bundle is the moat.
 
 ---
 
