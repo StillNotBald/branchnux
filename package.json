@@ -1,6 +1,6 @@
 {
   "name": "leapnux-5nux-monorepo",
-  "version": "0.4.0-alpha.1",
+  "version": "0.4.1-alpha.1",
   "description": "5-NUX — OSS anchor product for the LeapNuX methodology. Monorepo containing rootnux, trunknux, branchnux, leafnux, fruitnux + 6nux-core shared lib + 5nux meta-package.",
   "private": true,
   "license": "Apache-2.0",

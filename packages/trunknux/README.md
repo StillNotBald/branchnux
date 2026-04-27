@@ -1,16 +1,42 @@
 # @leapnux/trunknux
 
-Build-layer CLI for the 6-NUX taxonomy. Manages sprint scaffolding, build narratives, summaries.
+Build-layer CLI for the 6-NUX taxonomy. Manages sprint scaffolding, build narratives, and summaries.
 
-**Status:** v0.4.0-alpha.1 — package skeleton. Verbs ship in **v0.4.2**.
+**Status:** v0.4.1-alpha.1 — three verbs shipped: `new-sprint`, `summarize`, `lint`.
 
-## Planned verbs (v0.4.2)
+## Verbs
 
 ```
 trunknux new-sprint <slug>      # create date-prefixed sprint-log/<date>_<slug>/ folder
 trunknux summarize              # generate SPRINT_SUMMARY.md from git log
 trunknux lint                   # verify sprint folder structure conventions
 ```
+
+### `trunknux new-sprint <slug>`
+
+Creates `sprint-log/<YYYY-MM-DD>_<slug>/` with a scaffolded `README.md`.
+
+- Slug must be kebab-case (lowercase letters, digits, hyphens).
+- Idempotent: prints "Sprint folder already exists" and exits 0 if folder is present.
+- `--no-readme` — skip README scaffolding (create folder only).
+
+### `trunknux summarize`
+
+Generates `SPRINT_SUMMARY.md` in the most-recent (or named) sprint folder by grouping `git log` output into conventional-commit sections.
+
+- `--sprint <name>` — target a specific sprint slug.
+- `--since <YYYY-MM-DD>` — git log start date (default: sprint folder date).
+- `--until <YYYY-MM-DD>` — git log end date (default: today).
+- `--force` — overwrite an existing `SPRINT_SUMMARY.md`.
+
+### `trunknux lint`
+
+Validates every folder in `sprint-log/` against naming conventions and README structure.
+
+- Checks `<YYYY-MM-DD>_<kebab-slug>` folder name format with valid dates.
+- Checks that `README.md` exists and contains YAML frontmatter with `sprint:` and `date:` keys.
+- `--json` — machine-readable JSON output.
+- Exits 0 (clean), 1 (errors), or 2 (no sprint-log found).
 
 ## Where this fits
 

@@ -1,27 +1,49 @@
 #!/usr/bin/env node
 // trunknux CLI — build-layer of the 6-NUX taxonomy.
-// v0.4.0-alpha.1: skeleton package. Verbs ship in v0.4.2.
 
-const VERSION = '0.4.0-alpha.1';
+import { Command } from 'commander';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { newSprint } from '../src/commands/new-sprint.mjs';
+import { summarize } from '../src/commands/summarize.mjs';
+import { lint } from '../src/commands/lint.mjs';
 
-const message = `
-trunknux v${VERSION}
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const pkgPath = path.join(__dirname, '..', 'package.json');
+let version = '0.4.0-alpha.1';
+try {
+  version = JSON.parse(readFileSync(pkgPath, 'utf-8')).version ?? version;
+} catch {
+  // package.json not present — use default
+}
 
-  Status: SKELETON — package reserved, verbs not yet implemented.
-  Planned for v0.4.2:
+const program = new Command();
 
-    trunknux new-sprint <slug>   create date-prefixed sprint-log/<date>_<slug>/ folder
-    trunknux summarize           generate SPRINT_SUMMARY.md from git log
-    trunknux lint                verify sprint folder structure conventions
+program
+  .name('trunknux')
+  .description('trunknux — build layer of the 6-NUX taxonomy')
+  .version(version);
 
-  Where this fits in 6-NUX:
+program
+  .command('new-sprint <slug>')
+  .description('Create a date-prefixed sprint folder in sprint-log/')
+  .option('--no-readme', 'skip README.md scaffolding')
+  .action((slug, opts) => newSprint(slug, opts));
 
-    trunknux is the BUILD LAYER — sprint-log, build artifacts, what was grown.
-    See docs/6-NUX.md and project_5nux_product_plan for the full taxonomy.
+program
+  .command('summarize')
+  .description('Generate SPRINT_SUMMARY.md from git log for the latest (or named) sprint')
+  .option('--sprint <name>', 'sprint slug to summarize (without date prefix)')
+  .option('--since <YYYY-MM-DD>', 'git log start date (default: sprint folder date)')
+  .option('--until <YYYY-MM-DD>', 'git log end date (default: today)')
+  .option('--force', 'overwrite existing SPRINT_SUMMARY.md')
+  .action((opts) => summarize(opts));
 
-  Roadmap: https://github.com/StillNotBald/branchnux (repo will move to
-  github.com/leapnux/5nux when the leapnux org is claimed).
-`.trim();
+program
+  .command('lint')
+  .description('Validate sprint folder naming and README conventions')
+  .option('--json', 'machine-readable JSON output')
+  .action((opts) => lint(opts));
 
-console.log(message);
-process.exit(0);
+program.parse();
