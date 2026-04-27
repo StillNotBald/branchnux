@@ -6,7 +6,7 @@
  *
  * Implements the `testnux sca` subcommand group:
  *
- *   testnux sca init <surface> [--industry general|fintech|healthcare]
+ *   testnux sca init <surface> [--industry general|fintech|healthcare|malaysia-banking]
  *     Scaffold requirements/validations/<surface>/v1.0_<DATE>.md from the
  *     canonical 8-section SCA template.
  *

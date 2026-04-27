@@ -1,0 +1,318 @@
+{
+  "_comment": "Copyright 2026 Chu Ling - SPDX-License-Identifier: Apache-2.0",
+  "$schema": "https://github.com/StillNotBald/testnux/schemas/industry-standards.schema.json",
+  "version": "0.2.0",
+  "industry": "malaysia-banking",
+  "description": "Malaysian banking and financial services industry standards bundle. Covers the Personal Data Protection Act 2010 (Act 709) as amended by the Personal Data Protection (Amendment) Act 2024, Bank Negara Malaysia Risk Management in Technology (BNM RMiT 2020 with 2023 amendments), BNM Guidelines on the Provision of Electronic Banking Services, and the Cyber Security Act 2024 (Act 854). All controls are scoped to testable obligations on web and authentication surfaces (login, signup, transaction, account management). Shipped in TestNUX v0.2.",
+  "standards": [
+    {
+      "id": "PDPA-S5-General",
+      "name": "PDPA — General Principle: Lawful Processing",
+      "description": "Personal data SHALL NOT be processed unless at least one lawful basis exists: the data subject's consent, contract performance, compliance with a legal obligation, or protection of vital interests. Data users SHALL ensure that personal data is processed fairly and lawfully at all times. Processing for purposes incompatible with the original collection purpose is prohibited.",
+      "family": "PDPA 2010 (Act 709) — Section 5: General Principle",
+      "references": [
+        "Personal Data Protection Act 2010 (Act 709), Section 5",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=709"
+      ]
+    },
+    {
+      "id": "PDPA-S6-Notice",
+      "name": "PDPA — Notice and Choice Principle: Disclosure at Collection",
+      "description": "A data user SHALL inform the data subject, in writing and in both Bahasa Malaysia and English, of the purposes for which personal data is being processed, the data subject's right to request access and correction, and the class of third parties to whom data may be disclosed. Where personal data is collected via an online form or web interface, the notice SHALL be displayed before or at the point of data collection and SHALL include a mechanism for the data subject to withhold or withdraw consent.",
+      "family": "PDPA 2010 (Act 709) — Section 6: Notice and Choice Principle",
+      "references": [
+        "Personal Data Protection Act 2010 (Act 709), Section 6",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=709"
+      ]
+    },
+    {
+      "id": "PDPA-S7-Disclosure",
+      "name": "PDPA — Disclosure Principle: Restriction on Onward Transfer",
+      "description": "Personal data SHALL NOT be disclosed to third parties without the data subject's consent, unless disclosure is required or authorised by law. A data user operating a web application SHALL ensure that data shared with third-party integrations (analytics, payment processors, marketing platforms) is covered by explicit consent or a lawful exemption. Cross-border transfers of personal data are prohibited unless the destination jurisdiction is specified in the approved list or adequate safeguards are in place.",
+      "family": "PDPA 2010 (Act 709) — Section 7: Disclosure Principle",
+      "references": [
+        "Personal Data Protection Act 2010 (Act 709), Section 7",
+        "Personal Data Protection (Amendment) Act 2024",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=709"
+      ]
+    },
+    {
+      "id": "PDPA-S9-Security",
+      "name": "PDPA — Security Principle: Technical and Organisational Safeguards",
+      "description": "A data user SHALL take practical steps to protect personal data from any loss, misuse, modification, unauthorised or accidental access or disclosure, alteration or destruction. Security measures SHALL include technical controls applied at the application layer, such as encrypted transmission (TLS), access controls, and input validation. Financial institutions processing sensitive personal data SHOULD apply controls proportionate to the sensitivity of the data.",
+      "family": "PDPA 2010 (Act 709) — Section 9: Security Principle",
+      "references": [
+        "Personal Data Protection Act 2010 (Act 709), Section 9",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=709"
+      ]
+    },
+    {
+      "id": "PDPA-S10-Retention",
+      "name": "PDPA — Retention Principle: Data Not Kept Longer Than Necessary",
+      "description": "Personal data processed for any purpose SHALL NOT be kept longer than is necessary for the fulfilment of that purpose. Data users SHALL establish and enforce retention schedules and SHALL delete or anonymise personal data once the retention period expires. Web applications SHALL implement automated purging or anonymisation workflows where personal data is stored in user accounts, logs, or audit trails.",
+      "family": "PDPA 2010 (Act 709) — Section 10: Retention Principle",
+      "references": [
+        "Personal Data Protection Act 2010 (Act 709), Section 10",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=709"
+      ]
+    },
+    {
+      "id": "PDPA-S11-DataIntegrity",
+      "name": "PDPA — Data Integrity Principle: Accuracy and Completeness",
+      "description": "A data user SHALL take reasonable steps to ensure that personal data is accurate, complete, not misleading, and kept up-to-date, having regard to the purpose (including any directly related purpose) for which the personal data was collected and is to be further processed. Web-based financial applications SHALL provide authenticated users with a mechanism to view and correct their personal data.",
+      "family": "PDPA 2010 (Act 709) — Section 11: Data Integrity Principle",
+      "references": [
+        "Personal Data Protection Act 2010 (Act 709), Section 11",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=709"
+      ]
+    },
+    {
+      "id": "PDPA-S12-Access",
+      "name": "PDPA — Access Principle: Subject Access and Correction Rights",
+      "description": "A data subject SHALL have the right to request access to, and correction of, personal data held by the data user. A data user SHALL not deny access without lawful grounds, and SHALL process access requests within a reasonable timeframe. Web applications SHALL implement authenticated self-service portals or request workflows that enable data subjects to exercise access and correction rights without undue delay or cost.",
+      "family": "PDPA 2010 (Act 709) — Section 12: Access Principle",
+      "references": [
+        "Personal Data Protection Act 2010 (Act 709), Section 12",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=709"
+      ]
+    },
+    {
+      "id": "PDPA-2024-DPO",
+      "name": "PDPA 2024 Amendment — Mandatory Data Protection Officer",
+      "description": "The Personal Data Protection (Amendment) Act 2024 introduces a mandatory requirement for data users in prescribed classes (including financial institutions) to designate a Data Protection Officer (DPO). The DPO SHALL be responsible for ensuring compliance with the Act, handling data subject requests, and acting as the contact point with the Department of Personal Data Protection. The appointment and contact details of the DPO SHALL be published on the organisation's website or web application.",
+      "family": "PDPA 2010 (Act 709) as amended — Personal Data Protection (Amendment) Act 2024: Data Protection Officer",
+      "references": [
+        "Personal Data Protection (Amendment) Act 2024",
+        "Personal Data Protection Act 2010 (Act 709)",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=709"
+      ]
+    },
+    {
+      "id": "PDPA-2024-BreachNotification",
+      "name": "PDPA 2024 Amendment — 72-Hour Breach Notification",
+      "description": "The Personal Data Protection (Amendment) Act 2024 introduces mandatory breach notification obligations. Where a personal data breach occurs, the data user SHALL notify the Personal Data Protection Commissioner within 72 hours of becoming aware of the breach. The notification SHALL include the nature of the breach, categories of affected data subjects, likely consequences, and measures taken or proposed to mitigate the breach. Web application security monitoring SHALL be capable of detecting and escalating breach indicators within this response window.",
+      "family": "PDPA 2010 (Act 709) as amended — Personal Data Protection (Amendment) Act 2024: Breach Notification",
+      "references": [
+        "Personal Data Protection (Amendment) Act 2024",
+        "Personal Data Protection Act 2010 (Act 709)",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=709"
+      ]
+    },
+    {
+      "id": "PDPA-2024-Portability",
+      "name": "PDPA 2024 Amendment — Data Portability Rights",
+      "description": "The Personal Data Protection (Amendment) Act 2024 grants data subjects the right to request that their personal data be transmitted to another data user in a structured, commonly used, and machine-readable format where technically feasible. Financial institutions operating web portals SHALL implement data export mechanisms that satisfy this right upon authenticated request. The right SHALL apply to personal data provided by the data subject and processed on the basis of consent.",
+      "family": "PDPA 2010 (Act 709) as amended — Personal Data Protection (Amendment) Act 2024: Data Portability",
+      "references": [
+        "Personal Data Protection (Amendment) Act 2024",
+        "Personal Data Protection Act 2010 (Act 709)",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=709"
+      ]
+    },
+    {
+      "id": "BNM-RMiT-S10-2FA",
+      "name": "BNM RMiT — Internet Banking: Mandatory Two-Factor Authentication",
+      "description": "Financial institutions offering internet or mobile banking SHALL implement at least two-factor authentication (2FA) for customer login, combining something the customer knows (password or PIN) with something the customer possesses (one-time password via SMS, hardware token, or authenticator app) or an inherence factor (biometric). Single-factor authentication SHALL NOT be used as the sole authentication mechanism for access to transactional banking functions. 2FA SHALL be enforced for both initial login and when adding new payees or changing security credentials.",
+      "family": "BNM RMiT — Section 10: Internet and Mobile Banking Customer Authentication",
+      "references": [
+        "Bank Negara Malaysia, Risk Management in Technology (RMiT) Policy Document, Section 10",
+        "https://www.bnm.gov.my/documents/20124/963937/Risk+Management+in+Technology+%28RMiT%29.pdf"
+      ]
+    },
+    {
+      "id": "BNM-RMiT-S10-LoginAttempts",
+      "name": "BNM RMiT — Internet Banking: Login Attempt Limits and Account Lockout",
+      "description": "Financial institutions SHALL implement controls to limit the number of consecutive failed login attempts for internet and mobile banking channels. Accounts SHALL be locked or suspended after a defined number of failed attempts (typically three to five consecutive failures). Customers SHALL be notified of failed login attempts and account lockout via their registered contact channel. Unlocking procedures SHALL require re-authentication through a verified out-of-band method.",
+      "family": "BNM RMiT — Section 10: Internet and Mobile Banking",
+      "references": [
+        "Bank Negara Malaysia, Risk Management in Technology (RMiT) Policy Document, Section 10",
+        "https://www.bnm.gov.my/documents/20124/963937/Risk+Management+in+Technology+%28RMiT%29.pdf"
+      ]
+    },
+    {
+      "id": "BNM-RMiT-S10-SessionTimeout",
+      "name": "BNM RMiT — Internet Banking: Session Timeout",
+      "description": "Internet and mobile banking sessions SHALL be automatically terminated after a period of inactivity to protect customers from session hijacking. Financial institutions SHALL implement session timeout controls that enforce re-authentication after inactivity. Sessions SHALL also be invalidated upon explicit logout. Web applications SHALL not permit session tokens to remain valid indefinitely and SHALL enforce server-side session expiry.",
+      "family": "BNM RMiT — Section 10: Internet and Mobile Banking",
+      "references": [
+        "Bank Negara Malaysia, Risk Management in Technology (RMiT) Policy Document, Section 10",
+        "https://www.bnm.gov.my/documents/20124/963937/Risk+Management+in+Technology+%28RMiT%29.pdf"
+      ]
+    },
+    {
+      "id": "BNM-RMiT-S10-TransactionSigning",
+      "name": "BNM RMiT — Internet Banking: Transaction Signing for High-Value Transfers",
+      "description": "Financial institutions SHALL implement transaction signing or dynamic out-of-band authorisation for high-value financial transactions conducted through internet banking. The authorisation code or token SHALL be cryptographically bound to the specific transaction amount and beneficiary account such that modification of either parameter invalidates the authorisation. This control SHALL apply to fund transfers above the institution's defined high-value threshold.",
+      "family": "BNM RMiT — Section 10: Internet and Mobile Banking",
+      "references": [
+        "Bank Negara Malaysia, Risk Management in Technology (RMiT) Policy Document, Section 10",
+        "https://www.bnm.gov.my/documents/20124/963937/Risk+Management+in+Technology+%28RMiT%29.pdf"
+      ]
+    },
+    {
+      "id": "BNM-RMiT-S11-PasswordComplexity",
+      "name": "BNM RMiT — Customer Authentication: Password Complexity Requirements",
+      "description": "Financial institutions SHALL enforce password complexity requirements for customer credentials used to access banking web applications. Passwords SHALL meet a minimum length and include a combination of character types (uppercase, lowercase, numeric, and special characters) as defined in the institution's security policy. Weak or commonly used passwords SHALL be rejected at the point of account creation and password reset. Password history controls SHOULD prevent immediate reuse of recently used credentials.",
+      "family": "BNM RMiT — Section 11: Customer Authentication",
+      "references": [
+        "Bank Negara Malaysia, Risk Management in Technology (RMiT) Policy Document, Section 11",
+        "https://www.bnm.gov.my/documents/20124/963937/Risk+Management+in+Technology+%28RMiT%29.pdf"
+      ]
+    },
+    {
+      "id": "BNM-RMiT-S11-OTP",
+      "name": "BNM RMiT — Customer Authentication: OTP Controls",
+      "description": "One-time passwords (OTPs) used for customer authentication in internet banking SHALL be generated using a cryptographically secure method, be time-limited (typically valid for no more than five minutes), and be single-use. OTPs SHALL be delivered via a channel independent of the primary web session (out-of-band delivery). Expired or already-used OTPs SHALL be invalidated server-side and SHALL NOT be accepted.",
+      "family": "BNM RMiT — Section 11: Customer Authentication",
+      "references": [
+        "Bank Negara Malaysia, Risk Management in Technology (RMiT) Policy Document, Section 11",
+        "https://www.bnm.gov.my/documents/20124/963937/Risk+Management+in+Technology+%28RMiT%29.pdf"
+      ]
+    },
+    {
+      "id": "BNM-RMiT-S13-TLS",
+      "name": "BNM RMiT — Cryptography: Minimum TLS Version",
+      "description": "Financial institutions SHALL enforce a minimum of TLS 1.2 for all internet-facing web application connections. TLS 1.0 and TLS 1.1 SHALL be disabled. TLS 1.3 is the RECOMMENDED standard. Cipher suites that provide forward secrecy SHOULD be preferred. SSL and deprecated cipher suites (including those using RC4, DES, or 3DES) SHALL be disabled. Public-facing certificate deployments SHALL use certificates issued by a trusted certificate authority with a minimum key size of 2048 bits (RSA) or 256 bits (ECDSA).",
+      "family": "BNM RMiT — Section 13: Cryptography",
+      "references": [
+        "Bank Negara Malaysia, Risk Management in Technology (RMiT) Policy Document, Section 13",
+        "https://www.bnm.gov.my/documents/20124/963937/Risk+Management+in+Technology+%28RMiT%29.pdf"
+      ]
+    },
+    {
+      "id": "BNM-RMiT-S13-Encryption",
+      "name": "BNM RMiT — Cryptography: Encryption Standards for Data at Rest",
+      "description": "Financial institutions SHALL use AES-256 or equivalent approved encryption algorithms for protecting sensitive data at rest, including customer personal data, credentials, and financial records stored within web application databases and file systems. SHA-1 SHALL NOT be used for any new cryptographic operations including hashing of passwords, digital signatures, or certificate generation. SHA-256 or stronger algorithms SHALL be used in their place.",
+      "family": "BNM RMiT — Section 13: Cryptography",
+      "references": [
+        "Bank Negara Malaysia, Risk Management in Technology (RMiT) Policy Document, Section 13",
+        "https://www.bnm.gov.my/documents/20124/963937/Risk+Management+in+Technology+%28RMiT%29.pdf"
+      ]
+    },
+    {
+      "id": "BNM-RMiT-S14-LeastPrivilege",
+      "name": "BNM RMiT — Logical Access Control: Least Privilege and Segregation of Duties",
+      "description": "Financial institutions SHALL implement logical access controls based on the principle of least privilege, granting users the minimum level of access required to perform their assigned functions. Administrative and privileged access to banking web application components SHALL be segregated from regular user access and SHALL require additional authentication. Access rights SHALL be reviewed periodically and revoked promptly upon role change or termination. Segregation of duties SHALL be enforced to prevent any single individual from having end-to-end control over critical financial transactions.",
+      "family": "BNM RMiT — Section 14: Logical Access Control",
+      "references": [
+        "Bank Negara Malaysia, Risk Management in Technology (RMiT) Policy Document, Section 14",
+        "https://www.bnm.gov.my/documents/20124/963937/Risk+Management+in+Technology+%28RMiT%29.pdf"
+      ]
+    },
+    {
+      "id": "BNM-RMiT-S14-PrivilegedAccess",
+      "name": "BNM RMiT — Logical Access Control: Privileged Account Management",
+      "description": "Privileged accounts with administrative access to financial web application infrastructure, databases, and back-end systems SHALL be individually assigned, not shared, and SHALL require multi-factor authentication. Use of privileged accounts SHALL be logged and monitored. Generic or default administrator accounts provided by vendors SHALL be disabled or renamed before production deployment. Privileged session activity SHALL be subject to enhanced logging sufficient to support audit and forensic investigation.",
+      "family": "BNM RMiT — Section 14: Logical Access Control",
+      "references": [
+        "Bank Negara Malaysia, Risk Management in Technology (RMiT) Policy Document, Section 14",
+        "https://www.bnm.gov.my/documents/20124/963937/Risk+Management+in+Technology+%28RMiT%29.pdf"
+      ]
+    },
+    {
+      "id": "BNM-RMiT-S9-Logging",
+      "name": "BNM RMiT — Cybersecurity Operations: Security Event Logging and Monitoring",
+      "description": "Financial institutions SHALL implement centralised logging of security-relevant events across internet banking channels, including authentication events (successful and failed logins), session lifecycle events, privilege escalation, and transaction submissions. Logs SHALL be protected from unauthorised modification or deletion, retained for a minimum period as prescribed by BNM, and reviewed through continuous or periodic monitoring processes. Anomalous patterns indicative of credential stuffing, brute-force, or account takeover attempts SHALL trigger automated alerting.",
+      "family": "BNM RMiT — Section 9: Cybersecurity Operations",
+      "references": [
+        "Bank Negara Malaysia, Risk Management in Technology (RMiT) Policy Document, Section 9",
+        "https://www.bnm.gov.my/documents/20124/963937/Risk+Management+in+Technology+%28RMiT%29.pdf"
+      ]
+    },
+    {
+      "id": "BNM-RMiT-S17-OWASP",
+      "name": "BNM RMiT — Application Security: OWASP Top 10 Coverage",
+      "description": "Financial institutions SHALL assess and remediate web application vulnerabilities in accordance with recognised application security standards, including the OWASP Top 10. Controls SHALL address injection attacks (SQL, command, LDAP), broken authentication, sensitive data exposure, cross-site scripting (XSS), cross-site request forgery (CSRF), and security misconfiguration. Application vulnerability assessments SHALL be conducted at least annually and upon significant application changes.",
+      "family": "BNM RMiT — Section 17: Application Security",
+      "references": [
+        "Bank Negara Malaysia, Risk Management in Technology (RMiT) Policy Document, Section 17",
+        "OWASP Top 10",
+        "https://www.bnm.gov.my/documents/20124/963937/Risk+Management+in+Technology+%28RMiT%29.pdf"
+      ]
+    },
+    {
+      "id": "BNM-RMiT-S18-InputValidation",
+      "name": "BNM RMiT — Secure Development: Input Validation and Injection Prevention",
+      "description": "Financial institutions SHALL ensure that web applications validate all input received from untrusted sources (user-supplied data, API parameters, HTTP headers) against expected type, length, format, and range before processing. Parameterised queries or prepared statements SHALL be used exclusively for database interactions to prevent SQL injection. Output encoding SHALL be applied before rendering user-supplied content in HTML, JavaScript, or other contexts to prevent cross-site scripting. Security testing for injection vulnerabilities SHALL be part of the pre-production acceptance process.",
+      "family": "BNM RMiT — Section 18: Secure Development",
+      "references": [
+        "Bank Negara Malaysia, Risk Management in Technology (RMiT) Policy Document, Section 18",
+        "https://www.bnm.gov.my/documents/20124/963937/Risk+Management+in+Technology+%28RMiT%29.pdf"
+      ]
+    },
+    {
+      "id": "BNM-eBanking-CustomerAuth",
+      "name": "BNM e-Banking — Customer Authentication Strength",
+      "description": "Financial institutions providing electronic banking services SHALL ensure that customer authentication mechanisms are commensurate with the risk of the transaction or service being accessed. Authentication strength SHALL be escalated for high-risk activities such as beneficiary registration, limit changes, and high-value fund transfers. The authentication mechanism SHALL be resistant to phishing, man-in-the-middle, and replay attacks. Weak authentication mechanisms (static passwords alone) SHALL NOT be acceptable for transactional access.",
+      "family": "BNM Guidelines on the Provision of Electronic Banking Services — Customer Authentication",
+      "references": [
+        "Bank Negara Malaysia, Guidelines on the Provision of Electronic Banking Services, Section on Customer Authentication",
+        "https://www.bnm.gov.my/documents/20124/938430/Electronic+Banking+Guideline.pdf"
+      ]
+    },
+    {
+      "id": "BNM-eBanking-TransactionMonitoring",
+      "name": "BNM e-Banking — Transaction Monitoring",
+      "description": "Financial institutions SHALL implement real-time or near-real-time monitoring of electronic banking transactions to detect and respond to suspicious or anomalous activity. Transaction monitoring systems SHALL flag unusual patterns such as transactions outside normal operating hours, transactions to new or unrecognised beneficiaries, or transaction amounts significantly above a customer's historical profile. Customer notification via registered channels SHALL be triggered for designated high-value or suspicious transactions.",
+      "family": "BNM Guidelines on the Provision of Electronic Banking Services — Transaction Monitoring",
+      "references": [
+        "Bank Negara Malaysia, Guidelines on the Provision of Electronic Banking Services, Section on Transaction Monitoring",
+        "https://www.bnm.gov.my/documents/20124/938430/Electronic+Banking+Guideline.pdf"
+      ]
+    },
+    {
+      "id": "BNM-eBanking-ServiceAvailability",
+      "name": "BNM e-Banking — Service Availability SLA",
+      "description": "Financial institutions SHALL maintain internet and mobile banking service availability at levels consistent with BNM's prescribed SLA requirements and commensurate with customer expectations and contractual commitments. Planned and unplanned downtime SHALL be managed, logged, and reported in accordance with BNM incident reporting requirements. Recovery time objectives (RTO) and recovery point objectives (RPO) SHALL be defined, tested regularly, and met for internet banking services. Significant service disruptions SHALL be reported to BNM within the prescribed notification timeframe.",
+      "family": "BNM Guidelines on the Provision of Electronic Banking Services — Service Availability",
+      "references": [
+        "Bank Negara Malaysia, Guidelines on the Provision of Electronic Banking Services, Section on Service Availability",
+        "https://www.bnm.gov.my/documents/20124/938430/Electronic+Banking+Guideline.pdf"
+      ]
+    },
+    {
+      "id": "CSA-2024-S3-NCII",
+      "name": "CSA 2024 — NCII Designation: Banking Sector Obligations",
+      "description": "Under the Cyber Security Act 2024 (Act 854), banking and financial institutions are designated as National Critical Information Infrastructure (NCII) entities. NCII entities SHALL comply with mandatory cybersecurity requirements prescribed by the Chief Executive of the National Cyber Security Agency (NACSA), including implementation of the Cyber Security Code of Practice. Web applications and digital banking platforms operated by NCII entities are within the mandatory scope of these requirements.",
+      "family": "Cyber Security Act 2024 (Act 854) — Part III: National Critical Information Infrastructure",
+      "references": [
+        "Cyber Security Act 2024 (Act 854), Part III",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=854"
+      ]
+    },
+    {
+      "id": "CSA-2024-IncidentReporting",
+      "name": "CSA 2024 — Cybersecurity Incident Reporting to NACSA",
+      "description": "NCII entities (including banking institutions) SHALL report cybersecurity incidents to NACSA within the prescribed timeframe upon becoming aware of a cybersecurity incident affecting their systems. The incident report SHALL describe the nature and scope of the incident, affected systems, impact assessment, and remediation steps taken or planned. Web application compromises, data breaches, and significant authentication failures affecting customer-facing banking platforms qualify as reportable incidents under the Act.",
+      "family": "Cyber Security Act 2024 (Act 854) — Incident Reporting Obligations",
+      "references": [
+        "Cyber Security Act 2024 (Act 854)",
+        "National Cyber Security Agency (NACSA)",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=854",
+        "https://nacsa.gov.my"
+      ]
+    },
+    {
+      "id": "CSA-2024-CodeOfPractice",
+      "name": "CSA 2024 — Cyber Security Code of Practice Compliance",
+      "description": "NCII entities SHALL comply with the Cyber Security Code of Practice issued under the Cyber Security Act 2024. The Code prescribes minimum cybersecurity standards applicable to digital banking and financial services platforms, including controls over access management, vulnerability management, and secure application development. Entities SHALL conduct periodic assessments to verify compliance with the Code and SHALL remediate identified gaps within timeframes specified by NACSA.",
+      "family": "Cyber Security Act 2024 (Act 854) — Cyber Security Code of Practice",
+      "references": [
+        "Cyber Security Act 2024 (Act 854)",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=854",
+        "https://nacsa.gov.my"
+      ]
+    },
+    {
+      "id": "CSA-2024-AnnualAudit",
+      "name": "CSA 2024 — Mandatory Annual Cybersecurity Audit",
+      "description": "NCII entities SHALL conduct a mandatory cybersecurity audit at least once every 12 months to assess the effectiveness of cybersecurity controls applied to critical information infrastructure, including internet-facing banking platforms. The audit SHALL be conducted by a qualified cybersecurity auditor and SHALL assess compliance with the Cyber Security Code of Practice. Audit findings SHALL be reported to NACSA and SHALL be remediated within prescribed timelines. Web application penetration testing forms part of the audit scope for digital banking services.",
+      "family": "Cyber Security Act 2024 (Act 854) — Mandatory Cybersecurity Audit",
+      "references": [
+        "Cyber Security Act 2024 (Act 854)",
+        "https://lom.agc.gov.my/act-detail.php?language=BI&act=854",
+        "https://nacsa.gov.my"
+      ]
+    }
+  ]
+}

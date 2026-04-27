@@ -241,7 +241,7 @@ scaCmd
     'Scaffold requirements/validations/<surface>/v1.0_<DATE>.md from the canonical ' +
     '8-section SCA template. Human-edited sections survive subsequent generate runs.',
   )
-  .option('--industry <industry>', 'industry standards profile (general|fintech|healthcare)', 'general')
+  .option('--industry <industry>', 'industry standards profile (general|fintech|healthcare|malaysia-banking)', 'general')
   .option('--dry-run', 'print generated content to stdout without writing the file')
   .option('--config <path>', 'path to testnux.config.mjs')
   .option('--standards-version <version>', 'standards snapshot version recorded in frontmatter', '1.0.0')

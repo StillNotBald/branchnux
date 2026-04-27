@@ -32,6 +32,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BIN = path.resolve(__dirname, '..', 'bin', 'testnux.mjs');
 const NODE = process.execPath;
+const INDUSTRY_STANDARDS_DIR = path.resolve(__dirname, '..', 'src', 'config', 'industry-standards');
 
 /**
  * Run the CLI synchronously.
@@ -432,5 +433,56 @@ describe('global flags', () => {
     expect(jsonLines.length).toBeGreaterThanOrEqual(1);
     const parsed = JSON.parse(jsonLines[0]);
     expect(parsed).toHaveProperty('event');
+  });
+});
+
+// ── 8. malaysia-banking industry-standards config ─────────────────────────────
+
+describe('industry-standards: malaysia-banking bundle', () => {
+  const configPath = path.join(INDUSTRY_STANDARDS_DIR, 'malaysia-banking.json');
+
+  it('file exists and parses as valid JSON', () => {
+    expect(fs.existsSync(configPath)).toBe(true);
+    const raw = fs.readFileSync(configPath, 'utf-8');
+    expect(() => JSON.parse(raw)).not.toThrow();
+  });
+
+  it('has correct top-level shape (industry, version, standards)', () => {
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    expect(config.industry).toBe('malaysia-banking');
+    expect(config.version).toBe('0.2.0');
+    expect(Array.isArray(config.standards)).toBe(true);
+    expect(config.standards.length).toBeGreaterThan(0);
+  });
+
+  it('every control has id, name, description, family, and references', () => {
+    const { standards } = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    for (const ctrl of standards) {
+      expect(ctrl, `control missing id: ${JSON.stringify(ctrl)}`).toHaveProperty('id');
+      expect(ctrl, `control missing name (id=${ctrl.id})`).toHaveProperty('name');
+      expect(ctrl, `control missing description (id=${ctrl.id})`).toHaveProperty('description');
+      expect(ctrl, `control missing family (id=${ctrl.id})`).toHaveProperty('family');
+      expect(ctrl, `control missing references (id=${ctrl.id})`).toHaveProperty('references');
+      expect(Array.isArray(ctrl.references)).toBe(true);
+    }
+  });
+
+  it('has at least 8 PDPA-prefixed, 12 BNM-prefixed, 3 CSA-prefixed controls and >= 25 total', () => {
+    const { standards } = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    const pdpa = standards.filter((s) => s.id.startsWith('PDPA'));
+    const bnm  = standards.filter((s) => s.id.startsWith('BNM'));
+    const csa  = standards.filter((s) => s.id.startsWith('CSA'));
+    expect(pdpa.length).toBeGreaterThanOrEqual(8);
+    expect(bnm.length).toBeGreaterThanOrEqual(12);
+    expect(csa.length).toBeGreaterThanOrEqual(3);
+    expect(standards.length).toBeGreaterThanOrEqual(25);
+  });
+
+  it('contains no FirstLeap/Venezuela/PDVSA/EY/claims-portal references in any field', () => {
+    const raw = fs.readFileSync(configPath, 'utf-8');
+    const banned = ['FirstLeap', 'Venezuela', 'PDVSA', 'EY', 'claims-portal'];
+    for (const term of banned) {
+      expect(raw).not.toContain(term);
+    }
   });
 });
