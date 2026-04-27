@@ -1,0 +1,40 @@
+{
+  "name": "@leapnux/trunknux",
+  "version": "0.4.0-alpha.1",
+  "description": "trunknux — build-layer CLI for the 6-NUX taxonomy. Sprint scaffolding, summaries. Status: skeleton; verbs ship in v0.4.2.",
+  "license": "Apache-2.0",
+  "author": "Chu Ling",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StillNotBald/branchnux.git"
+  },
+  "homepage": "https://github.com/StillNotBald/branchnux#readme",
+  "bugs": {
+    "url": "https://github.com/StillNotBald/branchnux/issues"
+  },
+  "type": "module",
+  "bin": {
+    "trunknux": "bin/trunknux.mjs"
+  },
+  "files": [
+    "bin/",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@leapnux/6nux-core": "0.4.0-alpha.1"
+  },
+  "keywords": [
+    "leapnux",
+    "trunknux",
+    "6nux",
+    "sprint",
+    "build-log",
+    "scaffolding"
+  ]
+}

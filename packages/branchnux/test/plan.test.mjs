@@ -173,7 +173,14 @@ const { runPlan } = await import('../src/commands/plan.mjs');
 // for entries whose name includes the slug.  We create a date-prefixed subfolder
 // inside tmpDir so the out-dir scan picks it up without touching cwd.
 
-function writeScenarios(slug, content, datePrefix = '2026-04-27') {
+function writeScenarios(slug, content, datePrefix) {
+  // Default to today's date so scenarios and plan output land in the same
+  // date-prefixed subdirectory regardless of when the test runs (avoids
+  // a date-rollover failure when the suite was authored on day N but runs on day N+1).
+  if (!datePrefix) {
+    const now = new Date();
+    datePrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  }
   const subDir = path.join(tmpDir, `${datePrefix}_${slug}`);
   fs.mkdirSync(subDir, { recursive: true });
   const file = path.join(subDir, 'scenarios.md');

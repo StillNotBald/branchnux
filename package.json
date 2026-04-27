@@ -1,8 +1,8 @@
 {
-  "name": "branchnux",
-  "version": "0.3.0-alpha.1",
-  "description": "Generate auditor-ready test artifacts from markdown test plans and Playwright evidence. OSS evidence-chain for regulated software (test plans → RTM → SCA).",
-  "private": false,
+  "name": "leapnux-5nux-monorepo",
+  "version": "0.4.0-alpha.1",
+  "description": "5-NUX — OSS anchor product for the LeapNuX methodology. Monorepo containing rootnux, trunknux, branchnux, leafnux, fruitnux + 6nux-core shared lib + 5nux meta-package.",
+  "private": true,
   "license": "Apache-2.0",
   "author": "Chu Ling",
   "repository": {
@@ -13,75 +13,20 @@
   "bugs": {
     "url": "https://github.com/StillNotBald/branchnux/issues"
   },
-  "keywords": [
-    "testing",
-    "audit",
-    "compliance",
-    "playwright",
-    "soc2",
-    "nist",
-    "oscal",
-    "owasp",
-    "wcag",
-    "hipaa",
-    "test-report",
-    "evidence",
-    "traceability",
-    "rtm",
-    "sca",
-    "uat"
-  ],
   "type": "module",
-  "bin": {
-    "branchnux": "bin/branchnux.mjs"
-  },
-  "files": [
-    "bin/",
-    "src/",
-    "templates/",
-    "schemas/",
-    "scripts/lint-templates.mjs",
-    "LICENSE",
-    "NOTICE",
-    "README.md"
+  "workspaces": [
+    "packages/*"
   ],
   "engines": {
     "node": ">=20.0.0"
   },
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "lint": "eslint src/ bin/ test/",
-    "lint:fix": "eslint src/ bin/ test/ --fix",
-    "lint:templates": "node scripts/lint-templates.mjs",
-    "prepublishOnly": "npm test && npm run lint && npm run lint:templates"
-  },
-  "dependencies": {
-    "commander": "^14.0.3",
-    "exceljs": "^4.4.0",
-    "glob": "^13.0.6",
-    "gray-matter": "^4.0.3",
-    "isomorphic-dompurify": "^3.10.0",
-    "marked": "^18.0.2",
-    "sharp": "^0.34.5",
-    "uuid": "^14.0.0"
-  },
-  "optionalDependencies": {
-    "pixelmatch": "^6.0.0",
-    "pngjs": "^7.0.0"
-  },
-  "peerDependencies": {
-    "@anthropic-ai/sdk": "^0.91.1",
-    "@playwright/test": "^1.40.0"
-  },
-  "peerDependenciesMeta": {
-    "@anthropic-ai/sdk": {
-      "optional": true
-    },
-    "@playwright/test": {
-      "optional": true
-    }
+    "test": "npm run test --workspaces --if-present",
+    "test:watch": "npm run test:watch --workspace=@leapnux/branchnux",
+    "test:coverage": "npm run test:coverage --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "lint:templates": "npm run lint:templates --workspace=@leapnux/branchnux"
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.91.1",

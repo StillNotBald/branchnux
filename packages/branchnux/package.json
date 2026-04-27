@@ -1,0 +1,96 @@
+{
+  "name": "@leapnux/branchnux",
+  "version": "0.4.0-alpha.1",
+  "description": "Generate auditor-ready test artifacts from markdown test plans and Playwright evidence. OSS evidence-chain for regulated software (test plans → RTM → SCA).",
+  "private": false,
+  "license": "Apache-2.0",
+  "author": "Chu Ling",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StillNotBald/branchnux.git"
+  },
+  "homepage": "https://github.com/StillNotBald/branchnux#readme",
+  "bugs": {
+    "url": "https://github.com/StillNotBald/branchnux/issues"
+  },
+  "keywords": [
+    "testing",
+    "audit",
+    "compliance",
+    "playwright",
+    "soc2",
+    "nist",
+    "oscal",
+    "owasp",
+    "wcag",
+    "hipaa",
+    "test-report",
+    "evidence",
+    "traceability",
+    "rtm",
+    "sca",
+    "uat"
+  ],
+  "type": "module",
+  "bin": {
+    "branchnux": "bin/branchnux.mjs"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "templates/",
+    "schemas/",
+    "scripts/lint-templates.mjs",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/ bin/ test/",
+    "lint:fix": "eslint src/ bin/ test/ --fix",
+    "lint:templates": "node scripts/lint-templates.mjs",
+    "prepublishOnly": "npm test && npm run lint && npm run lint:templates"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "exceljs": "^4.4.0",
+    "glob": "^13.0.6",
+    "gray-matter": "^4.0.3",
+    "isomorphic-dompurify": "^3.10.0",
+    "marked": "^18.0.2",
+    "sharp": "^0.34.5",
+    "uuid": "^14.0.0"
+  },
+  "optionalDependencies": {
+    "pixelmatch": "^6.0.0",
+    "pngjs": "^7.0.0"
+  },
+  "peerDependencies": {
+    "@anthropic-ai/sdk": "^0.91.1",
+    "@playwright/test": "^1.40.0"
+  },
+  "peerDependenciesMeta": {
+    "@anthropic-ai/sdk": {
+      "optional": true
+    },
+    "@playwright/test": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^0.91.1",
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^4.1.5",
+    "eslint": "^10.2.1",
+    "vitest": "^4.1.5"
+  }
+}

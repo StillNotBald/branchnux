@@ -1,0 +1,41 @@
+{
+  "name": "@leapnux/rootnux",
+  "version": "0.4.0-alpha.1",
+  "description": "rootnux — intent-layer CLI for the 6-NUX taxonomy. Specs (R-XX), ADRs, decisions, risks. Status: skeleton; verbs ship in v0.4.1.",
+  "license": "Apache-2.0",
+  "author": "Chu Ling",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StillNotBald/branchnux.git"
+  },
+  "homepage": "https://github.com/StillNotBald/branchnux#readme",
+  "bugs": {
+    "url": "https://github.com/StillNotBald/branchnux/issues"
+  },
+  "type": "module",
+  "bin": {
+    "rootnux": "bin/rootnux.mjs"
+  },
+  "files": [
+    "bin/",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@leapnux/6nux-core": "0.4.0-alpha.1"
+  },
+  "keywords": [
+    "leapnux",
+    "rootnux",
+    "6nux",
+    "requirements",
+    "adr",
+    "rtm",
+    "compliance"
+  ]
+}

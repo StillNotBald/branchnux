@@ -1,0 +1,42 @@
+{
+  "name": "@leapnux/6nux-core",
+  "version": "0.4.0-alpha.1",
+  "description": "Shared core for the 6-NUX product family — schemas, file conventions, validators, ID generators. Internal to LeapNuX 5-NUX/6-NUX packages; not intended for direct end-user use.",
+  "license": "Apache-2.0",
+  "author": "Chu Ling",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StillNotBald/branchnux.git"
+  },
+  "homepage": "https://github.com/StillNotBald/branchnux#readme",
+  "bugs": {
+    "url": "https://github.com/StillNotBald/branchnux/issues"
+  },
+  "type": "module",
+  "main": "src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./conventions": "./src/conventions.mjs",
+    "./schemas": "./src/schemas.mjs",
+    "./ids": "./src/ids.mjs",
+    "./utils": "./src/utils.mjs",
+    "./validators": "./src/validators.mjs"
+  },
+  "files": [
+    "src/",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "leapnux",
+    "6nux",
+    "core",
+    "schemas",
+    "validators"
+  ]
+}
