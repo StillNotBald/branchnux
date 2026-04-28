@@ -29,6 +29,7 @@ import {
   verifyChain,
   getLatest,
   hmac,
+  _canonicalJSON,
 } from '../src/lib/uat-log.mjs';
 
 // ── Test fixtures ─────────────────────────────────────────────────────────────
@@ -110,11 +111,39 @@ describe('appendEntry — basic behaviour', () => {
     expect(entry.prev_hash).toBe(expectedPrevHash);
   });
 
-  it('TC-UAT-02: first entry signature is HMAC(tc_id|status|reviewer|ts)', () => {
+  it('TC-UAT-02: first entry signature uses v2 contract — HMAC(canonicalJSON(entry))', () => {
+    // v2 signs the canonical JSON of the full entry (all fields except
+    // `signature` itself, keys sorted alphabetically). This covers
+    // reviewer_role, justification, and prev_hash — fields that v1 left unsigned.
     const entry = appendEntry(logPath, ENTRY_A, SECRET);
-    const sigInput = [entry.tc_id, entry.status, entry.reviewer, entry.ts].join('|');
-    const expectedSig = hmac(SECRET, sigInput);
+    const expectedSig = hmac(SECRET, _canonicalJSON(entry));
     expect(entry.signature).toBe(expectedSig);
+    // Also confirm it does NOT equal the old v1 contract (tc_id|status|reviewer|ts)
+    const v1Input = [entry.tc_id, entry.status, entry.reviewer, entry.ts].join('|');
+    expect(entry.signature).not.toBe(hmac(SECRET, v1Input));
+  });
+
+  it('TC-UAT-02b: verifyChain rejects a chain containing a v1-signed entry', () => {
+    // Manually craft a v1-signed entry to simulate a legacy log
+    const ts = new Date().toISOString();
+    const v1SigInput = ['TC-LEGACY', 'PASS', 'legacy-reviewer', ts].join('|');
+    const v1Entry = {
+      tc_id: 'TC-LEGACY',
+      status: 'PASS',
+      reviewer: 'legacy-reviewer',
+      reviewer_role: 'QA',
+      justification: '',
+      ts,
+      prev_hash: hmac(SECRET, ''), // valid empty-hash sentinel
+      signature_version: 1,
+      signature: hmac(SECRET, v1SigInput),
+    };
+    fs.appendFileSync(logPath, JSON.stringify(v1Entry) + '\n', 'utf-8');
+
+    const result = verifyChain(logPath, SECRET);
+    expect(result.valid).toBe(false);
+    expect(result.brokenAt).toBe(1);
+    expect(result.errors[0]).toMatch(/v1|signature_version|minimum accepted/i);
   });
 
   it('TC-UAT-03: second entry prev_hash = HMAC(secret, raw-JSON-of-first-entry)', () => {

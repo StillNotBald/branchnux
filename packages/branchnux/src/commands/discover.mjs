@@ -33,6 +33,8 @@
 
 import path from 'path';
 import fs from 'fs';
+import net from 'net';
+import dns from 'dns/promises';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -97,15 +99,15 @@ export async function runDiscover(url, opts = {}) {
       err.exitCode = 1;
       throw err;
     }
-    // Reject AWS metadata IP and other link-local addresses (basic SSRF guard)
-    const host = parsed.hostname.toLowerCase();
-    const BLOCKED_HOSTS = ['169.254.169.254', 'metadata.google.internal', 'metadata.internal'];
-    if (BLOCKED_HOSTS.includes(host)) {
-      printError(json, `URL host "${parsed.hostname}" is blocked (SSRF protection).`);
-      const err = new Error(`Blocked host: ${parsed.hostname}`);
-      err.exitCode = 1;
-      throw err;
-    }
+    // SSRF guard: reject loopback, link-local, private (RFC1918), unique-local
+    // (ULA), and known cloud-metadata hostnames. Resolve DNS so that an
+    // attacker cannot bypass this with a hostname that resolves into the
+    // blocked ranges. Re-resolution at fetch time would still leave a TOCTOU
+    // window — discover only fetches once, immediately after this check, so
+    // the residual window is acceptable. Future hardening: pass the resolved
+    // IP into the fetch via a custom agent.
+    const ssrfErr = await _ssrfCheck(parsed, json);
+    if (ssrfErr) throw ssrfErr;
   }
 
   // ── Step 1: Check CLAUDE_API_KEY ──────────────────────────────────────────
@@ -847,6 +849,205 @@ function ensureVerifyMarkers(text) {
 function countTCs(content) {
   const matches = content.match(/^#{2,3}\s+TC-/gm);
   return matches ? matches.length : 0;
+}
+
+// ── SSRF Guard ────────────────────────────────────────────────────────────────
+
+/**
+ * SSRF guard: resolves the hostname of `parsedUrl` via DNS and rejects any IP
+ * that falls in a blocked range (loopback, link-local, RFC1918, ULA, cloud
+ * metadata, multicast).
+ *
+ * Returns `null` when safe, or an `Error` (with `.exitCode = 1`) when blocked.
+ *
+ * @param {URL}     parsedUrl   - already-validated URL object
+ * @param {boolean} jsonOutput  - when true, caller formats the error as JSON
+ * @returns {Promise<Error|null>}
+ */
+async function _ssrfCheck(parsedUrl, jsonOutput) {
+  const hostname = parsedUrl.hostname;
+
+  // If the hostname is a bare IP literal, validate it directly (no DNS needed)
+  const literalKind = net.isIP(hostname); // 0=not-IP, 4=IPv4, 6=IPv6
+  if (literalKind !== 0) {
+    const blocked = _isBlockedIp(hostname, literalKind === 6);
+    if (blocked) {
+      printError(jsonOutput,
+        `SSRF: URL resolves to a blocked IP address (${hostname}).\n\n` +
+        `  ${blocked}\n\n` +
+        '  discover only fetches publicly-routable Internet hosts.',
+      );
+      const err = new Error(`SSRF blocked: ${hostname} — ${blocked}`);
+      err.exitCode = 1;
+      return err;
+    }
+    return null;
+  }
+
+  // Resolve hostname to IPv4 + IPv6 addresses
+  let addrs = [];
+  try {
+    const [v4, v6] = await Promise.allSettled([
+      dns.resolve4(hostname),
+      dns.resolve6(hostname),
+    ]);
+    if (v4.status === 'fulfilled') addrs = addrs.concat(v4.value);
+    if (v6.status === 'fulfilled') addrs = addrs.concat(v6.value);
+  } catch {
+    // DNS failure is not an SSRF risk — let the subsequent fetch() surface it
+    return null;
+  }
+
+  if (addrs.length === 0) {
+    // No addresses resolved — let the subsequent fetch() fail naturally
+    return null;
+  }
+
+  for (const addr of addrs) {
+    const isV6 = net.isIPv4(addr) === false && net.isIP(addr) === 6;
+    const blocked = _isBlockedIp(addr, isV6);
+    if (blocked) {
+      printError(jsonOutput,
+        `SSRF: "${hostname}" resolves to a blocked IP (${addr}).\n\n` +
+        `  ${blocked}\n\n` +
+        '  discover only fetches publicly-routable Internet hosts.',
+      );
+      const err = new Error(`SSRF blocked: ${hostname} → ${addr} — ${blocked}`);
+      err.exitCode = 1;
+      return err;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Returns a descriptive reason string if `addr` is in a blocked range, or
+ * `null` if the address is publicly routable.
+ *
+ * Blocked ranges (IPv4):
+ *   - 127.0.0.0/8      Loopback
+ *   - 10.0.0.0/8       RFC 1918 private
+ *   - 172.16.0.0/12    RFC 1918 private
+ *   - 192.168.0.0/16   RFC 1918 private
+ *   - 169.254.0.0/16   Link-local / cloud metadata (AWS 169.254.169.254,
+ *                       Alibaba 100.100.100.200 handled separately below)
+ *   - 100.64.0.0/10    Shared address space (RFC 6598) — carrier-grade NAT;
+ *                       also covers Alibaba metadata 100.100.100.200
+ *   - 0.0.0.0/8        "This" network
+ *   - 240.0.0.0/4      Reserved
+ *   - 224.0.0.0/4      Multicast
+ *
+ * Blocked ranges (IPv6):
+ *   - ::1/128          Loopback
+ *   - fe80::/10        Link-local
+ *   - fc00::/7         Unique-local (ULA)
+ *   - ff00::/8         Multicast
+ *
+ * @param {string}  addr  - IP address string
+ * @param {boolean} isV6  - true if addr is IPv6
+ * @returns {string|null}
+ */
+function _isBlockedIp(addr, isV6) {
+  // ── Explicit known cloud metadata IPs ──────────────────────────────────────
+  if (addr === '169.254.169.254') return 'AWS EC2 instance metadata service (169.254.169.254)';
+  if (addr === '100.100.100.200') return 'Alibaba Cloud instance metadata service (100.100.100.200)';
+
+  if (isV6) {
+    return _isBlockedIpV6(addr);
+  }
+  return _isBlockedIpV4(addr);
+}
+
+/**
+ * IPv4 range checks using bitmask arithmetic.
+ * @param {string} addr
+ * @returns {string|null}
+ */
+function _isBlockedIpV4(addr) {
+  // Convert dotted-decimal → 32-bit unsigned integer
+  const parts = addr.split('.');
+  if (parts.length !== 4) return null;
+  const n = parts.reduce((acc, p) => {
+    const octet = parseInt(p, 10);
+    if (isNaN(octet) || octet < 0 || octet > 255) return NaN;
+    return (acc * 256 + octet) >>> 0;
+  }, 0);
+  if (isNaN(n)) return null;
+
+  // 127.0.0.0/8  — Loopback
+  if ((n >>> 24) === 127) return 'loopback (127.0.0.0/8)';
+  // 10.0.0.0/8   — RFC 1918 private
+  if ((n >>> 24) === 10) return 'RFC 1918 private network (10.0.0.0/8)';
+  // 172.16.0.0/12 — RFC 1918 private
+  if ((n >>> 20) === (0xAC1 >>> 0)) return 'RFC 1918 private network (172.16.0.0/12)';
+  // 192.168.0.0/16 — RFC 1918 private
+  if ((n >>> 16) === 0xC0A8) return 'RFC 1918 private network (192.168.0.0/16)';
+  // 169.254.0.0/16 — Link-local / AWS metadata range
+  if ((n >>> 16) === 0xA9FE) return 'link-local / cloud metadata range (169.254.0.0/16)';
+  // 100.64.0.0/10  — Shared address space / Alibaba metadata
+  if ((n >>> 22) === (0x64400000 >>> 22)) return 'shared address space / carrier-grade NAT (100.64.0.0/10)';
+  // 0.0.0.0/8 — "This" network
+  if ((n >>> 24) === 0) return '"this" network (0.0.0.0/8)';
+  // 240.0.0.0/4 — Reserved
+  if ((n >>> 28) === 0xF) return 'reserved address space (240.0.0.0/4)';
+  // 224.0.0.0/4 — Multicast
+  if ((n >>> 28) === 0xE) return 'multicast (224.0.0.0/4)';
+
+  return null;
+}
+
+/**
+ * IPv6 range checks.
+ * @param {string} addr
+ * @returns {string|null}
+ */
+function _isBlockedIpV6(addr) {
+  const normalized = addr.toLowerCase().replace(/^\[|\]$/g, '');
+
+  // ::1 — Loopback
+  if (normalized === '::1' || normalized === '0:0:0:0:0:0:0:1') return 'loopback (::1)';
+
+  // For prefix checks we expand the address to full 8-group form
+  const expanded = _expandIPv6(normalized);
+  if (!expanded) return null;
+
+  // fe80::/10 — Link-local: first 10 bits are 1111111010
+  // Groups[0] starts with fe8x – febx
+  const g0 = parseInt(expanded[0], 16);
+  if ((g0 & 0xFFC0) === 0xFE80) return 'link-local (fe80::/10)';
+
+  // fc00::/7 — ULA: first 7 bits are 1111110
+  if ((g0 & 0xFE00) === 0xFC00) return 'unique-local address (ULA) (fc00::/7)';
+
+  // ff00::/8 — Multicast
+  if ((g0 & 0xFF00) === 0xFF00) return 'multicast (ff00::/8)';
+
+  return null;
+}
+
+/**
+ * Expand an IPv6 address to 8 groups of 4 hex digits.
+ * Returns null on parse error.
+ * @param {string} addr
+ * @returns {string[]|null}
+ */
+function _expandIPv6(addr) {
+  // Handle :: expansion
+  const halves = addr.split('::');
+  if (halves.length > 2) return null;
+
+  let left  = halves[0] ? halves[0].split(':') : [];
+  let right = halves.length === 2 && halves[1] ? halves[1].split(':') : [];
+
+  const missing = 8 - left.length - right.length;
+  if (missing < 0) return null;
+
+  const middle = Array(missing).fill('0');
+  const groups = [...left, ...middle, ...right];
+  if (groups.length !== 8) return null;
+
+  return groups.map((g) => g.padStart(4, '0'));
 }
 
 // ── Utility Helpers ───────────────────────────────────────────────────────────

@@ -8,13 +8,19 @@
  *
  * Each JSONL line is a sign-off entry:
  *   { tc_id, status, reviewer, reviewer_role, justification,
- *     ts, prev_hash, signature }
+ *     ts, prev_hash, signature, signature_version }
  *
- * The chain guarantee:
- *   prev_hash — HMAC-SHA256 of the raw JSON string of the previous entry
- *   signature — HMAC-SHA256 of (tc_id + "|" + status + "|" + reviewer + "|" + ts)
+ * Signature versions:
+ *   v1 (legacy): signature = HMAC-SHA256(secret, "tc_id|status|reviewer|ts")
+ *                — does NOT cover reviewer_role, justification, prev_hash.
+ *   v2 (current): signature = HMAC-SHA256(secret, canonicalJSON(entry without signature/signature_version))
+ *                — covers every field including prev_hash.
  *
- * Both MACs use the project's UAT_SECRET env var.
+ * verifyChain() REJECTS v1 entries (MIN_ACCEPTED_VERSION = 2). v1 chains must
+ * be re-signed with v2 before they can be verified. New entries always use v2.
+ *
+ * All signature/prev_hash equality checks use crypto.timingSafeEqual to prevent
+ * timing-side-channel attacks against attestation chains.
  *
  * Chain integrity means:
  *   - Entries cannot be removed without detection (prev_hash breaks).
@@ -26,6 +32,16 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
+const SIGNATURE_VERSION = 2;
+
+/**
+ * Minimum accepted signature version for chain verification.
+ * v1 signatures only covered tc_id|status|reviewer|ts, leaving reviewer_role,
+ * justification, and prev_hash unsigned — a material integrity gap.
+ * Chains containing v1 entries are rejected rather than silently downgraded.
+ */
+const MIN_ACCEPTED_VERSION = 2;
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /**
@@ -34,7 +50,7 @@ import crypto from 'crypto';
  * @param {string} jsonlPath  - absolute or relative path to the .jsonl file
  * @param {object} entry      - { tc_id, status, reviewer, reviewer_role, justification? }
  * @param {string} secret     - HMAC secret (typically process.env.UAT_SECRET)
- * @returns {object}          - the full entry that was written (with ts, prev_hash, signature)
+ * @returns {object}          - the full entry that was written (with ts, prev_hash, signature, signature_version)
  */
 export function appendEntry(jsonlPath, entry, secret) {
   if (!secret) throw new UatLogError('UAT_SECRET is required for signing log entries', 2);
@@ -43,14 +59,10 @@ export function appendEntry(jsonlPath, entry, secret) {
   if (!entry.reviewer) throw new UatLogError('entry.reviewer is required', 2);
   if (!entry.reviewer_role) throw new UatLogError('entry.reviewer_role is required', 2);
 
-  // Ensure directory exists
   fs.mkdirSync(path.dirname(path.resolve(jsonlPath)), { recursive: true });
 
   const ts = new Date().toISOString();
   const prevHash = _computePrevHash(jsonlPath, secret);
-
-  const sigInput = [entry.tc_id, entry.status, entry.reviewer, ts].join('|');
-  const signature = hmac(secret, sigInput);
 
   const fullEntry = {
     tc_id: entry.tc_id,
@@ -60,8 +72,9 @@ export function appendEntry(jsonlPath, entry, secret) {
     justification: entry.justification ?? '',
     ts,
     prev_hash: prevHash,
-    signature,
+    signature_version: SIGNATURE_VERSION,
   };
+  fullEntry.signature = hmac(secret, _canonicalJSON(fullEntry));
 
   fs.appendFileSync(jsonlPath, JSON.stringify(fullEntry) + '\n', 'utf-8');
   return fullEntry;
@@ -81,7 +94,7 @@ export function verifyChain(jsonlPath, secret) {
   if (lines.length === 0) return { valid: true, brokenAt: null, errors: [] };
 
   const errors = [];
-  let prevRawJson = null; // raw JSON string of the previous entry
+  let prevRawJson = null;
 
   for (let i = 0; i < lines.length; i++) {
     const raw = lines[i];
@@ -93,12 +106,11 @@ export function verifyChain(jsonlPath, secret) {
       return { valid: false, brokenAt: i + 1, errors };
     }
 
-    // Verify prev_hash
     const expectedPrevHash = prevRawJson === null
       ? _emptyHash(secret)
       : hmac(secret, prevRawJson);
 
-    if (entry.prev_hash !== expectedPrevHash) {
+    if (!_safeEqual(entry.prev_hash, expectedPrevHash)) {
       errors.push(
         `Line ${i + 1} (${entry.tc_id}): prev_hash mismatch — chain broken. ` +
         `Expected ${expectedPrevHash.slice(0, 8)}… got ${String(entry.prev_hash).slice(0, 8)}…`
@@ -106,10 +118,21 @@ export function verifyChain(jsonlPath, secret) {
       return { valid: false, brokenAt: i + 1, errors };
     }
 
-    // Verify signature
-    const sigInput = [entry.tc_id, entry.status, entry.reviewer, entry.ts].join('|');
-    const expectedSig = hmac(secret, sigInput);
-    if (entry.signature !== expectedSig) {
+    // Reject v1 entries — they only sign tc_id|status|reviewer|ts, leaving
+    // reviewer_role, justification, and prev_hash unsigned.
+    const entryVersion = entry.signature_version ?? 1;
+    if (entryVersion < MIN_ACCEPTED_VERSION) {
+      errors.push(
+        `Line ${i + 1} (${entry.tc_id}): signature_version ${entryVersion} is below ` +
+        `minimum accepted version ${MIN_ACCEPTED_VERSION}. ` +
+        'v1 signatures do not cover reviewer_role, justification, or prev_hash. ' +
+        'Re-sign this chain with v2 to restore chain integrity.'
+      );
+      return { valid: false, brokenAt: i + 1, errors };
+    }
+
+    const expectedSig = _expectedSignature(entry, secret);
+    if (!_safeEqual(entry.signature, expectedSig)) {
       errors.push(
         `Line ${i + 1} (${entry.tc_id}): signature mismatch — entry may have been tampered.`
       );
@@ -158,6 +181,55 @@ export function hmac(secret, data) {
 }
 
 /**
+ * Constant-time hex-string comparison.
+ * Returns false for any length mismatch or non-string input without leaking timing.
+ */
+function _safeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (a.length !== b.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(a, 'hex'), Buffer.from(b, 'hex'));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Canonical JSON serialization for signing.
+ * Keys sorted alphabetically; signature field excluded (signature_version
+ * IS included so it is part of the signed payload).
+ *
+ * Exported for use in tests and external tooling.
+ */
+export function _canonicalJSON(entry) {
+  const { signature: _s, ...rest } = entry; // eslint-disable-line no-unused-vars
+  const sortedKeys = Object.keys(rest).sort();
+  const sorted = {};
+  for (const k of sortedKeys) sorted[k] = rest[k];
+  return JSON.stringify(sorted);
+}
+
+/**
+ * Compute the expected signature for a stored entry.
+ * Only v2+ signatures are accepted.
+ * v2 (current): HMAC over canonical JSON of the full entry (all fields
+ * except signature itself, keys sorted alphabetically).
+ *
+ * @throws {UatLogError} if entry.signature_version < MIN_ACCEPTED_VERSION
+ */
+function _expectedSignature(entry, secret) {
+  const version = entry.signature_version ?? 1;
+  if (version < MIN_ACCEPTED_VERSION) {
+    throw new UatLogError(
+      `v1 signatures are no longer accepted; please re-sign with v2. ` +
+      `(entry tc_id=${entry.tc_id}, signature_version=${version})`,
+      1,
+    );
+  }
+  return hmac(secret, _canonicalJSON(entry));
+}
+
+/**
  * The prev_hash for the very first entry in a log is HMAC of the empty string.
  * This is a deterministic sentinel — verifiers reproduce it without state.
  */
@@ -172,7 +244,6 @@ function _emptyHash(secret) {
 function _computePrevHash(jsonlPath, secret) {
   const lines = readLines(jsonlPath);
   if (lines.length === 0) return _emptyHash(secret);
-  // prev_hash = HMAC of the raw JSON string of the last line (not the parsed object).
   const lastRaw = lines[lines.length - 1];
   return hmac(secret, lastRaw);
 }
