@@ -31,9 +31,9 @@ npm install -g @leapnux/5nux
 | `branchnux validate <surface>` | Lint a testing-log folder against the schema. |
 | `branchnux rtm` | Regenerate `requirements/TRACEABILITY.md` from REQUIREMENTS.md + sprint folders + source code annotations + test files. |
 | `branchnux sca <surface>` | Generate Security Control Assessment (8 standard sections, regulator-ready). |
-| `branchnux sca-oscal <surface>` | Emit NIST OSCAL 1.1.2 JSON for FedRAMP / SOC 2 / GRC platform ingest. |
+| `branchnux sca oscal <surface>` | Emit NIST OSCAL 1.1.2 JSON for FedRAMP / SOC 2 / GRC platform ingest. |
 | `branchnux sign <surface>` | HMAC-chained tamper-evident attestation; appends to `uat-log.jsonl`. |
-| `branchnux sign-pdf <surface>` | PDF rendering of the signed attestation packet. |
+| `branchnux sign pdf <surface>` | PDF rendering of the signed attestation packet. |
 | `branchnux visual <surface>` | Visual regression diff against baseline screenshots. |
 | `branchnux br <id>` | Cross-link Business Requirements (BR-XX) ↔ R-XX in the RTM. |
 | `branchnux doctor` | Diagnose installed dependencies (Node, Playwright, optional peer deps). |
@@ -48,7 +48,7 @@ Run `<verb> --help` for the full flag surface, or see [docs/reference.md](https:
 - `--max-spend <USD>` — abort mid-run if cost exceeds the cap.
 - `--json` — structured output for downstream agent processing.
 
-Set `CLAUDE_API_KEY` environment variable to enable. Deterministic-core verbs (`init`, `report`, `validate`, `rtm`, `sca-oscal`, `sign`, `sign-pdf`, `visual`, `br`, `doctor`) make zero network calls and require no API key.
+Set `CLAUDE_API_KEY` environment variable to enable. Deterministic-core verbs (`init`, `report`, `validate`, `rtm`, `sca oscal`, `sign`, `sign pdf`, `visual`, `br`, `doctor`) make zero network calls and require no API key.
 
 ## The `[VERIFY]` marker contract
 

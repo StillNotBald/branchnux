@@ -27,7 +27,7 @@ What you get, concretely:
 |---|---|
 | `branchnux rtm` | Requirements Traceability Matrix regenerated from REQUIREMENTS.md + sprint folders + source-code annotations + test files |
 | `branchnux sca <surface>` | Security Control Assessment (8 standard sections, regulator-ready) |
-| `branchnux sca-oscal <surface>` | NIST OSCAL 1.1.2 JSON — the format FedRAMP auditors and SOC 2 examiners prefer |
+| `branchnux sca oscal <surface>` | NIST OSCAL 1.1.2 JSON — the format FedRAMP auditors and SOC 2 examiners prefer |
 | `branchnux sign <surface>` | HMAC-chained tamper-evident attestation; signed PDF for handoff |
 | `rootnux adr-new <title>` | Sequentially numbered ADR scaffold |
 | `rootnux risk-add` | Risk register entry |
@@ -63,7 +63,7 @@ For the full "what's enough" breakdown, comparison vs DOORS / Polarion / Jama / 
 |---|---|---|---|
 | `@leapnux/rootnux` | intent (specs, ADRs, risks, KB) | active | `init`, `lint`, `adr-new`, `risk-add`, `status`, `kb-init` |
 | `@leapnux/trunknux` | build (sprint scaffolding) | active | `new-sprint`, `summarize`, `lint`, `log` |
-| `@leapnux/branchnux` | verification (test plans, RTM, SCA, OSCAL, sign) | active | `init`, `plan`, `codify`, `report`, `validate`, `sca`, `sca-oscal`, `rtm`, `sign`, `sign-pdf`, `visual`, `discover`, `enrich`, `br`, `doctor` (15+) |
+| `@leapnux/branchnux` | verification (test plans, RTM, SCA, OSCAL, sign) | active | `init`, `plan`, `codify`, `report`, `validate`, `sca`, `sca oscal`, `rtm`, `sign`, `sign pdf`, `visual`, `discover`, `enrich`, `br`, `doctor` (15+) |
 | `@leapnux/leafnux` | continuous health | active | `health` |
 | `@leapnux/fruitnux` | external deliverables | scoped (verbs in design) | (`pack` candidate for v0.5.1+) |
 | `@leapnux/6nux-core` | shared library | active | (no CLI; shared schemas, conventions, IDs, utils) |
@@ -96,7 +96,7 @@ trunknux summarize                                    # SPRINT_SUMMARY.md from g
 branchnux plan login                                  # AI-drafted test plan with [VERIFY] markers
 branchnux rtm                                         # regenerate TRACEABILITY.md
 branchnux sca login                                   # 8-section Security Control Assessment
-branchnux sca-oscal login                             # NIST OSCAL 1.1.2 JSON
+branchnux sca oscal login                             # NIST OSCAL 1.1.2 JSON
 branchnux sign login                                  # HMAC-chained sign-off
 leafnux health                                        # GREEN/AMBER/RED snapshot of project state
 ```
