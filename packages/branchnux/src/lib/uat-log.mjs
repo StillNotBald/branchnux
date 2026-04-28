@@ -107,7 +107,7 @@ export function verifyChain(jsonlPath, secret) {
     }
 
     const expectedPrevHash = prevRawJson === null
-      ? _emptyHash(secret)
+      ? _emptyHash(secret, jsonlPath)
       : hmac(secret, prevRawJson);
 
     if (!_safeEqual(entry.prev_hash, expectedPrevHash)) {
@@ -230,20 +230,30 @@ function _expectedSignature(entry, secret) {
 }
 
 /**
- * The prev_hash for the very first entry in a log is HMAC of the empty string.
- * This is a deterministic sentinel — verifiers reproduce it without state.
+ * The prev_hash for the very first entry in a log is domain-separated by the
+ * basename of the JSONL file so that two projects sharing the same UAT_SECRET
+ * produce distinct genesis sentinels and cannot replay each other's chains.
+ *
+ * Input format: "chain-init:<basename>" (e.g. "chain-init:uat-log.jsonl")
+ *
+ * BREAKING CHANGE (SEC-F7): old sentinel = hmac(secret, '').
+ * Existing chains written before this version will fail verifyChain() at the
+ * first entry. Re-create or re-sign existing chains to adopt the new sentinel.
+ *
+ * @param {string} secret
+ * @param {string} jsonlPath  — absolute or relative path to the .jsonl file
  */
-function _emptyHash(secret) {
-  return hmac(secret, '');
+function _emptyHash(secret, jsonlPath) {
+  return hmac(secret, 'chain-init:' + path.basename(jsonlPath));
 }
 
 /**
  * Compute the prev_hash that the NEXT entry should record.
- * If the file doesn't exist or is empty, returns the empty-hash sentinel.
+ * If the file doesn't exist or is empty, returns the domain-separated sentinel.
  */
 function _computePrevHash(jsonlPath, secret) {
   const lines = readLines(jsonlPath);
-  if (lines.length === 0) return _emptyHash(secret);
+  if (lines.length === 0) return _emptyHash(secret, jsonlPath);
   const lastRaw = lines[lines.length - 1];
   return hmac(secret, lastRaw);
 }

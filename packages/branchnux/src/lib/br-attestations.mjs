@@ -234,7 +234,7 @@ export function verifyAttestationChain(jsonlPath, secret) {
 
     // Verify prev_hash
     const expectedPrevHash = prevRawJson === null
-      ? emptyHash(secret)
+      ? emptyHash(secret, jsonlPath)
       : hmac(secret, prevRawJson);
 
     if (!safeEqual(entry.prev_hash, expectedPrevHash)) {
@@ -328,13 +328,24 @@ function expectedSignature(entry, secret) {
   return hmac(secret, canonicalJSON(entry));
 }
 
-function emptyHash(secret) {
-  return hmac(secret, '');
+/**
+ * Domain-separated genesis sentinel (SEC-F7).
+ * Uses the JSONL file basename so that two projects sharing the same UAT_SECRET
+ * produce distinct sentinels and cannot replay each other's chains.
+ *
+ * Input format: "chain-init:<basename>" (e.g. "chain-init:br-attestations.jsonl")
+ *
+ * BREAKING CHANGE: old sentinel = hmac(secret, '').
+ * Existing chains will fail verifyAttestationChain() at the first entry.
+ * Re-create or re-sign existing chains to adopt the new sentinel.
+ */
+function emptyHash(secret, jsonlPath) {
+  return hmac(secret, 'chain-init:' + path.basename(jsonlPath));
 }
 
 function computePrevHash(jsonlPath, secret) {
   const lines = readRawLines(jsonlPath);
-  if (lines.length === 0) return emptyHash(secret);
+  if (lines.length === 0) return emptyHash(secret, jsonlPath);
   return hmac(secret, lines[lines.length - 1]);
 }
 

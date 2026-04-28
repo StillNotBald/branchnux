@@ -95,7 +95,7 @@ afterEach(() => {
 // ── appendEntry ───────────────────────────────────────────────────────────────
 
 describe('appendEntry — basic behaviour', () => {
-  it('TC-UAT-01: first entry has all required fields and prev_hash = HMAC("","")', () => {
+  it('TC-UAT-01: first entry has all required fields and prev_hash = domain-separated sentinel', () => {
     const entry = appendEntry(logPath, ENTRY_A, SECRET);
 
     expect(entry).toHaveProperty('tc_id', 'TC-001');
@@ -106,9 +106,13 @@ describe('appendEntry — basic behaviour', () => {
     expect(entry).toHaveProperty('prev_hash');
     expect(entry).toHaveProperty('signature');
 
-    // prev_hash of the first entry must equal HMAC(secret, '') — the empty-hash sentinel
-    const expectedPrevHash = hmac(SECRET, '');
+    // SEC-F7: prev_hash of the first entry must equal the domain-separated sentinel
+    // = HMAC(secret, 'chain-init:<basename>'), NOT HMAC(secret, '')
+    const basename = path.basename(logPath);
+    const expectedPrevHash = hmac(SECRET, 'chain-init:' + basename);
     expect(entry.prev_hash).toBe(expectedPrevHash);
+    // Confirm it is NOT the old (insecure) sentinel
+    expect(entry.prev_hash).not.toBe(hmac(SECRET, ''));
   });
 
   it('TC-UAT-02: first entry signature uses v2 contract — HMAC(canonicalJSON(entry))', () => {
@@ -124,7 +128,9 @@ describe('appendEntry — basic behaviour', () => {
   });
 
   it('TC-UAT-02b: verifyChain rejects a chain containing a v1-signed entry', () => {
-    // Manually craft a v1-signed entry to simulate a legacy log
+    // Manually craft a v1-signed entry to simulate a legacy log.
+    // Use the new domain-separated sentinel as prev_hash so the prev_hash check
+    // passes and the version rejection is what triggers the failure.
     const ts = new Date().toISOString();
     const v1SigInput = ['TC-LEGACY', 'PASS', 'legacy-reviewer', ts].join('|');
     const v1Entry = {
@@ -134,7 +140,7 @@ describe('appendEntry — basic behaviour', () => {
       reviewer_role: 'QA',
       justification: '',
       ts,
-      prev_hash: hmac(SECRET, ''), // valid empty-hash sentinel
+      prev_hash: hmac(SECRET, 'chain-init:' + path.basename(logPath)), // new domain-separated sentinel
       signature_version: 1,
       signature: hmac(SECRET, v1SigInput),
     };
@@ -304,7 +310,7 @@ describe('verifyChain — SECURITY: structural attacks', () => {
 
     const result = verifyChain(logPath, WRONG_SECRET);
     expect(result.valid).toBe(false);
-    // First entry's prev_hash = hmac(SECRET,'') ≠ hmac(WRONG_SECRET,'')
+    // First entry's prev_hash = hmac(SECRET,'chain-init:<base>') ≠ hmac(WRONG_SECRET,'chain-init:<base>')
     expect(result.brokenAt).toBe(1);
   });
 });
@@ -382,5 +388,47 @@ describe('hmac — internal helper (exported for testing)', () => {
   it('TC-UAT-24: cross-validates against Node built-in crypto', () => {
     const expected = crypto.createHmac('sha256', SECRET).update('hello', 'utf-8').digest('hex');
     expect(hmac(SECRET, 'hello')).toBe(expected);
+  });
+});
+
+// ── SEC-F7: cross-project domain separation ───────────────────────────────────
+
+describe('SEC-F7: domain-separated empty-hash sentinel', () => {
+  it('TC-UAT-25: two chains with the same secret but different filenames produce different genesis sentinels', () => {
+    // Simulate project-A and project-B sharing the same UAT_SECRET
+    const logPathA = path.join(tmpDir, 'project-a-uat-log.jsonl');
+    const logPathB = path.join(tmpDir, 'project-b-uat-log.jsonl');
+
+    const entryA = appendEntry(logPathA, ENTRY_A, SECRET);
+    const entryB = appendEntry(logPathB, ENTRY_A, SECRET);
+
+    // Both are the first entries so both use the genesis sentinel as prev_hash.
+    // The sentinels MUST differ between files even with the same secret.
+    expect(entryA.prev_hash).not.toBe(entryB.prev_hash);
+  });
+
+  it('TC-UAT-26: two chains with the same secret and same filename produce identical genesis sentinels (same chain)', () => {
+    // Same filename means same chain — sentinel must be reproducible.
+    const logPathX = path.join(tmpDir, 'uat-log.jsonl');
+    const logPathY = path.join(tmpDir, 'uat-log.jsonl'); // same path
+
+    const entry1 = appendEntry(logPathX, ENTRY_A, SECRET);
+    // Read back the file and verify the chain fresh
+    const result = verifyChain(logPathY, SECRET);
+    expect(result.valid).toBe(true);
+    // The first entry's prev_hash equals the domain-separated sentinel for that path
+    const basename = path.basename(logPathX);
+    const expectedSentinel = hmac(SECRET, 'chain-init:' + basename);
+    expect(entry1.prev_hash).toBe(expectedSentinel);
+  });
+
+  it('TC-UAT-27: verifyChain correctly verifies a chain started with the domain-separated sentinel', () => {
+    appendEntry(logPath, ENTRY_A, SECRET);
+    appendEntry(logPath, ENTRY_B, SECRET);
+    appendEntry(logPath, ENTRY_C, SECRET);
+
+    const result = verifyChain(logPath, SECRET);
+    expect(result.valid).toBe(true);
+    expect(result.brokenAt).toBeNull();
   });
 });

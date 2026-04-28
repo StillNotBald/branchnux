@@ -9,11 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- (nothing yet)
+- SEC-F5: `validateSurface()` extracted to `src/lib/validate-surface.mjs` and imported by `sign`, `sign-pdf`, `sca`, and `sca-oscal` — blocks path-traversal attacks (`../foo`, `..\\foo`, `foo/bar`, `foo bar`) before any `path.resolve()` occurs.
+- SEC-F6: Puppeteer launch in `sign-pdf` and `sca pdf` now tries sandboxed mode first; falls back to `--no-sandbox` only if the initial launch fails (rootless container / CI) and emits a prominent `stderr` warning explaining the trade-off.
 
 ### Changed
 
-- (nothing yet)
+- **BREAKING — SEC-F7:** `_emptyHash` sentinel in `uat-log.mjs` and `br-attestations.mjs` is now domain-separated by the JSONL file basename: `HMAC(secret, 'chain-init:<basename>')` instead of `HMAC(secret, '')`. This prevents two projects sharing the same `UAT_SECRET` from producing identical genesis hashes, which would allow cross-project chain replay. **Existing chains written before this version will fail `verifyChain()` / `verifyAttestationChain()` at the first entry.** Re-create or re-sign existing chains to adopt the new sentinel.
 
 ### Fixed
 

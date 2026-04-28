@@ -75,7 +75,7 @@ afterEach(() => {
 // ══════════════════════════════════════════════════════════════════════════════
 
 describe('appendAttestation — TC-BR-01: chaining behaviour', () => {
-  it('first entry has status "attested" and prev_hash = HMAC(secret, "")', () => {
+  it('first entry has status "attested" and prev_hash = domain-separated sentinel (SEC-F7)', () => {
     const entry = appendAttestation(jsonlPath, ATTEST_QA, SECRET);
 
     expect(entry.status).toBe('attested');
@@ -87,9 +87,14 @@ describe('appendAttestation — TC-BR-01: chaining behaviour', () => {
     expect(entry).toHaveProperty('prev_hash');
     expect(entry).toHaveProperty('signature');
 
-    // First entry prev_hash must be HMAC("", secret) — the genesis sentinel
-    const expected = crypto.createHmac('sha256', SECRET).update('', 'utf-8').digest('hex');
+    // SEC-F7: prev_hash of the first entry must be HMAC(secret, 'chain-init:<basename>')
+    // — NOT the old HMAC(secret, '') which was identical across all chains sharing the same secret.
+    const basename = path.basename(jsonlPath);
+    const expected = crypto.createHmac('sha256', SECRET).update('chain-init:' + basename, 'utf-8').digest('hex');
     expect(entry.prev_hash).toBe(expected);
+    // Confirm it is NOT the old (insecure) sentinel
+    const oldSentinel = crypto.createHmac('sha256', SECRET).update('', 'utf-8').digest('hex');
+    expect(entry.prev_hash).not.toBe(oldSentinel);
   });
 
   it('subsequent entry prev_hash = HMAC(secret, raw-JSON-of-previous-line)', () => {
