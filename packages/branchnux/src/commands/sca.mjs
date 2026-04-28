@@ -353,10 +353,11 @@ export async function runScaPdf(surface, opts = {}) {
     ],
     ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'id', 'class'],
     ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|data:image\/(?:png|jpeg|gif|webp)):|[^a-z]|[a-z+.-]+(?:[^a-z+.-:]|$))/i,
-    ADD_TAGS: ['style'],
-    ADD_ATTR: ['style'],
-    FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button'],
-    FORBID_ATTR: ['onload', 'onerror', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'srcset'],
+    // Layout CSS lives in _wrapHtml; never accept <style> or inline style= from
+    // user-authored markdown — CSS-attribute-selector exfiltration vector at
+    // PDF render time, plus @import url(file:///...) reads at chromium load.
+    FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'style'],
+    FORBID_ATTR: ['style', 'onload', 'onerror', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'srcset'],
   });
 
   const html = _wrapHtml(safeHtml, `SCA — ${surface}`);

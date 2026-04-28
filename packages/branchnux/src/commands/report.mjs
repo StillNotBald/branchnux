@@ -104,14 +104,20 @@ function findEvidenceDir(folder) {
 
 function openFile(filePath) {
   const platform = process.platform;
+  // Use spawn with arg array (no shell:true, no string interpolation) to prevent
+  // command injection via filePath containing shell metacharacters.
   try {
+    let cmd, args;
     if (platform === 'darwin') {
-      childProcess.execSync(`open "${filePath}"`, { stdio: 'ignore' });
+      cmd = 'open'; args = [filePath];
     } else if (platform === 'win32') {
-      childProcess.execSync(`start "" "${filePath}"`, { stdio: 'ignore', shell: true });
+      // cmd.exe /c start "" <file> — '' is the window title, then literal file arg
+      cmd = 'cmd'; args = ['/c', 'start', '', filePath];
     } else {
-      childProcess.execSync(`xdg-open "${filePath}"`, { stdio: 'ignore' });
+      cmd = 'xdg-open'; args = [filePath];
     }
+    const result = childProcess.spawnSync(cmd, args, { stdio: 'ignore', shell: false });
+    if (result.error) throw result.error;
   } catch {
     // Graceful no-op if none of the above are available
   }

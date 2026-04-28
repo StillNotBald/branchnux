@@ -37,6 +37,8 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
+const SIGNATURE_VERSION = 2;
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /**
@@ -56,8 +58,6 @@ export function appendAttestation(jsonlPath, entry, secret) {
   const ts       = new Date().toISOString();
   const status   = 'attested';
   const prevHash = computePrevHash(jsonlPath, secret);
-  const sigInput = [entry.br_id, entry.tc_id, entry.reviewer, entry.reviewer_role, status, ts].join('|');
-  const signature = hmac(secret, sigInput);
 
   const fullEntry = {
     br_id:         entry.br_id,
@@ -67,9 +67,10 @@ export function appendAttestation(jsonlPath, entry, secret) {
     status,
     justification: entry.justification ?? '',
     ts,
-    prev_hash:     prevHash,
-    signature,
+    prev_hash:         prevHash,
+    signature_version: SIGNATURE_VERSION,
   };
+  fullEntry.signature = hmac(secret, canonicalJSON(fullEntry));
 
   fs.appendFileSync(jsonlPath, JSON.stringify(fullEntry) + '\n', 'utf-8');
   return fullEntry;
@@ -97,8 +98,6 @@ export function revokeAttestation(jsonlPath, entry, secret) {
   const ts       = new Date().toISOString();
   const status   = 'revoked';
   const prevHash = computePrevHash(jsonlPath, secret);
-  const sigInput = [entry.br_id, entry.tc_id, entry.reviewer, entry.reviewer_role, status, ts].join('|');
-  const signature = hmac(secret, sigInput);
 
   const fullEntry = {
     br_id:         entry.br_id,
@@ -108,9 +107,10 @@ export function revokeAttestation(jsonlPath, entry, secret) {
     status,
     justification: entry.justification ?? '',
     ts,
-    prev_hash:     prevHash,
-    signature,
+    prev_hash:         prevHash,
+    signature_version: SIGNATURE_VERSION,
   };
+  fullEntry.signature = hmac(secret, canonicalJSON(fullEntry));
 
   fs.appendFileSync(jsonlPath, JSON.stringify(fullEntry) + '\n', 'utf-8');
   return fullEntry;
@@ -237,19 +237,15 @@ export function verifyAttestationChain(jsonlPath, secret) {
       ? emptyHash(secret)
       : hmac(secret, prevRawJson);
 
-    if (entry.prev_hash !== expectedPrevHash) {
+    if (!safeEqual(entry.prev_hash, expectedPrevHash)) {
       errors.push(
         `Line ${i + 1} (${entry.br_id}/${entry.tc_id}): prev_hash mismatch — chain broken.`
       );
       return { valid: false, brokenAt: i + 1, errors };
     }
 
-    // Verify signature
-    const sigInput = [
-      entry.br_id, entry.tc_id, entry.reviewer, entry.reviewer_role, entry.status, entry.ts,
-    ].join('|');
-    const expectedSig = hmac(secret, sigInput);
-    if (entry.signature !== expectedSig) {
+    const expectedSig = expectedSignature(entry, secret);
+    if (!safeEqual(entry.signature, expectedSig)) {
       errors.push(
         `Line ${i + 1} (${entry.br_id}/${entry.tc_id}): signature mismatch — entry may be tampered.`
       );
@@ -297,6 +293,39 @@ export function formatAttestationStatus(status) {
 
 function hmac(secret, data) {
   return crypto.createHmac('sha256', secret).update(data, 'utf-8').digest('hex');
+}
+
+// Constant-time hex-string comparison; false on length mismatch or non-string input.
+function safeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (a.length !== b.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(a, 'hex'), Buffer.from(b, 'hex'));
+  } catch {
+    return false;
+  }
+}
+
+// Canonical JSON for signing — keys sorted, signature field excluded.
+function canonicalJSON(entry) {
+  const { signature: _s, ...rest } = entry; // eslint-disable-line no-unused-vars
+  const sortedKeys = Object.keys(rest).sort();
+  const sorted = {};
+  for (const k of sortedKeys) sorted[k] = rest[k];
+  return JSON.stringify(sorted);
+}
+
+// Dispatch by signature_version. v1 (legacy) covers only the partial sigInput;
+// v2 (current) covers the full canonical entry.
+function expectedSignature(entry, secret) {
+  const version = entry.signature_version || 1;
+  if (version === 1) {
+    const sigInput = [
+      entry.br_id, entry.tc_id, entry.reviewer, entry.reviewer_role, entry.status, entry.ts,
+    ].join('|');
+    return hmac(secret, sigInput);
+  }
+  return hmac(secret, canonicalJSON(entry));
 }
 
 function emptyHash(secret) {
