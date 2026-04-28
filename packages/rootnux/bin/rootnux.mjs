@@ -28,7 +28,7 @@ import path from 'node:path';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgPath = path.join(__dirname, '..', 'package.json');
-let version = '0.4.1-alpha.1';
+let version = '0.5.0-alpha.1';
 try {
   version = JSON.parse(readFileSync(pkgPath, 'utf-8')).version ?? version;
 } catch {
