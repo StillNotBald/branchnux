@@ -10,4 +10,6 @@ export * from './conventions.mjs';
 export * from './schemas.mjs';
 export * from './ids.mjs';
 export * from './utils.mjs';
-export * from './validators.mjs';
+// validators.mjs is intentionally NOT re-exported here. Stub functions
+// that throw 'not yet implemented' must not appear in the public API.
+// Validators planned for v0.6.0+; see validators.mjs for details.

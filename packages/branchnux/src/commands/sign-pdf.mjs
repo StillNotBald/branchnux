@@ -118,9 +118,15 @@ export async function runSignPdf(surface, opts = {}) {
         'table', 'thead', 'tbody', 'tr', 'th', 'td',
         'a',
       ],
-      ALLOWED_ATTR: ['href', 'id', 'class', 'style'],
+      ALLOWED_ATTR: ['href', 'id', 'class'],
+      // Layout CSS lives in the tool-authored doc-level <style> block inside
+      // _buildHtml; never accept inline style= from user-authored markdown —
+      // CSS-attribute-selector exfiltration vector at PDF render time
+      // (background: url(file:///etc/shadow)) since scripts are blocked but
+      // CSS is not. Mirrors the sca.mjs fix from fe07e1b — both PDF renderers
+      // now consistent.
       FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'img'],
-      FORBID_ATTR: ['onload', 'onerror', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'srcset'],
+      FORBID_ATTR: ['style', 'onload', 'onerror', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'srcset'],
     });
   } else {
     // Synthesise per-entry blocks from the JSONL.
