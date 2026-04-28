@@ -1,19 +1,21 @@
 # 5-NUX
 
-> The entire PM tool chain in your CLI: requirement → sprint → test → validation → ship.
+> 5-NUX gives you a whole tree. You provide the soil and you ship yourself.
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Node: >=20](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](https://nodejs.org/)
 [![Tests: 528 passing](https://img.shields.io/badge/tests-528%20passing-brightgreen.svg)]()
-[![Version: v0.4.3-alpha.1](https://img.shields.io/badge/version-v0.4.3--alpha.1-orange.svg)](CHANGELOG.md)
+[![Version: v0.5.0-alpha.1](https://img.shields.io/badge/version-v0.5.0--alpha.1-orange.svg)](CHANGELOG.md)
 
 ## What this is
 
-5-NUX is the OSS anchor product for the **LeapNuX** methodology. It is a 7-package npm-workspaces monorepo — one CLI per node of the 6-NUX taxonomy (root, trunk, branch, leaf, fruit) plus a shared core library and a meta-package that installs the full stack. The taxonomy maps directly to the regulated-software lifecycle: you state your requirements, plan your sprints, verify your branches, monitor health, and ship audit-ready deliverables — all from the CLI, all in your repo.
+5-NUX is a complete project artifact-chain — **root** (specs), **trunk** (build), **branch** (verification), **leaf** (continuous health signals fed back into the loop), **fruit** (external audit-ready handoffs). All five nodes are OSS. The sixth node — **soil** (your hosting, your vendors, your multi-user backend) — is premium territory in the future 6-NUX commercial product. The act of shipping (your CI, your release pipeline) is yours.
+
+It is a 7-package npm-workspaces monorepo — one CLI per node of the 6-NUX taxonomy plus a shared core library and a meta-package that installs the full stack. The taxonomy maps directly to the regulated-software lifecycle: you state your requirements, plan your sprints, verify your branches, monitor health, and ship audit-ready deliverables — all from the CLI, all in your repo.
 
 The intended audience is engineering and QA leads at regulated-software teams who need a defensible audit-evidence trail (test plans → RTM → SCA → OSCAL) but do not want to pay for a hosted SaaS or cede control of their evidence to a vendor. Every artifact 5-NUX produces is a plain-format file (Markdown, XLSX, HTML, PDF, JSON) that lives in your git repo and can be read by auditors without installing anything.
 
-Apache 2.0, ESM-only, Node 20+. This is the anchor, not the revenue product. Premium features — hosting, multi-user workflows, managed accounts, the full 6-NUX commercial spec — belong in the future commercial tier. See [`docs/MOTTO.md`](docs/MOTTO.md) for the OSS/Premium split.
+Apache 2.0, ESM-only, Node 20+. This is the anchor, not the revenue product. The OSS/Premium boundary is sharp: anything local + single-user + file-native is OSS. Anything hosted + multi-user + account-bound is premium (soil + 6-NUX). See [`docs/MOTTO.md`](docs/MOTTO.md) for the OSS/Premium split.
 
 ---
 
@@ -24,8 +26,8 @@ Apache 2.0, ESM-only, Node 20+. This is the anchor, not the revenue product. Pre
 | `@leapnux/rootnux` | intent (specs, ADRs, risks) | active | `init`, `lint`, `adr-new`, `risk-add`, `status` |
 | `@leapnux/trunknux` | build (sprint scaffolding) | active | `new-sprint`, `summarize`, `lint` |
 | `@leapnux/branchnux` | verification (test plans, RTM, SCA) | active | `init`, `plan`, `codify`, `report`, `validate`, `sca`, `sca-oscal`, `rtm`, `sign`, `sign-pdf`, `visual`, `discover`, `enrich`, `br`, `doctor` (15+ verbs) |
-| `@leapnux/leafnux` | continuous health | deferred skeleton | (see roadmap) |
-| `@leapnux/fruitnux` | external deliverables | deferred skeleton | (see roadmap) |
+| `@leapnux/leafnux` | continuous health | active — `health` verb in v0.5.0 | `health` |
+| `@leapnux/fruitnux` | external deliverables | scoped — verbs in design | (verbs in design) |
 | `@leapnux/6nux-core` | shared library | active | (no CLI; shared schemas, conventions, IDs, utils) |
 | `@leapnux/5nux` | meta-package | active | (no CLI; installs all 5 NUX packages) |
 
@@ -112,8 +114,8 @@ The 6-NUX taxonomy is a directed graph of concerns in the regulated-software lif
 rootnux (intent / specs)
     └── trunknux (build / sprint)
             └── branchnux (verification / evidence)
-                    ├── leafnux (continuous health) [deferred]
-                    └── fruitnux (audit deliverables) [deferred]
+                    ├── leafnux (continuous health) [active OSS scope]
+                    └── fruitnux (audit deliverables) [active OSS scope]
 ```
 
 **Cross-package contract:** NUX packages do not import each other. They communicate via file-system conventions defined in `@leapnux/6nux-core`. A rootnux artifact (e.g. `REQUIREMENTS.md`) is a file that trunknux and branchnux read by path — not by API call. This keeps the packages independently installable and avoids coupling the release cycles.
@@ -149,8 +151,8 @@ BranchNuX is the most mature node in the tree. A few design decisions worth know
 
 ## Roadmap
 
-- **v0.4.x** — current alpha series; rootnux + trunknux + branchnux mature; leafnux + fruitnux remain reserved skeletons with no committed timeline
-- **v0.5+** — leafnux + fruitnux verbs (deferred pending real adopter pull and OSS-vs-premium clarity)
+- **v0.4.x** — alpha series; rootnux + trunknux + branchnux mature; leafnux + fruitnux brought into active OSS scope
+- **v0.5.0-alpha.1** — `trunknux log`, `rootnux kb-init`, `leafnux health` (three verbs shipping in parallel); fruitnux scoped with first verb candidate (`fruitnux pack`) in design
 - **v1.0** — stability milestone + landing page at leapnux.com + 6-NUX commercial spec
 
 If you want the roadmap to prioritize a specific artifact type, [open an issue](https://github.com/StillNotBald/branchnux/issues).

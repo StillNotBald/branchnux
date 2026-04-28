@@ -1,6 +1,6 @@
 {
   "name": "@leapnux/5nux",
-  "version": "0.4.4-alpha.1",
+  "version": "0.5.0-alpha.1",
   "description": "5-NUX — meta-package for the LeapNuX OSS stack. Installs the 3 active NUX CLIs (rootnux + trunknux + branchnux). leafnux + fruitnux are reserved-skeleton optional dependencies.",
   "license": "Apache-2.0",
   "author": "Chu Ling",
@@ -23,13 +23,13 @@
     "access": "public"
   },
   "dependencies": {
-    "@leapnux/rootnux": "0.4.4-alpha.1",
-    "@leapnux/trunknux": "0.4.4-alpha.1",
-    "@leapnux/branchnux": "0.4.4-alpha.1"
+    "@leapnux/rootnux": "0.5.0-alpha.1",
+    "@leapnux/trunknux": "0.5.0-alpha.1",
+    "@leapnux/branchnux": "0.5.0-alpha.1"
   },
   "optionalDependencies": {
-    "@leapnux/leafnux": "0.4.4-alpha.1",
-    "@leapnux/fruitnux": "0.4.4-alpha.1"
+    "@leapnux/leafnux": "0.5.0-alpha.1",
+    "@leapnux/fruitnux": "0.5.0-alpha.1"
   },
   "keywords": [
     "leapnux",

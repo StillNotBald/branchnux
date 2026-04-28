@@ -1,6 +1,6 @@
 {
   "name": "@leapnux/6nux-core",
-  "version": "0.4.4-alpha.1",
+  "version": "0.5.0-alpha.1",
   "description": "Shared core for the 6-NUX product family — schemas, file conventions, validators, ID generators. Internal to LeapNuX 5-NUX/6-NUX packages; not intended for direct end-user use.",
   "license": "Apache-2.0",
   "author": "Chu Ling",

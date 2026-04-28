@@ -1,7 +1,7 @@
 {
   "name": "@leapnux/leafnux",
-  "version": "0.4.4-alpha.1",
-  "description": "leafnux — continuous-internal-health CLI for the 6-NUX taxonomy. Status: skeleton; planned for v0.5.0.",
+  "version": "0.5.0-alpha.1",
+  "description": "leafnux — continuous-health-layer CLI for the 6-NUX taxonomy. `health` verb shipping in v0.5.0.",
   "license": "Apache-2.0",
   "author": "Chu Ling",
   "repository": {
@@ -18,6 +18,7 @@
   },
   "files": [
     "bin/",
+    "src/",
     "README.md"
   ],
   "engines": {
@@ -26,8 +27,13 @@
   "publishConfig": {
     "access": "public"
   },
+  "scripts": {
+    "test": "vitest run"
+  },
   "dependencies": {
-    "@leapnux/6nux-core": "0.4.4-alpha.1"
+    "@leapnux/6nux-core": "0.5.0-alpha.1",
+    "commander": "^14.0.3",
+    "gray-matter": "^4.0.3"
   },
   "keywords": [
     "leapnux",

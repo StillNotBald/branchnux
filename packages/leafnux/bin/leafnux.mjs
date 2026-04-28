@@ -1,43 +1,82 @@
 #!/usr/bin/env node
-// leafnux CLI — continuous-internal-health layer of the 6-NUX taxonomy.
-// v0.4.2-alpha.1: skeleton. DEFERRED to a future sprint (no committed timeline).
+// Copyright (c) 2026 Chu Ling
+// SPDX-License-Identifier: Apache-2.0
 
+/**
+ * bin/leafnux.mjs
+ *
+ * CLI entry point for LeafNuX — the continuous-health layer of the 6-NUX taxonomy.
+ *
+ * Verbs:
+ *   health   — read 5-NUX artifacts in cwd, produce a structured health snapshot
+ *
+ * Flags (health):
+ *   --json           emit machine-readable JSON
+ *   --quiet          print only "Overall: GREEN/AMBER/RED"; use exit codes
+ *   --check <cat>    run only one category (requirements/risks/adrs/sprint/tests)
+ *
+ * Exit codes (without --quiet, always 0):
+ *   0  GREEN
+ *   1  AMBER
+ *   2  RED
+ */
+
+import { Command } from 'commander';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-let version = '0.4.2-alpha.1';
+const pkgPath = path.join(__dirname, '..', 'package.json');
+let version = '0.4.4-alpha.1';
 try {
-  version = JSON.parse(readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8')).version ?? version;
+  version = JSON.parse(readFileSync(pkgPath, 'utf-8')).version ?? version;
 } catch {
   // package.json not present — use default
 }
 
-const message = `
-leafnux v${version}
+// ── Command imports ───────────────────────────────────────────────────────────
 
-  Status: SKELETON — DEFERRED to a future sprint.
+const { runHealth } = await import('../src/commands/health.mjs');
 
-  This package is reserved in the @leapnux scope but not actively developed.
-  Verb scope is intentionally undecided pending real-world signal:
-    - input from real adopters running 5-NUX in production
-    - pull from at least one production adopter
-    - clarity on which leaf-layer signals are OSS vs premium (6-NUX hosted)
+// ── Root program ──────────────────────────────────────────────────────────────
 
-  Where this fits in 6-NUX:
+const program = new Command();
 
-    leafnux is the CONTINUOUS HEALTH LAYER — observability signals,
-    CI/CD gates, dependabot, secrets-scan, performance trends,
-    audit-log integrity. The day-to-day vital signs that keep the tree alive.
+program
+  .name('leafnux')
+  .description('leafnux — continuous-health layer of the 6-NUX taxonomy')
+  .version(version);
 
-  Many leaf-layer features may belong to 6-NUX premium (hosted dashboards,
-  multi-project rollups, account-bound alerting) rather than the OSS CLI.
-  The OSS line is being kept tight.
+// ── health ────────────────────────────────────────────────────────────────────
 
-  See docs/6-NUX.md and docs/MOTTO.md for the OSS/Premium product split.
-  Roadmap: https://github.com/StillNotBald/branchnux
-`.trim();
+program
+  .command('health')
+  .description(
+    'Read 5-NUX artifacts in cwd and produce a structured health snapshot. ' +
+    'Checks: requirements completion, open risks, ADR status, sprint freshness, test infra.',
+  )
+  .option('--json', 'emit machine-readable JSON output')
+  .option('--quiet', 'print only Overall status line; exit codes 0/1/2 = GREEN/AMBER/RED')
+  .option('--check <category>', 'run only one category: requirements, risks, adrs, sprint, tests')
+  .action(async (opts) => {
+    try {
+      const code = await runHealth({
+        cwd: process.cwd(),
+        json: opts.json ?? false,
+        quiet: opts.quiet ?? false,
+        check: opts.check ?? null,
+      });
+      process.exit(code ?? 0);
+    } catch (err) {
+      console.error(`ERROR: ${err.message}`);
+      process.exit(err.exitCode ?? 1);
+    }
+  });
 
-console.log(message);
-process.exit(0);
+// ── parse ─────────────────────────────────────────────────────────────────────
+
+program.parseAsync(process.argv).catch((err) => {
+  console.error(err.message);
+  process.exit(1);
+});

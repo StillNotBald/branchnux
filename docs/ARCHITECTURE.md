@@ -2,7 +2,7 @@
 
 > **Audience:** contributors, integrators, security auditors. If you just want to use the CLI, start with the top-level [README](../README.md). If you want the conceptual model, read [docs/6-NUX.md](./6-NUX.md). This file is the *implementation* spec.
 >
-> **Status as of v0.4.2-alpha.1:** seven workspaces, two active packages (rootnux, trunknux), one shared core (6nux-core), three skeletons (leafnux, fruitnux, branchnux is mature), one meta-package (5nux). 458+ tests. Apache 2.0 single-license. Anchor-not-revenue posture.
+> **Status as of v0.5.0-alpha.1:** seven workspaces, five active OSS packages (rootnux, trunknux, branchnux, leafnux, fruitnux scoped), one shared core (6nux-core), one meta-package (5nux). 528+ tests. Apache 2.0 single-license. Anchor-not-revenue posture. The whole tree is OSS; soil is premium.
 
 ---
 
@@ -14,8 +14,8 @@ LeapNuX (org / company)             ← leapnux.com
 │   ├── @leapnux/rootnux            ← intent (specs, ADRs, risks)
 │   ├── @leapnux/trunknux           ← build (sprint scaffolding)
 │   ├── @leapnux/branchnux          ← verification (test plans, RTM, SCA)
-│   ├── @leapnux/leafnux            ← health (planned v0.5)
-│   ├── @leapnux/fruitnux           ← deliverables (planned v0.5)
+│   ├── @leapnux/leafnux            ← health (active — `health` verb in v0.5.0)
+│   ├── @leapnux/fruitnux           ← deliverables (active scope — verbs in design)
 │   ├── @leapnux/6nux-core          ← shared internals
 │   └── @leapnux/5nux               ← meta-package
 └── 6-NUX (Product 2, premium)      ← future, commercial license
@@ -46,8 +46,8 @@ github.com/leapnux/5nux/                      ← repo (transferring from StillN
 │   ├── rootnux/                              → @leapnux/rootnux
 │   ├── trunknux/                             → @leapnux/trunknux
 │   ├── branchnux/                            → @leapnux/branchnux
-│   ├── leafnux/                              → @leapnux/leafnux  (skeleton)
-│   ├── fruitnux/                             → @leapnux/fruitnux (skeleton)
+│   ├── leafnux/                              → @leapnux/leafnux  (active)
+│   ├── fruitnux/                             → @leapnux/fruitnux (active scope)
 │   └── 5nux/                                 → @leapnux/5nux meta
 ├── examples/                                 ← cross-package demos
 ├── requirements/                             ← 5-NUX self-dogfood (root level — applies to whole repo)
@@ -243,23 +243,29 @@ The dogfood discipline is **load-bearing for credibility**. Every time we ship a
 | v0.4.0-alpha.1 | Monorepo migration | shipped 2026-04-28 |
 | v0.4.1-alpha.1 | rootnux + trunknux MVPs + 1 CRITICAL + 9 HIGH hardening + motto lock | shipped 2026-04-28 |
 | v0.4.2-alpha.1 | 6nux-core extraction + 8 MEDIUM/LOW polish + ARCHITECTURE.md | shipped 2026-04-28 |
-| v0.4.3-alpha.1 | leafnux+fruitnux deferral formalized | shipped 2026-04-28 |
-| v0.5+ | 5 ports identified, scoped from production-PM-tool feedback | scoped, not started |
+| v0.4.3-alpha.1 | branchnux verb hardening; OSS/Premium line sharpened | shipped 2026-04-28 |
+| **v0.5.0-alpha.1** | `trunknux log` + `rootnux kb-init` + `leafnux health` — three verbs shipping in parallel; fruitnux scoped | **in progress** |
 | v1.0.0 | Stability + leapnux.com landing page + 6-NUX commercial spec | planned |
 
-### v0.5+ candidate verbs
+### v0.5.0-alpha.1 — active scope (three verbs building in parallel)
+
+| Verb | Package | Design state | Effort |
+|---|---|---|---|
+| `trunknux log` | trunknux | Fresh design — pattern valid, implementation from first principles | S |
+| `rootnux kb-init` | rootnux | Fresh design — universal KB schema (objective, owner, lessons, stakeholders) | S |
+| `leafnux health` | leafnux | Fresh design — file-native health check, no domain-specific assumptions | S |
+
+### v0.5+ candidate verbs (next wave)
 
 | # | Candidate | Verdict | Package | Effort |
 |---|---|---|---|---|
-| 1 | `leafnux critical-path` — CPM dependency analysis | **clean port** — pure computation on a dependency graph, domain-agnostic | leafnux | M |
-| 2 | `trunknux log` — weekly narrative log | **fresh design needed** — pattern is valid, prior implementations carry domain assumptions | trunknux | S |
-| 3 | `leafnux health` — status linter / RAG transitions | **fresh design needed** — concept valid; prior implementations bake in domain-specific status taxonomies | leafnux | S |
-| 4 | `rootnux kb-init` — knowledge base scaffold | **fresh design needed** — sections (objective, owner, lessons, stakeholders) are universal, but the KB schema must be authored from first principles | rootnux | S |
-| 5 | `branchnux gate-new` — gate checkpoint artifact | **fresh design needed** — file-native gate schema with approver list + state is portable; reject any "live voting UI" temptation (premium territory) | branchnux | M |
+| 1 | `fruitnux pack` — bundle ADRs + risks + RTM + SCAs into a regulator-ready handoff | **first fruitnux verb** — file-native, OSS; multi-party sign-off workflows remain premium | fruitnux | M |
+| 2 | `leafnux critical-path` — CPM dependency analysis | **clean port** — pure computation on a dependency graph, domain-agnostic | leafnux | M |
+| 3 | `branchnux gate-new` — gate checkpoint artifact | **fresh design needed** — file-native gate schema with approver list + state is portable; reject any "live voting UI" temptation (premium territory) | branchnux | M |
 
-**Discipline:** "fresh design needed" means the candidate's *idea* survived critical review, but no prior implementation is suitable for direct porting (any reviewed source carries domain assumptions, audience-specific UX, or architectural compromises that 5-NUX must not inherit). The OSS verb gets designed from first principles + adopter pull, not lifted.
+**Discipline:** "fresh design needed" means the candidate's *idea* survived critical review, but no prior implementation is suitable for direct porting. The OSS verb gets designed from first principles + adopter pull, not lifted.
 
-**Note on leafnux + fruitnux:** the skeleton packages remain reserved. `leafnux critical-path` is the only pre-vetted leafnux candidate; everything else is undecided. fruitnux remains deferred indefinitely; branchnux already covers the OSS-CLI portion of audit evidence (`sca`, `sca-oscal`, `sign`, `sign-pdf`), and most other deliverable workflows (multi-party sign-off, immutable evidence stores, regulator portals) are inherently 6-NUX premium.
+**OSS/Premium boundary for leaf + fruit:** local + single-user + file-native = OSS. Hosted dashboards, multi-project rollups, account-bound alerting, multi-party sign-off workflows, immutable evidence stores, and regulator portals = premium (6-NUX soil layer).
 
 ### Anti-patterns to avoid
 
@@ -307,7 +313,8 @@ The big architectural decisions, in order:
 4. **Lockstep versioning** (rejected independent per-package versioning) — locked 2026-04-28
 5. **ESM-only `.mjs` source as published artifact** (rejected TypeScript build pipeline) — locked 2026-04-28
 6. **File-system convention contract** (rejected NUX-to-NUX cross-imports) — locked 2026-04-28
-7. **Motto: OSS = entire PM tool chain in CLI; Premium = onboarding/training/hosting/backend/accounts** — locked 2026-04-28
+7. **Motto: OSS = entire PM artifact-chain in CLI (all 5 NUX nodes); Premium = soil (hosting/backend/accounts)** — locked 2026-04-28, sharpened 2026-04-27
+8. **leafnux + fruitnux promoted from reserved skeletons to active OSS scope** — 2026-04-27; leafnux ships `health` in v0.5.0; fruitnux scoped with `pack` as first candidate
 
 These are not up for re-litigation without strong new evidence.
 

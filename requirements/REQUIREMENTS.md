@@ -1,6 +1,10 @@
+---
+schema: rxx-v1
+title: Requirements
+---
 # BranchNuX — Requirements
 
-> **Project:** BranchNuX (renamed from testnux 2026-04-27, v0.2.2)
+> **Project:** BranchNuX
 > **Repo:** github.com/StillNotBald/branchnux
 > **Owner:** Chu Ling
 > **Last updated:** 2026-04-27
@@ -52,7 +56,7 @@ This is a **dogfood document** — BranchNuX is the tool that produces audit-def
 **Description:** Running `branchnux validate <folder>` parses every markdown file in `<folder>`, checks required frontmatter keys (`slug`, `industry`, `tc_prefix`, `status`), validates R-XX ID format consistency, and verifies status taxonomy. Results are printed as a structured report. `--strict` promotes warnings to errors.
 **Acceptance:**
 - Missing required frontmatter key is reported as an error with file path and line reference
-- Malformed R-XX reference (e.g. `R-1` instead of `R-01`) is flagged
+- Malformed R-XX reference (single-digit instead of zero-padded) is flagged
 - Invalid `status` value outside allowed taxonomy is flagged
 - `--strict` causes exit code 3 on any warning or error
 - Exit code 0 when no errors (or warnings in non-strict mode)
@@ -189,7 +193,7 @@ This is a **dogfood document** — BranchNuX is the tool that produces audit-def
 ## R-13 — `branchnux br link <br-id> <r-ids>` links BR-XX to R-IDs
 
 **Status:** DONE (v0.2.0)
-**Description:** Running `branchnux br link <br-id> <r-ids>` adds a `BR-XX → R-ID` mapping inside `requirements/BUSINESS_REQUIREMENTS.md`. The `r-ids` argument is a comma-separated list (e.g. `R-01,R-02`). Linking to a non-existent BR-ID exits code 2 with a clear error.
+**Description:** Running `branchnux br link <br-id> <r-ids>` adds a `BR-XX → R-ID` mapping inside `requirements/BUSINESS_REQUIREMENTS.md`. The `r-ids` argument is a comma-separated list of zero-padded R-XX IDs. Linking to a non-existent BR-ID exits code 2 with a clear error.
 **Acceptance:**
 - R-ID list is appended to the correct BR-XX block in BUSINESS_REQUIREMENTS.md
 - Comma-separated multiple R-IDs are all recorded in a single invocation

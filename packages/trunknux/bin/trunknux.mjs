@@ -8,6 +8,7 @@ import path from 'node:path';
 import { newSprint } from '../src/commands/new-sprint.mjs';
 import { summarize } from '../src/commands/summarize.mjs';
 import { lint } from '../src/commands/lint.mjs';
+import { log } from '../src/commands/log.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgPath = path.join(__dirname, '..', 'package.json');
@@ -45,5 +46,13 @@ program
   .description('Validate sprint folder naming and README conventions')
   .option('--json', 'machine-readable JSON output')
   .action((opts) => lint(opts));
+
+program
+  .command('log')
+  .description('Append a date-stamped narrative entry to the current sprint LOG.md')
+  .option('-m, --message <text>', 'log entry text (skips interactive prompt)')
+  .option('--sprint <slug>', 'override current-sprint detection — use this named slug')
+  .option('--json', 'emit the appended entry as JSON (still writes to disk)')
+  .action((opts) => log(opts));
 
 program.parse();

@@ -1,3 +1,7 @@
+---
+schema: rtm-v1
+title: Requirements Traceability Matrix
+---
 <!-- branchnux:rtm generated -->
 <!-- Generated: 2026-04-27 by branchnux rtm. Do NOT edit the table rows directly. -->
 <!-- Human-edit zone: the Notes column inside each row marker pair survives regeneration. -->

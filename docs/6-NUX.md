@@ -12,14 +12,14 @@
 
 ## TL;DR
 
-| Node | Plain English |
-|---|---|
-| **rootnux** | Why the product is what it is — specs, decisions, governance |
-| **trunknux** | What was built — sprint-log, code, design system applied |
-| **branchnux** | How we verify — testing-log, the BranchNuX OSS tool, RTM |
-| **leafnux** | Continuous internal health — observability, security gates, perf trends |
-| **fruitnux** | What we hand to outsiders — SCAs, audit packages, sign-off packets |
-| **soilnux** | What the tree grows in — infra, vendors, runtime ops |
+| Node | Plain English | OSS status |
+|---|---|---|
+| **rootnux** | Why the product is what it is — specs, decisions, governance | active OSS |
+| **trunknux** | What was built — sprint-log, code, design system applied | active OSS |
+| **branchnux** | How we verify — testing-log, the BranchNuX OSS tool, RTM | active OSS |
+| **leafnux** | Continuous internal health — observability, security gates, perf trends | active OSS (`health` verb in v0.5.0) |
+| **fruitnux** | What we hand to outsiders — SCAs, audit packages, sign-off packets | active OSS scope (verbs in design; `pack` is first candidate) |
+| **soilnux** | What the tree grows in — infra, vendors, runtime ops | **premium** — 6-NUX commercial product |
 
 Connecting tissue: **RTM** (`requirements/TRACEABILITY.md`) — the cambium that wires nodes together.
 
@@ -300,22 +300,25 @@ If you got 10+ on first try, the model holds. If you got <8, the most common con
 
 ## Mapping to a typical project layout
 
-| File / folder | Node |
-|---|---|
-| `requirements/REQUIREMENTS.md` | rootnux |
-| `requirements/TRACEABILITY.md` | branchnux + connective tissue |
-| `requirements/validations/<surface>/` | fruitnux |
-| `requirements/risks/` | rootnux |
-| `docs/adr/` | rootnux |
-| `docs/governance/{vendors,data-classification,threat-model}.md` | rootnux |
-| `docs/6-NUX.md` (this file) | meta (the schema) |
-| `sprint-log/<date>_<title>/` | trunknux |
-| `testing-log/<date>_<surface>/` | branchnux |
-| `<your-app>/src/` | trunknux |
-| `<your-app>/e2e/`, `*.test.ts` | branchnux |
-| Hosting + DBs + queues + observability vendors | soilnux |
-| Pen test, SOC 2, SCA PDFs | fruitnux |
-| Project memory / AI assistant guides | meta (out of scope) |
+| File / folder | Node | OSS / Premium |
+|---|---|---|
+| `requirements/REQUIREMENTS.md` | rootnux | OSS |
+| `requirements/TRACEABILITY.md` | branchnux + connective tissue | OSS |
+| `requirements/validations/<surface>/` | fruitnux | OSS |
+| `requirements/risks/` | rootnux | OSS |
+| `docs/adr/` | rootnux | OSS |
+| `docs/governance/{vendors,data-classification,threat-model}.md` | rootnux | OSS |
+| `docs/6-NUX.md` (this file) | meta (the schema) | — |
+| `sprint-log/<date>_<title>/` | trunknux | OSS |
+| `testing-log/<date>_<surface>/` | branchnux | OSS |
+| `<your-app>/src/` | trunknux | OSS |
+| `<your-app>/e2e/`, `*.test.ts` | branchnux | OSS |
+| Local health checks, CI gate output, file-native perf trends | leafnux | OSS |
+| Bundled audit handoff packages, regulator-ready PDFs | fruitnux | OSS |
+| Hosting + DBs + queues + observability vendors | soilnux | **Premium** |
+| Multi-user backends, account management, hosted dashboards | soilnux | **Premium** |
+| Pen test, SOC 2, SCA PDFs | fruitnux | OSS |
+| Project memory / AI assistant guides | meta (out of scope) | — |
 
 ---
 

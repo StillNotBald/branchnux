@@ -13,6 +13,7 @@ export const PATHS = {
   testingLog: 'testing-log/',
   adrs: 'docs/adr/',
   governance: 'docs/governance/',
+  kb: 'docs/KNOWLEDGE_BASE.md',
 };
 
 export const SCHEMAS = { rxx: 'v1', adr: 'v1', sprintFolder: 'v1', testPlan: 'v1', rtm: 'v1' };

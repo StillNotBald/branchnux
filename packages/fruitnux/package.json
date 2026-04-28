@@ -1,6 +1,6 @@
 {
   "name": "@leapnux/fruitnux",
-  "version": "0.4.4-alpha.1",
+  "version": "0.5.0-alpha.1",
   "description": "fruitnux — external-deliverables CLI for the 6-NUX taxonomy. SCAs, audit packages, sign-off packets. Status: skeleton; planned for v0.5.0.",
   "license": "Apache-2.0",
   "author": "Chu Ling",
@@ -27,7 +27,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@leapnux/6nux-core": "0.4.4-alpha.1"
+    "@leapnux/6nux-core": "0.5.0-alpha.1"
   },
   "keywords": [
     "leapnux",

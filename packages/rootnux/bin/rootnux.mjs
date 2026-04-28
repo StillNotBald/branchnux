@@ -13,6 +13,7 @@
  *   adr-new <title>  — scaffold a new ADR with sequential numbering
  *   risk-add         — append a templated row to the risk register
  *   status           — show DONE/BLOCKED/PARTIAL/NOT STARTED/... counts + %
+ *   kb-init          — scaffold docs/KNOWLEDGE_BASE.md (audit-prep ownership file)
  *
  * Exit codes:
  *   0  success
@@ -41,6 +42,7 @@ const { runLint }    = await import('../src/commands/lint.mjs');
 const { runAdrNew }  = await import('../src/commands/adr-new.mjs');
 const { runRiskAdd } = await import('../src/commands/risk-add.mjs');
 const { runStatus }  = await import('../src/commands/status.mjs');
+const { runKbInit }  = await import('../src/commands/kb-init.mjs');
 
 // ── Root program ─────────────────────────────────────────────────────────────
 
@@ -135,6 +137,26 @@ program
   .action(async (opts) => {
     try {
       const code = await runStatus({ cwd: process.cwd(), json: opts.json ?? false });
+      process.exit(code ?? 0);
+    } catch (err) {
+      console.error(`ERROR: ${err.message}`);
+      process.exit(err.exitCode ?? 1);
+    }
+  });
+
+// ── kb-init ───────────────────────────────────────────────────────────────────
+
+program
+  .command('kb-init')
+  .description(
+    'Scaffold docs/KNOWLEDGE_BASE.md in cwd. Idempotent — skips if present. ' +
+    'Audit-prep gold: captures ownership, stakeholders, compliance mapping, ' +
+    'lessons learned, and DR/BCP contacts in one file.',
+  )
+  .option('--force', 'Refuse with exit 1 if the file already exists (does not overwrite)')
+  .action(async (opts) => {
+    try {
+      const code = await runKbInit({ cwd: process.cwd(), force: opts.force ?? false });
       process.exit(code ?? 0);
     } catch (err) {
       console.error(`ERROR: ${err.message}`);
