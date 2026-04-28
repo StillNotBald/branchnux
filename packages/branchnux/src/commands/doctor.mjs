@@ -8,15 +8,35 @@
  *
  * Runs preflight checks and emits ✅/⚠️/❌ per check with an actionable message.
  *
- * Checks:
+ * Checks (generic — always run):
  *   1. node        — Node.js version >= 20
  *   2. playwright  — Playwright browsers installed (dry-run detection)
- *   3. env         — .env.local: SITE_GATE_PIN set, SUPABASE_URL without SERVICE_ROLE_KEY warn
- *   4. supabase    — MFA Enroll vs Verify toggle mismatch (requires SUPABASE_MANAGEMENT_TOKEN +
- *                    --project-ref flag)
- *   5. build       — Detect if a `npm run dev` process is running on port 3000 and warn that
+ *   3. env         — Config-driven env var checks via branchnux.config.mjs
+ *                    { env: { required: ['VAR1'], recommended: ['VAR2'] } }
+ *                    If no config file is present, env check is skipped.
+ *   4. build       — Detect if a `npm run dev` process is running on port 3000 and warn that
  *                    Playwright must run against `npm run build && npm start` (prod build)
- *   6. conventions — Check that testing-log/ and requirements/ folders exist in CWD
+ *   5. conventions — Check that testing-log/ and requirements/ folders exist in CWD
+ *
+ * Opt-in checks (require --check <name>):
+ *   supabase       — MFA Enroll vs Verify toggle mismatch (requires SUPABASE_MANAGEMENT_TOKEN +
+ *                    --project-ref flag). Run with: branchnux doctor --check supabase
+ *                    This check was previously part of the default run but was FirstLeap-specific
+ *                    (AP-F4, audit ref: docs/audit/2026-04-28/SYNTHESIS-5nux.md).
+ *
+ * Config-driven env checks (AP-F4):
+ *   Create branchnux.config.mjs in your project root:
+ *
+ *     export default {
+ *       env: {
+ *         required: ['DATABASE_URL', 'API_KEY'],
+ *         recommended: ['LOG_LEVEL', 'SENTRY_DSN'],
+ *       },
+ *     };
+ *
+ *   - required: any missing var is reported as an error
+ *   - recommended: any missing var is reported as a warning
+ *   If branchnux.config.mjs is absent, env checks are skipped entirely.
  *
  * Exit codes:
  *   0  all checks green (or only non-fatal warnings)
@@ -25,7 +45,8 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync, spawnSync } from 'child_process';
+import { pathToFileURL } from 'url';
+import { spawnSync } from 'child_process';
 
 // ── Public API ───────────────────────────────────────────────────────────────
 
@@ -34,6 +55,9 @@ import { execSync, spawnSync } from 'child_process';
  */
 export async function runDoctor(opts = {}) {
   const { check, projectRef, json = false } = opts;
+
+  // Load branchnux.config.mjs from cwd if present (AP-F4)
+  const doctorCfg = await _loadDoctorConfig();
 
   const results = [];
   let hasErrors = false;
@@ -50,12 +74,20 @@ export async function runDoctor(opts = {}) {
     }
   };
 
+  // Generic checks — always run (unless filtered by --check)
   await runCheck('node', checkNode);
   await runCheck('playwright', checkPlaywright);
-  await runCheck('env', checkEnv);
-  await runCheck('supabase', () => checkSupabase(projectRef));
+  await runCheck('env', () => checkEnv(doctorCfg));
   await runCheck('build', checkBuild);
   await runCheck('conventions', checkConventions);
+
+  // Opt-in checks — only run when explicitly requested via --check <name>
+  // Default `branchnux doctor` (no --check flag) does NOT run these.
+  // Supabase check is FirstLeap-specific; other projects should use --check supabase only
+  // if they rely on Supabase MFA (AP-F4).
+  if (check === 'supabase') {
+    await runCheck('supabase', () => checkSupabase(projectRef));
+  }
 
   // ── Output ─────────────────────────────────────────────────────────────────
 
@@ -94,6 +126,41 @@ export async function runDoctor(opts = {}) {
     const err = new Error('Doctor found critical issues — see output above');
     err.exitCode = 1;
     throw err;
+  }
+}
+
+// ── Config loader ─────────────────────────────────────────────────────────────
+
+/**
+ * Attempt to load branchnux.config.mjs from process.cwd().
+ *
+ * AP-F4 (audit ref: docs/audit/2026-04-28/SYNTHESIS-5nux.md):
+ * Env-var checks are now project-configurable via this file, eliminating the
+ * previous hardcoded FirstLeap-specific vars (SITE_GATE_PIN, SUPABASE_URL,
+ * SUPABASE_SERVICE_ROLE_KEY, SUPABASE_MANAGEMENT_TOKEN).
+ *
+ * Schema:
+ *   export default {
+ *     env: {
+ *       required: ['VAR1'],      // missing → error
+ *       recommended: ['VAR2'],   // missing → warning
+ *     },
+ *   };
+ *
+ * @returns {{ env?: { required?: string[], recommended?: string[] } } | null}
+ *   Parsed config object, or null if no config file found.
+ */
+async function _loadDoctorConfig() {
+  const configPath = path.join(process.cwd(), 'branchnux.config.mjs');
+  if (!fs.existsSync(configPath)) return null;
+  try {
+    // Use pathToFileURL to handle Windows absolute paths (ESM import requires
+    // file:// URLs on Windows; bare absolute paths with drive letters fail).
+    const mod = await import(pathToFileURL(configPath).href);
+    return mod.default ?? null;
+  } catch {
+    // Config load failure → treat as no config (don't abort doctor run)
+    return null;
   }
 }
 
@@ -142,56 +209,84 @@ function checkPlaywright() {
   }
 }
 
-function checkEnv() {
-  const envPath = path.join(process.cwd(), '.env.local');
-  if (!fs.existsSync(envPath)) {
+/**
+ * Config-driven env check (AP-F4).
+ *
+ * When a branchnux.config.mjs is present and exports an `env` section, this
+ * function checks:
+ *   - env.required  → missing var = error
+ *   - env.recommended → missing var = warning
+ *
+ * When no config is present, the check is skipped (returns ok).
+ * This replaces the previous hardcoded FirstLeap-specific checks for
+ * SITE_GATE_PIN, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
+ *
+ * @param {{ env?: { required?: string[], recommended?: string[] } } | null} cfg
+ */
+function checkEnv(cfg) {
+  if (!cfg || !cfg.env) {
     return {
       level: 'ok',
-      message: '.env.local not found in CWD — skipping env checks (expected for OSS projects)',
+      message: 'Env check skipped — no branchnux.config.mjs found in CWD',
+      detail:
+        'Create branchnux.config.mjs with { env: { required: [...], recommended: [...] } } ' +
+        'to enable project-specific env checks.',
     };
   }
 
-  const raw = fs.readFileSync(envPath, 'utf-8');
-  const lines = raw.split('\n');
-  const vars = {};
-  for (const line of lines) {
-    const [key, ...rest] = line.split('=');
-    if (key && rest.length) vars[key.trim()] = rest.join('=').trim();
+  const required = Array.isArray(cfg.env.required) ? cfg.env.required : [];
+  const recommended = Array.isArray(cfg.env.recommended) ? cfg.env.recommended : [];
+
+  const errors = [];
+  const warnings = [];
+
+  for (const varName of required) {
+    if (!process.env[varName]) {
+      errors.push(`${varName} is required but not set`);
+    }
   }
 
-  const issues = [];
-
-  if (!vars['SITE_GATE_PIN'] && !vars['NEXT_PUBLIC_SITE_GATE_PIN']) {
-    issues.push('SITE_GATE_PIN not set — site gate will be inactive or will use a default PIN');
+  for (const varName of recommended) {
+    if (!process.env[varName]) {
+      warnings.push(`${varName} is recommended but not set`);
+    }
   }
 
-  if (vars['SUPABASE_URL'] && !vars['SUPABASE_SERVICE_ROLE_KEY']) {
-    issues.push(
-      'SUPABASE_URL is set but SUPABASE_SERVICE_ROLE_KEY is missing — ' +
-      'seed scripts and admin API routes will fail with 401',
-    );
+  if (errors.length === 0 && warnings.length === 0) {
+    return {
+      level: 'ok',
+      message: `Env check passed — all ${required.length} required, ${recommended.length} recommended vars present`,
+    };
   }
 
-  if (vars['SUPABASE_MANAGEMENT_TOKEN'] && vars['SUPABASE_MANAGEMENT_TOKEN'].length < 10) {
-    issues.push(
-      'SUPABASE_MANAGEMENT_TOKEN looks too short — ' +
-      'verify the token value (real sbp_ tokens are 50+ chars). ' +
-      'A typo in a similar Upstash token can silently break rate-limiting; verify exact length.',
-    );
-  }
-
-  if (issues.length === 0) {
-    return { level: 'ok', message: '.env.local looks healthy' };
+  if (errors.length > 0) {
+    return {
+      level: 'error',
+      message: `${errors.length} required env var(s) missing`,
+      detail: [...errors, ...warnings].join(' | '),
+      fix: 'Set the missing required environment variables before running tests',
+    };
   }
 
   return {
     level: 'warn',
-    message: `.env.local has ${issues.length} issue(s)`,
-    detail: issues.join(' | '),
-    fix: 'Review and correct the flagged environment variables above',
+    message: `${warnings.length} recommended env var(s) missing`,
+    detail: warnings.join(' | '),
+    fix: 'Consider setting the recommended environment variables',
   };
 }
 
+/**
+ * Supabase MFA check — opt-in via --check supabase (AP-F4).
+ *
+ * Previously ran in the default doctor pass, which made it FirstLeap-specific.
+ * Now only runs when explicitly requested: branchnux doctor --check supabase
+ *
+ * Checks MFA Enroll vs Verify toggle mismatch (Supabase TOTP Enroll/Verify are
+ * separate flags; the Dashboard may only expose Verify). Requires:
+ *   - SUPABASE_MANAGEMENT_TOKEN env var (sbp_* token, 50+ chars)
+ *   - --project-ref <ref> CLI flag
+ */
 async function checkSupabase(projectRef) {
   const token = process.env.SUPABASE_MANAGEMENT_TOKEN;
 

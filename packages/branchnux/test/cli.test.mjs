@@ -281,14 +281,19 @@ tc_prefix: "JSON"
   });
 });
 
-// ── 4. doctor smoke ───────────────────────────────────────────────────────────
+// ── 4. doctor smoke + config-driven env checks (AP-F4) ───────────────────────
+// Audit ref: docs/audit/2026-04-28/SYNTHESIS-5nux.md
 
 describe('doctor', () => {
+  let tmp;
+  beforeEach(() => { tmp = makeTmp(); });
+  afterEach(() => rimraf(tmp));
+
   it('exits 0 even when some checks warn (diagnostic, not a gate)', () => {
     // doctor exits 0 unless a check throws an error-level result AND the
     // underlying runDoctor throws. Node version ≥ 20 passes, playwright may warn.
     // We only care that it does not hard-crash with an uncaught exception.
-    const { status, stderr } = run(['doctor']);
+    const { status, stderr } = run(['doctor'], { cwd: tmp });
     // Doctor should exit 0 (ok / only warnings) in a standard CI environment
     // If it exits 1, it means a critical error check fired — acceptable but unusual
     expect([0, 1]).toContain(status);
@@ -297,7 +302,7 @@ describe('doctor', () => {
   });
 
   it('--json flag outputs valid JSON with expected shape', () => {
-    const { stdout, status } = run(['doctor', '--json']);
+    const { stdout, status } = run(['doctor', '--json'], { cwd: tmp });
     expect([0, 1]).toContain(status);
     const lines = stdout.trim().split('\n').filter(Boolean);
     expect(lines.length).toBeGreaterThanOrEqual(1);
@@ -307,9 +312,160 @@ describe('doctor', () => {
     expect(Array.isArray(parsed.checks)).toBe(true);
     expect(parsed).toHaveProperty('passed');
   });
+
+  it('env check is skipped when no branchnux.config.mjs is present (AP-F4)', () => {
+    // tmp dir has no config file — env check should show "skipped"
+    const { stdout, status } = run(['doctor', '--check', 'env', '--json'], { cwd: tmp });
+    expect([0, 1]).toContain(status);
+    const parsed = JSON.parse(stdout.trim().split('\n').filter(Boolean)[0]);
+    const envCheck = parsed.checks.find((c) => c.name === 'env');
+    expect(envCheck).toBeDefined();
+    expect(envCheck.level).toBe('ok');
+    expect(envCheck.message).toMatch(/skipped/i);
+  });
+
+  it('env check reports error for missing required vars from config (AP-F4)', () => {
+    // Write a branchnux.config.mjs that requires vars we know are not set
+    const cfgContent = `export default { env: { required: ['BRANCHNUX_TEST_REQUIRED_VAR_XYZ'], recommended: [] } };`;
+    fs.writeFileSync(path.join(tmp, 'branchnux.config.mjs'), cfgContent);
+    const { stdout, status } = run(['doctor', '--check', 'env', '--json'], {
+      cwd: tmp,
+      env: { ...process.env, BRANCHNUX_TEST_REQUIRED_VAR_XYZ: undefined },
+    });
+    const parsed = JSON.parse(stdout.trim().split('\n').filter(Boolean)[0]);
+    const envCheck = parsed.checks.find((c) => c.name === 'env');
+    expect(envCheck).toBeDefined();
+    expect(envCheck.level).toBe('error');
+    expect(envCheck.detail).toMatch(/BRANCHNUX_TEST_REQUIRED_VAR_XYZ/);
+  });
+
+  it('env check reports warning for missing recommended vars from config (AP-F4)', () => {
+    const cfgContent = `export default { env: { required: [], recommended: ['BRANCHNUX_TEST_RECOMMENDED_VAR_XYZ'] } };`;
+    fs.writeFileSync(path.join(tmp, 'branchnux.config.mjs'), cfgContent);
+    const env = { ...process.env };
+    delete env['BRANCHNUX_TEST_RECOMMENDED_VAR_XYZ'];
+    const { stdout } = run(['doctor', '--check', 'env', '--json'], { cwd: tmp, env });
+    const parsed = JSON.parse(stdout.trim().split('\n').filter(Boolean)[0]);
+    const envCheck = parsed.checks.find((c) => c.name === 'env');
+    expect(envCheck).toBeDefined();
+    expect(envCheck.level).toBe('warn');
+    expect(envCheck.detail).toMatch(/BRANCHNUX_TEST_RECOMMENDED_VAR_XYZ/);
+  });
+
+  it('env check passes when all required vars are set (AP-F4)', () => {
+    const cfgContent = `export default { env: { required: ['BRANCHNUX_TEST_SET_VAR'], recommended: [] } };`;
+    fs.writeFileSync(path.join(tmp, 'branchnux.config.mjs'), cfgContent);
+    const { stdout } = run(['doctor', '--check', 'env', '--json'], {
+      cwd: tmp,
+      env: { ...process.env, BRANCHNUX_TEST_SET_VAR: 'set' },
+    });
+    const parsed = JSON.parse(stdout.trim().split('\n').filter(Boolean)[0]);
+    const envCheck = parsed.checks.find((c) => c.name === 'env');
+    expect(envCheck).toBeDefined();
+    expect(envCheck.level).toBe('ok');
+  });
+
+  it('supabase check does NOT run in default doctor pass (AP-F4)', () => {
+    // Default run should not include supabase in the checks output
+    const { stdout } = run(['doctor', '--json'], { cwd: tmp });
+    const parsed = JSON.parse(stdout.trim().split('\n').filter(Boolean)[0]);
+    const supabaseCheck = parsed.checks.find((c) => c.name === 'supabase');
+    expect(supabaseCheck).toBeUndefined();
+  });
+
+  it('supabase check DOES run when --check supabase is passed (AP-F4)', () => {
+    // With --check supabase and no token, should get a skipped/ok result
+    const { stdout, status } = run(['doctor', '--check', 'supabase', '--json'], { cwd: tmp });
+    expect([0, 1]).toContain(status);
+    const parsed = JSON.parse(stdout.trim().split('\n').filter(Boolean)[0]);
+    const supabaseCheck = parsed.checks.find((c) => c.name === 'supabase');
+    expect(supabaseCheck).toBeDefined();
+    // No token set → ok/warn about missing token, not a hard error
+    expect(['ok', 'warn']).toContain(supabaseCheck.level);
+  });
+
+  it('--help mentions the opt-in supabase check and config-driven env', () => {
+    const { stdout, status } = run(['doctor', '--help']);
+    expect(status).toBe(0);
+    expect(stdout).toContain('--check');
+    expect(stdout).toContain('--project-ref');
+    // The new description should mention supabase as opt-in
+    expect(stdout).toMatch(/supabase/i);
+  });
 });
 
-// ── 5. report smoke ───────────────────────────────────────────────────────────
+// ── 5. --config path validation (SEC-F3) ─────────────────────────────────────
+// Audit ref: docs/audit/2026-04-28/SYNTHESIS-5nux.md
+
+describe('--config security validation (sca + rtm)', () => {
+  let tmp;
+  beforeEach(() => { tmp = makeTmp(); });
+  afterEach(() => rimraf(tmp));
+
+  it('sca generate rejects --config with disallowed extension (.json)', () => {
+    // The config file does not need to exist — rejection happens before load
+    const { status, stderr, stdout } = run(
+      ['sca', 'generate', 'surface', '--config', 'branchnux.config.json'],
+      { cwd: tmp },
+    );
+    expect(status).not.toBe(0);
+    expect((stderr + stdout)).toMatch(/rejected|not allowed|\.json/i);
+  });
+
+  it('sca generate rejects --config with .node extension', () => {
+    const { status, stderr, stdout } = run(
+      ['sca', 'generate', 'surface', '--config', 'evil.node'],
+      { cwd: tmp },
+    );
+    expect(status).not.toBe(0);
+    expect((stderr + stdout)).toMatch(/rejected|not allowed|\.node/i);
+  });
+
+  it('sca generate rejects --config path that escapes cwd', () => {
+    // Use a path that resolves outside tmp (into the parent directory)
+    const outsidePath = path.join(tmp, '..', 'outside.mjs');
+    const { status, stderr, stdout } = run(
+      ['sca', 'generate', 'surface', '--config', outsidePath],
+      { cwd: tmp },
+    );
+    expect(status).not.toBe(0);
+    expect((stderr + stdout)).toMatch(/rejected|outside|cwd/i);
+  });
+
+  it('sca generate accepts --config with .mjs extension inside cwd (missing file → different error)', () => {
+    // A .mjs file inside cwd passes validation then hits "file not found" or import error — NOT the security gate
+    const configPath = path.join(tmp, 'branchnux.config.mjs');
+    // Do NOT create the file — we want import() to fail, not security validation
+    const { status, stderr, stdout } = run(
+      ['sca', 'generate', 'surface', '--config', configPath],
+      { cwd: tmp },
+    );
+    // Should fail but NOT with the "rejected" security message
+    expect(status).not.toBe(0);
+    expect((stderr + stdout)).not.toMatch(/rejected.*not allowed/i);
+  });
+
+  it('rtm rejects --config with disallowed extension (.yaml)', () => {
+    const { status, stderr, stdout } = run(
+      ['rtm', '--config', 'branchnux.config.yaml'],
+      { cwd: tmp },
+    );
+    expect(status).not.toBe(0);
+    expect((stderr + stdout)).toMatch(/rejected|not allowed|\.yaml/i);
+  });
+
+  it('rtm rejects --config path that escapes cwd via ../', () => {
+    const outsidePath = path.join(tmp, '..', 'evil.mjs');
+    const { status, stderr, stdout } = run(
+      ['rtm', '--config', outsidePath],
+      { cwd: tmp },
+    );
+    expect(status).not.toBe(0);
+    expect((stderr + stdout)).toMatch(/rejected|outside|cwd/i);
+  });
+});
+
+// ── 6. report smoke ───────────────────────────────────────────────────────────
 
 describe('report', () => {
   let tmp;
