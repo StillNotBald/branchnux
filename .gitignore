@@ -49,3 +49,4 @@ test-results/
 playwright-report/
 playwright/.cache/
 *.bak
+packages/branchnux/test/.banned-tokens.json

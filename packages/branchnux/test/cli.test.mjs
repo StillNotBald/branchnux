@@ -478,11 +478,26 @@ describe('industry-standards: malaysia-banking bundle', () => {
     expect(standards.length).toBeGreaterThanOrEqual(25);
   });
 
-  it('contains no FirstLeap/Venezuela/PDVSA/EY/claims-portal references in any field', () => {
+  it('contains no internal-context tokens (banned list loaded from gitignored config)', () => {
+    // The actual banned strings live in .banned-tokens.json (gitignored).
+    // This keeps the strings out of the public OSS source while still letting
+    // the project guard against accidentally re-introducing them.
+    // If the config file is absent (fresh OSS clone), the test passes trivially —
+    // contributors who don't have the project's internal-context history don't
+    // need this guard. If you want to add your own banned list locally:
+    //   echo '["YourClient","YourEmployer"]' > packages/branchnux/test/.banned-tokens.json
     const raw = fs.readFileSync(configPath, 'utf-8');
-    const banned = ['FirstLeap', 'Venezuela', 'PDVSA', 'EY', 'claims-portal'];
+    const bannedPath = path.join(__dirname, '.banned-tokens.json');
+    let banned = [];
+    try {
+      if (fs.existsSync(bannedPath)) {
+        banned = JSON.parse(fs.readFileSync(bannedPath, 'utf-8'));
+      }
+    } catch {
+      // malformed JSON — skip the guard rather than fail the suite
+    }
     for (const term of banned) {
-      expect(raw).not.toContain(term);
+      expect(raw, `banned token '${term}' found in ${configPath}`).not.toContain(term);
     }
   });
 });

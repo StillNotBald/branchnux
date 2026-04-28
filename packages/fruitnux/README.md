@@ -8,8 +8,7 @@ External-deliverables layer of the 6-NUX taxonomy.
 
 `@leapnux/branchnux` already covers the OSS-CLI portion of audit-evidence generation: `sca`, `sca-oscal`, `rtm`, `sign`, `sign-pdf`. fruitnux's separate scope is intentionally undecided pending:
 
-1. Cross-check against prior PM-platform features (what worked, what bloated)
-2. Clarity on which deliverable workflows fit OSS-CLI vs 6-NUX premium:
+1. Clarity on which deliverable workflows fit OSS-CLI vs 6-NUX premium:
    - **Likely OSS** — file-native exports, format conversions, local PDF generation
    - **Likely premium** — multi-party sign-off workflows, immutable evidence stores, regulator-facing portals, account-bound access control
 3. Pull from at least one production adopter who'd actually use it
@@ -29,3 +28,7 @@ See [docs/6-NUX.md](https://github.com/StillNotBald/branchnux/blob/main/docs/6-N
 ## License
 
 Apache-2.0 (c) 2026 Chu Ling
+
+## Part of the 5-NUX family
+
+Sibling packages: [rootnux](../rootnux), [trunknux](../trunknux), [branchnux](../branchnux), [leafnux](../leafnux), [fruitnux](../fruitnux), [6nux-core](../6nux-core), [5nux meta](../5nux). See the [root README](../../README.md) for the full taxonomy and install instructions.

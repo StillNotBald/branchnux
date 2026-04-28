@@ -1,603 +1,178 @@
-# BranchNuX™
+# 5-NUX
 
-**BranchNuX bridges what you built and what you ship — one branch at a time.**  
-*Don't merge until your branch can tell its own story.*
+> The entire PM tool chain in your CLI: requirement → sprint → test → validation → ship.
 
-```
-   ENGINEER         QA            COMPLIANCE        AUDITOR
-   ─────────       ─────          ──────────       ─────────
-   test plan   →   reports    →   signoffs    →   evidence
-   + spec          XLSX/HTML      HMAC PDF         package
-   + evidence      RTM            SCA + OSCAL      (HTML+PDF+JSON)
-                                                   hash-chain
-                                                   verifiable
-```
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+[![Node: >=20](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](https://nodejs.org/)
+[![Tests: 528 passing](https://img.shields.io/badge/tests-528%20passing-brightgreen.svg)]()
+[![Version: v0.4.3-alpha.1](https://img.shields.io/badge/version-v0.4.3--alpha.1-orange.svg)](CHANGELOG.md)
 
-BranchNuX is a node in the **6-NUX framework** — a taxonomy of tools that together cover the full regulated-software lifecycle:
+## What this is
 
-**rootnux** (requirements/specs) → **trunknux** (sprint-log/build) → **branchnux** (this tool — verification + evidence production) → **leafnux** (continuous internal health) → **fruitnux** (external audit deliverables) → **soilnux** (infra/ops)
+5-NUX is the OSS anchor product for the **LeapNuX** methodology. It is a 7-package npm-workspaces monorepo — one CLI per node of the 6-NUX taxonomy (root, trunk, branch, leaf, fruit) plus a shared core library and a meta-package that installs the full stack. The taxonomy maps directly to the regulated-software lifecycle: you state your requirements, plan your sprints, verify your branches, monitor health, and ship audit-ready deliverables — all from the CLI, all in your repo.
 
-BranchNuX reads from rootnux (what you said you'd build) and trunknux (what was built), verifies the branch's claims through test execution, and produces leafnux + fruitnux: the health signals and audit-ready deliverables that let you merge with confidence and satisfy regulators without scrambling.
+The intended audience is engineering and QA leads at regulated-software teams who need a defensible audit-evidence trail (test plans → RTM → SCA → OSCAL) but do not want to pay for a hosted SaaS or cede control of their evidence to a vendor. Every artifact 5-NUX produces is a plain-format file (Markdown, XLSX, HTML, PDF, JSON) that lives in your git repo and can be read by auditors without installing anything.
 
-The tool is git-native, deterministic at the core, AI-augmented at the edges, with `[VERIFY]` markers that gate every LLM cell until a human attests it.
-
-No SaaS dependency. No CI lock-in. Output lives in your repo, versioned with your code.
+Apache 2.0, ESM-only, Node 20+. This is the anchor, not the revenue product. Premium features — hosting, multi-user workflows, managed accounts, the full 6-NUX commercial spec — belong in the future commercial tier. See [`docs/MOTTO.md`](docs/MOTTO.md) for the OSS/Premium split.
 
 ---
 
-## Why BranchNuX (renamed from TrunkNuX)
+## The 7 packages
 
-The metaphor sharpened. A testing tool is conventionally a *branch*, not a trunk: it runs on a git branch, verifies that branch's claims, and produces evidence before merge. The trunk fits the sprint-log better — it's the structural backbone of what was built.
-
-BranchNuX *literally* runs on a git branch. It verifies what the branch claims to do. It produces leaves (continuous health signals) and fruits (audit-ready deliverables) that the rest of the 6-NUX framework can consume. Renaming to BranchNuX makes that positioning unambiguous. The CLI surface is unchanged; only the name and metaphor have evolved.
-
----
-
-## TL;DR
-
-BranchNuX supports **the full journey from testing to audit, end-to-end**.
-
-```
-  ENGINEER          QA            COMPLIANCE        AUDITOR
-  writes tests  →   executes  →   attests       →   verifies
-  test-plan.md      report.html   sign + sca        hash-chain +
-                    + evidence    + OSCAL           traceability
-```
-
-Engineers write test plans. Tests execute and capture evidence. Reports go out. Compliance officers attest to controls with HMAC-chained signoffs. Auditors receive a self-contained evidence package they can verify independently of the tool. Everyone in the chain sees evidence in formats they can already open (HTML, Excel, PDF, JSON, Markdown). No SaaS login. No vendor lock-in. The data lives in your git repo.
-
-BranchNuX serves **two audiences at once**:
-
-- **Operators (engineering / QA leads)** install and run the CLI. They get the deterministic pipeline, the LLM accelerators, and the version-control discipline.
-- **Consumers (compliance officers, audit committees, legal counsel, UAT reviewers, external auditors, regulators)** read the artifacts the CLI produces — without ever installing anything. They get a self-contained HTML report, a signed PDF, an XLSX with Pass/Fail dropdowns, an SCA, and an OSCAL JSON for GRC ingestion.
-
-The first audience is small. The second is everyone in your audit chain. **Most BranchNuX users don't run the CLI — they read what the CLI produced.** See [Which output do I read?](#which-output-do-i-read) below for the full audience-to-artifact map.
-
-### What makes BranchNuX different from the dozen test-report generators that already exist:
-
-1. **Three-track discipline** — `requirements/` (what you said you'd build) + `sprint-log/` (what was built) + `testing-log/` (what was tested). One traceable graph, all in your repo, with date-stamped audit snapshots.
-2. **`[VERIFY]` markers on every LLM-drafted cell** — explicit "no human has attested this yet" annotation. AI accelerates authoring; humans gate evidence. Removing a `[VERIFY]` without reading the underlying content is the one thing that makes your evidence package fail under audit.
-3. **HMAC-chained signoff ledger** — tamper-evident attestation. The signoff PDF carries a hash-chain verification badge that auditors can confirm independently of the tool.
-
-The `report` command is fully deterministic — no LLM required, same output every run. AI features (`discover`/`plan`/`codify`/`enrich`/`batch-plan`) are opt-in accelerators with explicit cost gates (`--max-spend`, `--dry-run`). Target buyer: engineering lead at a regulated fintech (SOC 2 / NYDFS / OWASP audit cycle) who wants test evidence in **git, not a vendor cloud** — and whose compliance / audit / legal counterparts will be reading the output.
-
----
-
-### ⚠️ Important — BranchNuX reduces manual work. It does not replace human judgment.
-
-**Every output is a starting point, not a final answer.**
-
-BranchNuX is a CLI that reduces the manual workload of test-evidence authoring. It does not replace the judgment your QA engineers, compliance analysts, legal counsel, or auditors apply to that evidence. This applies across the entire output set:
-
-- **LLM-drafted artifacts** (`branchnux discover`, `branchnux plan`, `branchnux codify`, `branchnux enrich`) — every cell generated by a Claude API call renders with a `[VERIFY]` marker. That marker is not decoration. It means a human has not yet attested to this content. Until a qualified reviewer reads the output, corrects errors, fills gaps, and removes (or confirms) the `[VERIFY]` marker, that artifact is a draft, not evidence.
-- **Test plan** — a BranchNuX-scaffolded test plan still needs an engineer to write real Given/When/Then scenarios. A scaffold with placeholder text is not a test plan.
-- **Playwright spec** — a BranchNuX-codified spec still needs review for missed edge cases, incorrect assertions, and controls that the code claims to test but does not actually exercise.
-- **Execution report (XLSX + HTML)** — the `report` command is deterministic and traceable, but it faithfully documents whatever your test plan says. If your plan claims "TC-01 verifies password complexity" and your spec only checks that the form renders, the report will document that gap accurately. It will not catch the gap for you.
-- **SCA** — a Security Control Assessment generated by `branchnux sca` requires a qualified security reviewer to validate that the control mappings are accurate and complete for your specific environment.
-- **Signoff PDF** (`branchnux sign pdf`) — the HMAC-chained signoff ledger is designed for human attestation. A real reviewer must read each TC result and apply their judgment before signing. Signing without reading defeats the audit-defensibility purpose entirely.
-- **OSCAL export** — machine-readable output for GRC platform ingestion; the accuracy of the assessment content it encodes is your team's responsibility.
-
-**Auditors and regulators will hold you and your organization accountable** for what is in your evidence package. "BranchNuX generated this" is not a defense. The tool's role is to produce well-structured, traceable artifacts in the right formats. Verifying that those artifacts accurately reflect what was tested — and that the tests actually exercised the controls they claim to cover — is your team's responsibility.
-
-License: Apache 2.0. No warranty, express or implied. See LICENSE.
-
-**BranchNuX automates the mechanics. Humans own the decisions.**
-
----
-
-## Prerequisites
-
-**Deterministic core** (`report`, `validate`, `rtm`, `sca`, `run`/`compare`, `visual`, `sign`): Node.js 20+, npm 10+, a git repo. No LLM access required.
-
-**LLM agent commands** (`discover`/`plan`/`codify`/`enrich`/`batch-plan`): a Claude API key and the SDK.
-
-```bash
-export CLAUDE_API_KEY=sk-ant-...
-npm install @anthropic-ai/sdk
-```
-
-Use `--dry-run` to see the prompt + cost estimate before any API call. Set `--max-spend` to cap a batch run. See [docs/costs.md](docs/costs.md) for empirical per-page burn rates if you're scoping a budget.
-
-See [docs/prerequisites.md](docs/prerequisites.md) for `branchnux doctor --check` flags and the optional hybrid browser policy.
+| Package | Layer | Status | Verbs |
+|---|---|---|---|
+| `@leapnux/rootnux` | intent (specs, ADRs, risks) | active | `init`, `lint`, `adr-new`, `risk-add`, `status` |
+| `@leapnux/trunknux` | build (sprint scaffolding) | active | `new-sprint`, `summarize`, `lint` |
+| `@leapnux/branchnux` | verification (test plans, RTM, SCA) | active | `init`, `plan`, `codify`, `report`, `validate`, `sca`, `sca-oscal`, `rtm`, `sign`, `sign-pdf`, `visual`, `discover`, `enrich`, `br`, `doctor` (15+ verbs) |
+| `@leapnux/leafnux` | continuous health | deferred skeleton | (see roadmap) |
+| `@leapnux/fruitnux` | external deliverables | deferred skeleton | (see roadmap) |
+| `@leapnux/6nux-core` | shared library | active | (no CLI; shared schemas, conventions, IDs, utils) |
+| `@leapnux/5nux` | meta-package | active | (no CLI; installs all 5 NUX packages) |
 
 ---
 
 ## Install
 
-```bash
-npm install -g branchnux       # v0.3.0-alpha.1 — full pipeline
-branchnux --version             # 0.3.0-alpha.1
+**Full stack (all 5 NUX packages):**
+
+```sh
+npm install -g @leapnux/5nux
 ```
 
-One-shot via `npx branchnux <command>` works without install. Available on npm: [npmjs.com/package/branchnux](https://www.npmjs.com/package/branchnux). See [CHANGELOG.md](CHANGELOG.md) for what shipped.
+**Just one node:**
 
----
-
-## What you get
-
-BranchNuX produces a single self-contained HTML execution report:
-
-- 📋 Sticky TOC sidebar with anchor links to every TC
-- 🎯 Filter tabs: All / PASS / FAIL / BLOCKED / SKIPPED
-- 📊 Per-TC card: Given/When/Then, status badge, embedded screenshots, standards mapping
-- 🏛️ Banking-standards alignment matrix at the bottom
-- 🛡️ Threat coverage table (OWASP / NIST / WCAG)
-- 📈 Summary banner: total TCs, pass rate, P0 status
-
-Open `examples/demo-dashboard/output/login-execution-report.html` in your browser to see it live.
-
----
-
-## Which output do I read?
-
-> ### For compliance, audit, legal, UAT — you don't install BranchNuX
->
-> If you're a **compliance officer, audit committee member, legal counsel, UAT reviewer, internal auditor, or external auditor**, you read BranchNuX outputs without ever running the CLI. Your engineering or QA team operates BranchNuX; you receive the artifacts:
->
-> - **HTML execution report** — opens in any browser, no SaaS login, no plugin. TOC sidebar, status tabs, embedded screenshots, standards-alignment matrix.
-> - **XLSX test plan** — Excel-friendly, Pass/Fail dropdowns, colour-coded priority. UAT reviewers can edit directly.
-> - **Signoff PDF** — your formal attestation document with hash-chain verification badge. Tamper-evident.
-> - **SCA markdown / PDF** — 8-section Security Control Assessment for audit submission and vendor due-diligence.
-> - **OSCAL JSON** — machine-readable assessment that ingests directly into Vanta, Drata, Secureframe, RegScale.
->
-> If you're evaluating BranchNuX as a procurement decision, the questions that matter to you are: *Can I read the artifacts in the tools I already have? Can my auditors read them without a vendor login? Does the evidence survive when we change CLI tooling?* The answer to all three is **yes** — every output is a self-contained file in standard formats (HTML, Excel, PDF, JSON, Markdown) that your team can open today.
-
-BranchNuX produces a family of artifacts from the same underlying data. Different people on your team need different views.
-
-| Artifact | Primary audience | What they're looking at | When to consume |
-|---|---|---|---|
-| `test-plan.md` | Engineering lead + AI agents | TC matrix with Given/When/Then per TC, frontmatter R-IDs, standards alignment — the authoritative spec for what is being tested | Authoring time, before any tests run |
-| `spec.ts` | QA engineer | Playwright code that implements the test plan; must be reviewed for correctness and edge-case coverage | Authoring time and on every update |
-| `evidence/<TC-ID>.png` | QA engineer + external auditor | Per-TC Playwright screenshot proving the test ran and what the UI showed at that moment | Audit time; dispute resolution |
-| `execution-log.md` | Engineering lead + audit trail reviewer | Run-by-run results narrative with root-cause notes for failures and blockers | During and after each test run |
-| `<slug>-execution-report.html` | Business stakeholders + external auditors | Self-contained HTML: TOC sidebar, status tabs, embedded screenshots, standards alignment matrix, threat coverage table — no SaaS login required | Review cycles; auditor handoff |
-| `<slug>-test-plan.xlsx` | Non-technical UAT reviewers + business stakeholders | TC matrix with Pass/Fail dropdowns, colour-coded priority — no code visible | UAT cycles |
-| `sca/<surface>.md` (and `.pdf`) | CISO, GRC analyst, security reviewer | 8-section Security Control Assessment: control coverage, gap analysis, evidence linkage | Compliance reviews; vendor due diligence |
-| `<surface>/uat-log.jsonl` + `uat-sign-off.pdf` (from `branchnux sign pdf`) | Legal counsel, audit committee, regulator | Tamper-evident HMAC-chained signoff ledger with reviewer attestations and hash-chain verification badge | Final approval; regulator submission; legal hold |
-| `TRACEABILITY.md` | External auditor | Bidirectional R-XX → TC-XX → evidence → signoff matrix — the single-document walkthrough of your entire control coverage | Audit walkthrough; control gap analysis |
-| `oscal-assessment.json` (from `branchnux sca oscal`) | GRC platform integrators | Machine-readable NIST OSCAL 1.1.2 export of the assessment | Pipeline ingestion into Vanta, Drata, Secureframe, RegScale |
-| `visual-baseline/` + `visual-diff/` | Frontend QA + design QA | Per-TC baseline screenshots and pixel-diff images from `branchnux visual compare` | Visual regression review between releases or environments |
-
-All of these artifacts are different views of the same data graph: **Requirement → TestCase → Result → Evidence → Attestation**. The audience determines the format; the truth is one source. Updating the source (your `test-plan.md`, `execution-log.md`, and `evidence/` screenshots) propagates to every downstream artifact on the next `branchnux report` run.
-
----
-
-## 60-second quickstart
-
-```bash
-# Scaffold a new test pass
-branchnux init demo-login --industry general
-
-# Run BranchNuX's own demo (no setup required)
-branchnux demo
-
-# Check your environment
-branchnux doctor
-
-# After filling test-plan.md and running your Playwright spec:
-branchnux report demo-login
-
-# Validate a folder before reporting
-branchnux validate demo-login
+```sh
+npm install -g @leapnux/rootnux
+npm install -g @leapnux/trunknux
+npm install -g @leapnux/branchnux
 ```
 
-The `demo` command downloads a prebuilt fixture, generates the HTML + XLSX, and opens both in your browser — then deletes the fixture. Fastest path to the "aha."
+> Note: `@leapnux/*` packages are not yet published to npm — org claim and scope reservation are pending.
+> For now, clone this repo and run via the package binaries from the workspace root.
 
 ---
 
-## How BranchNuX compares to alternatives
+## Quick tour
 
-BranchNuX sits in the overlap of three established lanes. Honest comparisons against each:
+### State your requirements
 
-### vs. GRC compliance platforms
-
-|  | BranchNuX | Vanta / Drata / Secureframe | Comp AI / Delve |
-|---|---|---|---|
-| **Distribution** | OSS CLI (Apache 2.0); local-first | Hosted SaaS, per-seat | Hosted SaaS / OSS hybrid |
-| **Where evidence lives** | Your git repo (markdown + screenshots + OSCAL JSON) | Vendor's cloud (lock-in) | Vendor's cloud |
-| **What it produces** | Test plans + execution reports + RTM + SCA + signed UAT ledger | Continuous evidence collection + auditor portal | AI-drafted policies + auto-screenshot |
-| **Auditor handoff** | Export package (HTML + Excel + PDF + Markdown + OSCAL); auditor reads in any tool | Auditor logs into their platform | Auditor logs into their platform |
-| **Pricing** | Free OSS forever | $8K–$50K+/yr per company | $$ per company |
-| **AI-assisted plan/spec authoring** | Yes (opt-in, BYO Claude API key, [VERIFY] markers) | No (focus on policy + evidence) | Yes (core feature) |
-| **Federal compliance (OSCAL)** | Native emit (NIST 1.1.2) | Partial via integrations | Limited |
-| **Lock-in risk** | None (your data, your repo, exit anytime) | High (data lives in their DB) | Medium |
-| **Best fit** | Engineering-led teams + their compliance/audit/legal/UAT counterparts who want plain-format outputs everyone can open without a vendor login | Teams that want a turnkey GRC dashboard for their CISO | Teams that want AI to write their policies for them |
-
-### vs. test-management platforms
-
-|  | BranchNuX | TestRail / Xray / Zephyr / qTest |
-|---|---|---|
-| **Distribution** | OSS CLI; data in your git repo | Hosted SaaS; data in vendor cloud |
-| **Test plan authoring** | Markdown + frontmatter (any editor, any IDE, any AI assistant) | Vendor UI required |
-| **Standards alignment built-in** | Yes — 7 industry bundles ship today (`general` / `ecommerce` / `edu` / `fintech` / `gov` / `healthcare` / `malaysia-banking`) | No (manual mapping required) |
-| **Traceability (R-XX → TC-XX → evidence → signoff)** | Deterministic generator (`branchnux rtm`) | Manual matrix maintenance |
-| **AI plan/spec authoring** | Yes (Claude API, opt-in, [VERIFY] markers) | Some vendors are rolling out; quality varies |
-| **Audit-ready evidence package** | Yes — HMAC-chained signoff + OSCAL JSON + standards-alignment table baked in | No — they export TC results; you assemble the audit package separately |
-| **Pricing** | Free OSS | $20–50/user/month typical |
-| **Best fit** | Teams that already work in git and want tests + evidence + traceability in the same repo | Teams that need a multi-tenant test-management UI for non-technical testers without git access |
-
-### vs. OSS test-report generators
-
-|  | BranchNuX | Allure / Playwright HTML reporter / Cucumber Reports / Mochawesome |
-|---|---|---|
-| **What it produces** | Audit-ready evidence package: HTML + XLSX + RTM + SCA + signoff PDF + OSCAL JSON | HTML pass/fail report from a test run |
-| **Standards alignment** | OWASP / WCAG / HIPAA / PCI / NIST / FedRAMP / BNM RMiT / etc. baked in | None — pure pass/fail rendering |
-| **Traceability matrix** | Generated from `REQUIREMENTS.md` + test plans | Not in scope |
-| **Signoff / attestation layer** | HMAC-chained ledger + tamper-evident PDF | Not in scope |
-| **AI-drafted plans / specs** | Yes (opt-in) | Not in scope |
-| **Pricing** | Free OSS | Free OSS |
-| **Best fit** | Teams that need regulator-ready evidence, not just test results | Teams that just want a pretty test-results page in CI |
-
-### Where BranchNuX feeds into the others
-
-BranchNuX is **complementary, not competitive**, with most of these:
-
-- **GRC platforms (Vanta / Drata / Secureframe / RegScale)** ingest BranchNuX's OSCAL 1.1.2 JSON output. Pick BranchNuX for engineering-side authorship; layer a GRC platform on TOP if your CISO wants a hosted dashboard.
-- **Test-management platforms (TestRail / Xray)** can ingest BranchNuX's XLSX exports for non-technical reviewer flows. Or run BranchNuX standalone and skip them.
-- **OSS test reporters (Allure / Playwright HTML)** can run alongside BranchNuX in the same Playwright pipeline — BranchNuX writes its evidence in `evidence/`, your reporter writes its HTML in `playwright-report/`. They don't conflict.
-
-What makes BranchNuX different from any of them is the **combination**: git-native + standards-aligned + LLM-augmented + signoff-chained + audit-package-output. Each individual feature has a competitor; the bundle is the moat.
-
----
-
-## The full journey: testing → attestation → audit
-
-BranchNuX is built to cover the entire chain from "an engineer writes a test plan" to "an auditor signs off on the evidence package." Different stages need different artifacts, and different people consume them. The CLI handles each stage.
-
-### Stage 1 — Author and execute (engineering)
-
-An engineer or QA lead authors `test-plan.md`, writes `spec.ts`, runs Playwright. Evidence screenshots land in `evidence/`. AI accelerators (`branchnux discover`, `plan`, `codify`, `enrich`) draft the boilerplate; humans confirm `[VERIFY]` markers before anything becomes evidence.
-
-### Stage 2 — Report and traceability (engineering → compliance)
-
-`branchnux report` produces the deterministic XLSX + self-contained HTML + execution log. `branchnux rtm` produces the bidirectional traceability matrix mapping R-XX requirements to TC-XX test cases to evidence files. The HTML report is what most stakeholders read; the RTM is what auditors walk during the audit.
-
-### Stage 3 — Attest and assess (compliance)
-
-`branchnux sca` produces an 8-section Security Control Assessment for a surface (today most often a tested page, but any control surface works). `branchnux sign` records HMAC-chained attestations against TC results, control claims, vendor questionnaire responses, or release approvals. Multi-reviewer N-of-M attestation via `branchnux br` enforces that QA, Security, and Compliance have all signed before a record is final.
-
-### Stage 4 — Submit and verify (audit)
-
-`branchnux sign pdf` renders the signoff ledger to PDF with a hash-chain verification badge auditors can confirm independently of the tool. `branchnux sca oscal` emits NIST OSCAL 1.1.2 JSON for ingestion into Vanta, Drata, Secureframe, RegScale. `branchnux sign stale-check --threshold 90d` flags entries older than threshold so auditors know which evidence is fresh and which needs re-attestation.
-
-### Who runs each stage
-
-| Stage | Primary operator | Primary consumer |
-|---|---|---|
-| 1 — Author and execute | Engineer / QA lead | (internal: nobody yet) |
-| 2 — Report and traceability | QA lead | Engineering manager + audit trail reviewer |
-| 3 — Attest and assess | Compliance officer / CISO / GRC analyst | Same compliance team + risk committee |
-| 4 — Submit and verify | Compliance officer | External auditor + regulator |
-
-The journey is not strictly sequential. You can re-attest at any time. You can re-run reports as evidence changes. You can re-emit OSCAL whenever your GRC platform asks for an updated package. But every stage produces an artifact downstream stakeholders need.
-
-### Where the journey extends in v0.3
-
-Three artifact verbs that reuse the same machinery to cover non-testing workflows:
-
-| Coming in v0.3 | Stage | What it produces | Status |
-|---|---|---|---|
-| `branchnux attest <claim>` | 3 | Attestation workflow not tied to a test plan. A reviewer signs a control claim ("we encrypt customer data at rest with AES-256") with the same HMAC chain. Useful for SOC 2 / NYDFS / ISO 27001 attestation packages with 80+ control narratives that have nothing to do with testing. | Planned |
-| `branchnux comply <industry>` | 3 + 4 | Scaffolds a regulator-ready compliance package from one of the 7 industry bundles. Control coverage table + evidence pointers + signoff blocks + OSCAL emission, ready for audit submission. | Planned |
-| `branchnux respond <questionnaire>` | 4 | Vendor due-diligence response generator. Reads SIG / CAIQ / vendor questionnaire formats, drafts answers from the existing SCA + signoff log, marks every cell `[VERIFY]` for legal review before submission. | Planned |
-
-Same `[VERIFY]` discipline. Same HMAC ledger. Same git-native storage. Different artifact verbs covering different stages of the same journey.
-
-### Why we still lead with testing
-
-Testing is concrete. Engineering teams already do it. It's the one place where evidence and code naturally converge, which makes the wedge tractable. The README leads with the testing surface because that's where most users will start.
-
-But the wedge is not the product. The product is the journey. If you're a compliance officer, GRC analyst, vendor-DD lead, or release-approval workflow owner reading this, the existing commands (`sign`, `sca`, `rtm`, `br`, `sca oscal`) already cover non-testing workflows today. If you want the v0.3 roadmap to prioritize your specific artifact type, [open an issue](https://github.com/StillNotBald/branchnux/issues) tagged `artifact-type:<your-thing>`.
-
----
-
-## Best practices (optional)
-
-If you want consistent outcomes across teams, see [docs/adoption-checklist.md](docs/adoption-checklist.md) for 4 must-do practices.
-
----
-
-## Why this exists
-
-Most testing tools are **runtime-focused** — run tests, show results. They stop there.
-
-Regulators don't read Playwright output. They read structured evidence packages: per-TC screenshots, a traceability matrix from requirement to test result, a standards-alignment table. Building those by hand takes 4–8 hours per page. BranchNuX generates them in under 5 minutes from the same markdown and screenshot files your engineers already produce.
-
-The gap BranchNuX fills:
-
-| What auditors ask for | Typical answer | BranchNuX answer |
-|---|---|---|
-| "Show me test evidence for control IA-2" | Screenshot folder + spreadsheet pasted together | Per-TC evidence embedded in a self-contained HTML report, linked to R-XX |
-| "Which requirements does this test cover?" | Manually maintained spreadsheet | `TRACEABILITY.md` generated from plan frontmatter |
-| "Is this WCAG 2.2 AA compliant?" | "We think so" | Standards-alignment table baked into every report |
-| "Can a non-technical reviewer sign off?" | "Here's the code" | XLSX with Pass/Fail dropdowns and priority colour-coding |
-
-The deterministic pipeline (markdown → HTML + XLSX + RTM) is the product. The AI features that help author plans and specs are accelerators — useful, but not required.
-
----
-
-## What the pipeline produces
-
-```
-testing-log/
-  2026-05-01_login/
-    test-plan.md                  ← TC matrix + Given/When/Then per TC
-    execution-log.md              ← results + analysis narrative
-    evidence/
-      LOGIN-01.png
-      LOGIN-02.png
-      ...
-    login-test-plan.xlsx          ← generated: Pass/Fail dropdowns, priority colour
-    login-execution-report.html   ← generated: self-contained, TOC + tabs + screenshots
+```sh
+rootnux init
 ```
 
-| Artifact | Audience | Format |
-|---|---|---|
-| `test-plan.md` | Engineers + AI agents | Markdown (frontmatter schema + TC matrix + G/W/T) |
-| `execution-log.md` | Audit trail | Markdown (results + analysis) |
-| `*.xlsx` | Non-technical testers + UAT reviewers | Excel with Pass/Fail dropdown, colour-coded priority |
-| `*.html` | Stakeholders + auditors | Self-contained HTML: TOC, tabs, embedded screenshots, standards table |
-| `evidence/<TC-ID>.png` | Proof of execution | Per-TC Playwright `afterEach` screenshots |
-| `TRACEABILITY.md` rows | Bidirectional R-XX ↔ TC-XX mapping | Markdown matrix |
+Scaffolds `REQUIREMENTS.md`, `TRACEABILITY.md`, a risks register, and `docs/adr/`.
+
+### Record an architectural decision
+
+```sh
+rootnux adr-new "Use PostgreSQL for primary store"
+```
+
+Creates `docs/adr/0001-use-postgresql-for-primary-store.md` with sequential numbering.
+
+### Start a sprint
+
+```sh
+trunknux new-sprint v1-launch
+```
+
+Creates `sprint-log/2026-04-28_v1-launch/` with a sprint scaffold.
+
+### Summarize what was built
+
+```sh
+trunknux summarize
+```
+
+Generates `SPRINT_SUMMARY.md` from `git log`, grouped by conventional-commit type.
+
+### Generate a test plan
+
+```sh
+branchnux plan login
+```
+
+Produces `testing-log/<date>_login/test-plan.md` with TC matrix, Given/When/Then per TC, R-ID frontmatter, and `[VERIFY]` markers on every LLM-drafted cell.
+
+### Produce a Security Control Assessment
+
+```sh
+branchnux sca login
+```
+
+Produces an 8-section SCA document (Markdown + optional PDF) for the login surface.
 
 ---
 
-## The 6-phase pipeline
+## How it fits together
+
+The 6-NUX taxonomy is a directed graph of concerns in the regulated-software lifecycle:
 
 ```
-1. DISCOVER   →  page state catalogued (branchnux discover)
-      ↓
-2. PLAN       →  test-plan.md authored (branchnux plan)
-      ↓
-3. CODIFY     →  Playwright spec written (branchnux codify)
-      ↓
-4. EXECUTE    →  tests run, evidence captured (Playwright + afterEach hook)
-      ↓
-5. REPORT     →  XLSX + HTML generated (branchnux report)
-      ↓
-6. DOC        →  RTM + session log updated (branchnux rtm)
+rootnux (intent / specs)
+    └── trunknux (build / sprint)
+            └── branchnux (verification / evidence)
+                    ├── leafnux (continuous health) [deferred]
+                    └── fruitnux (audit deliverables) [deferred]
 ```
 
-**Honest scope at v0.2.0:** Phase 5 (REPORT) is the deterministic foundation — no LLM, same output every run. Phases 1, 2, 3, 6 are LLM-assisted (Claude API, opt-in via `CLAUDE_API_KEY`); every LLM-generated cell renders with a `[VERIFY]` marker until a human attests it. The deterministic core is what gets audited; the LLM agents accelerate authoring.
+**Cross-package contract:** NUX packages do not import each other. They communicate via file-system conventions defined in `@leapnux/6nux-core`. A rootnux artifact (e.g. `REQUIREMENTS.md`) is a file that trunknux and branchnux read by path — not by API call. This keeps the packages independently installable and avoids coupling the release cycles.
+
+See [`docs/6-NUX.md`](docs/6-NUX.md) for the full taxonomy schema and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the implementation spec.
 
 ---
 
-## Commands by 6-NUX output type
+## Why branchnux?
 
-BranchNuX commands map cleanly onto two output categories in the 6-NUX taxonomy:
+BranchNuX is the most mature node in the tree. A few design decisions worth knowing before you adopt it:
 
-### Leaves — Continuous Health
-
-These commands keep a branch honest on every cycle. Their outputs are internal signals: did the branch hold up, did the evidence stay fresh, did the controls hold?
-
-| Command | What it does |
-|---|---|
-| `branchnux test` / Playwright | Execute the spec, capture `evidence/<TC-ID>.png` |
-| `branchnux validate <folder>` | Lint test-plan.md frontmatter against JSON Schema (0 lint errors = healthy leaf) |
-| `branchnux doctor` | Preflight check — Node version, Playwright, env vars, common pitfalls |
-| `branchnux health` / `branchnux sign stale-check` | Flag stale attestations (older than threshold) — leaf goes yellow when evidence ages out |
-| `branchnux verify` / `branchnux compare <slug> envA envB` | Cross-env verdict: MATCH / PROMOTION / REGRESSION — the merge gate |
-
-### Fruits — Audit-Ready Deliverables
-
-These commands produce the external-facing artifacts that compliance officers, auditors, and regulators consume. They are the harvest: what the branch grew.
-
-| Command | What it produces |
-|---|---|
-| `branchnux report <folder>` | Self-contained HTML execution report + XLSX test plan (the primary audit artifact) |
-| `branchnux rtm` | `TRACEABILITY.md` — bidirectional R-XX → TC-XX → evidence → signoff matrix |
-| `branchnux sca init\|generate\|pdf` | 8-section Security Control Assessment (markdown + PDF) |
-| `branchnux sca oscal` | NIST OSCAL 1.1.2 JSON — machine-readable for Vanta, Drata, Secureframe, RegScale |
-| `branchnux sign pdf <surface>` | HMAC-chained signoff ledger → tamper-evident PDF with hash-chain verification badge |
-| `branchnux attest <claim>` *(v0.3)* | Attestation not tied to a test plan — SOC 2 / NYDFS / ISO 27001 control narratives |
-| `branchnux comply <industry>` *(v0.3)* | Regulator-ready compliance package from industry bundle |
-| `branchnux respond <questionnaire>` *(v0.3)* | Vendor due-diligence response drafted from existing SCA + signoff log |
+- **Three-track discipline.** `requirements/` (what you said you'd build) + `sprint-log/` (what was built) + `testing-log/` (what was tested). One traceable graph, all in your repo, date-stamped for audit snapshots.
+- **`[VERIFY]` markers on every LLM-drafted cell.** Explicit annotation that no human has attested the content yet. AI accelerates authoring; humans gate evidence. Removing a `[VERIFY]` without reading the underlying content is the one way to make your evidence package fail under audit.
+- **HMAC-chained signoff ledger.** Tamper-evident attestation. The signoff PDF carries a hash-chain verification badge that auditors can verify independently of the tool.
+- **Deterministic core, opt-in AI.** `branchnux report`, `validate`, `rtm`, `sca`, and the signoff suite require no LLM. The Claude API (`discover`, `plan`, `codify`, `enrich`) is opt-in with explicit cost gates (`--max-spend`, `--dry-run`).
+- **Audience split.** Most branchnux users never run the CLI — they read the HTML report, XLSX, signed PDF, or OSCAL JSON that the CLI produced. The artifact formats (HTML, Excel, PDF, JSON, Markdown) were chosen so compliance officers, legal counsel, and external auditors can open them without installing anything.
 
 ---
 
-## What's automated vs manual
+## Documentation
 
-| Phase | v0.1.1 | v0.2.0 (current) |
-|---|---|---|
-| DISCOVER | Manual | `branchnux discover <url>` (Claude API, [VERIFY] markers) |
-| PLAN | Template-assisted | `branchnux plan <slug>` (Claude API, [VERIFY] markers) |
-| CODIFY | Template-assisted | `branchnux codify <slug>` (Claude API, preserves XFF + form.requestSubmit + afterEach patterns) |
-| EXECUTE | Automated | Same — Playwright + bundled `afterEach` evidence hook |
-| REPORT | Fully automated (no LLM) | Same — fully deterministic, no LLM |
-| DOC | Template-assisted | `branchnux rtm` (deterministic) + `branchnux enrich` (LLM, append-only) |
-
-The deterministic `report` pipeline is the audit-defensible core in both versions. v0.2.0 adds LLM agents that draft scenarios → plans → specs → enrichments — every output flagged `[VERIFY]` until a human reviews. Use `branchnux batch-plan --pages "login,register,..."` for parallel multi-page authoring.
-
----
-
-## Industry-standards configuration
-
-Seven standards bundles ship today. Every generated report includes a standards-alignment table mapping each TC to the applicable controls.
-
-```bash
-npx branchnux init my-page --industry malaysia-banking
-```
-
-| `--industry` flag | What it covers |
-|---|---|
-| `general` | OWASP ASVS 4.0 + WCAG 2.2 AA — general-purpose web application security and accessibility baseline |
-| `ecommerce` | PCI DSS v4.0 (SAQ A / A-EP / D), GDPR Articles 6/7/13/17/30/32, CCPA/CPRA, ePrivacy Directive, OWASP ASVS, WCAG 2.2 AA |
-| `edu` | FERPA (student records), COPPA (under-13 consent), NIST SP 800-171 (CUI for grant-funded research), ISO 27001:2022, GDPR child consent, WCAG 2.2 AA |
-| `fintech` | NIST SP 800-63B, NYDFS 23 NYCRR 500, PCI DSS v4.0, FFIEC IT Handbook, PSD2 RTS on SCA, OWASP ASVS 4.0 |
-| `gov` | FedRAMP Moderate (NIST 800-53 Rev 5 core controls), FISMA, OMB Circular A-130, StateRAMP, CIS Controls v8, Section 508 accessibility |
-| `healthcare` | HIPAA Security Rule (Administrative, Physical, Technical Safeguards), HITECH Breach Notification, NIST SP 800-66r2, 21 CFR Part 11 |
-| `malaysia-banking` | PDPA 2010 + 2024 amendments (data protection), BNM RMiT 2020/2023 (technology risk for licensed banks), Cyber Security Act 2024 (NCII reporting obligations), BNM e-Banking Guidelines (customer authentication for retail e-banking) — 30 controls total |
-
-The standards config for each bundle lives in `src/config/industry-standards/<industry>.json`. To use a custom control set, drop a `standards.json` file in any test-pass folder — it overrides the bundled config for that folder only.
-
-`branchnux sca oscal` emits NIST OSCAL 1.1.2 — the machine-readable assessment format required by FedRAMP RFC-0024 (mandatory from September 2026). OSCAL output ingests directly into Vanta, Drata, Secureframe, and RegScale.
-
----
-
-## Demo
-
-The demo target is a prebuilt Next.js dashboard at `examples/demo-dashboard/`. It ships with sample output artifacts showing what BranchNuX produces:
-
-```
-examples/demo-dashboard/
-  output/
-    login-test-plan.md          ← 15 TCs, full G/W/T, OWASP ASVS + WCAG aligned
-    login-sca-v0.1.md           ← 8-section SCA reference artifact
-    login-execution-report.html ← self-contained HTML report (generated next)
-  screenshots/                  ← per-TC Playwright evidence screenshots
-```
-
-Run `npx branchnux demo` to generate and open these locally.
-
-**Live demo:** Browse the [sample execution report](./examples/demo-dashboard/output/login-execution-report.html) — a real `branchnux report` output from a Playwright run against the demo-dashboard project (13 PASS / 2 BLOCKED-CONFIG out of 15 TCs, 13 embedded screenshots), regenerated in v0.2.0 to replace the original hand-crafted sample. Self-contained HTML — open offline, no SaaS dashboard required.
-
----
-
-## Data model and architecture
-
-See `docs/architecture/` for the full data model. The core abstraction is a directed graph:
-
-```
-Requirement (R-XX)
-    └─ TestCase (TC-ID)
-          ├─ Evidence (TC-ID.png)
-          ├─ Result (PASS | FAIL | SKIP | BLOCKED)
-          └─ Control mapping (OWASP-ASVS-XX / WCAG-2.2-AA-XX / ...)
-```
-
-The CLI verbs are surface area on this graph. The JSON Schema for `test-plan.md` frontmatter lives at `docs/schema/test-plan.schema.json`.
-
-Note on AI-generated content: every LLM-generated cell in a report renders with a `[VERIFY]` marker until a human has reviewed and attested it. This is non-negotiable for audit defensibility.
-
----
-
-## Three-track discipline (requirements / sprint-log / testing-log)
-
-BranchNuX is built around a git-native three-track structure:
-
-```
-requirements/                    ← what you said you'd build
-  REQUIREMENTS.md
-  TRACEABILITY.md                ← R-XX → sprint → code → test → backlog
-
-sprint-log/<date>_<feature>/     ← what was built
-  SPRINT_SUMMARY.md
-
-testing-log/<date>_<page>/       ← what was tested
-  test-plan.md
-  execution-log.md
-  evidence/
-  *.xlsx
-  *.html
-```
-
-The date-prefix on test-pass folders creates audit snapshots — every engagement has a clear record of what was tested on what date against which version.
+- [`docs/MOTTO.md`](docs/MOTTO.md) — OSS / Premium product split and strategic posture
+- [`docs/6-NUX.md`](docs/6-NUX.md) — taxonomy schema
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — monorepo implementation spec
+- [`docs/concepts.md`](docs/concepts.md) — key concepts (three-track discipline, VERIFY markers, HMAC chain)
+- [`docs/getting-started.md`](docs/getting-started.md) — first 15 minutes
+- [`docs/reference.md`](docs/reference.md) — full verb reference
+- [`CHANGELOG.md`](CHANGELOG.md) — release history
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to contribute
 
 ---
 
 ## Roadmap
 
-### v0.1.1 (stable on `@latest`)
+- **v0.4.x** — current alpha series; rootnux + trunknux + branchnux mature; leafnux + fruitnux remain reserved skeletons with no committed timeline
+- **v0.5+** — leafnux + fruitnux verbs (deferred pending real adopter pull and OSS-vs-premium clarity)
+- **v1.0** — stability milestone + landing page at leapnux.com + 6-NUX commercial spec
 
-- `branchnux init <slug> [--industry general]` — scaffold test-pass folder
-- `branchnux report <folder>` — XLSX + HTML from markdown inputs (deterministic, no LLM)
-- `branchnux validate <folder>` — lint test-plan.md frontmatter against JSON Schema
-- `branchnux demo` — run bundled demo-dashboard fixture, open output in browser
-- `branchnux doctor` — preflight check (Node, Playwright, env vars, common pitfalls)
-- OWASP ASVS + WCAG 2.2 AA standards alignment out of the box
-- `[VERIFY]` confidence markers on every LLM-generated cell
-
-### v0.2.0 (current, shipped 2026-04-27)
-
-**LLM agent suite** (real Claude API; require `CLAUDE_API_KEY` + `npm install @anthropic-ai/sdk`):
-- `branchnux discover <url>` — browse a page, emit `scenarios.md` with G/W/T TCs
-- `branchnux plan <slug>` — `scenarios.md` → `test-plan.md` with frontmatter + R-IDs + [VERIFY]
-- `branchnux codify <slug>` — `test-plan.md` → Playwright `spec.ts`; preserves XFF + form.requestSubmit + afterEach patterns; `--safe` mode for hand-edited specs
-- `branchnux enrich <slug>` — three append-only passes (design-review / qa-structural / graph-context), marker-bounded so human edits survive regeneration
-- `branchnux batch-plan --pages "login,register,..."` — parallel multi-page pipeline with cumulative `--max-spend` enforcement and replacement-agent failure isolation
-- Eval harness at `test/eval/` — 3 fixture pages with golden outputs, scoring on TC count / R-ID format / [VERIFY] placement / standards alignment
-
-**Signoff suite (S1-S5):**
-- `branchnux sign <surface>` — record an attestation (chained HMAC log)
-- `branchnux sign pdf <surface>` — render the UAT signoff ledger to PDF with hash-chain verification badge
-- `branchnux sign stale-check <surface> --threshold 90d` — flag entries older than threshold (CI gate via `--strict`)
-- OSCAL `assessment-log` integration — `branchnux sca oscal` populates `responsible-parties` + `assessments[].assessment-log.entries` (validated against OSCAL 1.1.2 schema)
-- `branchnux sign --justify-with-llm` — optional LLM-drafted justification text; reviewer edits + confirms; auto-prefixed `[VERIFY] LLM-drafted, reviewer-confirmed:`
-- Multi-reviewer N-of-M — `required_reviewers` field in BR frontmatter; `branchnux br rtm` shows partial-attestation status; revocation supported (append-only)
-
-**Per-env + visual regression:**
-- `branchnux run <slug> --env staging|prod|local` — env-suffixed test-pass folders; auto-injects `env:` and `base_url:` into frontmatter
-- `branchnux compare <slug> staging prod` — per-TC verdict: MATCH / PROMOTION / REGRESSION / DIVERGE / MISSING-A / MISSING-B; CI gate via `--threshold`
-- `branchnux visual baseline <slug>` — capture full-page Playwright screenshots to `<folder>/visual-baseline/<TC-ID>.png`
-- `branchnux visual compare <slug> --threshold 0.05 [--strict]` — pixelmatch diffs against baseline; graceful degrade if `pixelmatch` not installed
-
-**Deterministic generators:**
-- `branchnux rtm` — generate `TRACEABILITY.md` from REQUIREMENTS.md + sprint-log + code grep + test-plan.md (human-edit-survives-regeneration markers)
-- `branchnux sca init|generate|pdf` — Security Control Assessment from test results
-- `branchnux mcp` — stdio MCP server for Claude Code integration (mount via `.claude/settings.json`)
-- `branchnux report` is **no longer a stub** — full XLSX + self-contained HTML (TOC sidebar, status tabs, embedded screenshots, standards alignment matrix, threat coverage, base64-inlined assets)
-
-**Tests:** 152 → 370 (all green). 0 lint errors.
-
-> v0.2.0 introduced the LLM agents; v0.2.1 (current) added smoke-test polish and bumped four major dependencies. Eval-set regression testing is in place (3 fixture pages with golden outputs) but coverage will expand in 0.2.x patch releases as the tool soaks against more real-world surfaces. Expect prompt-quality iteration during the 0.2.x cycle.
-
-### v0.3 (next; the journey extension)
-
-The v0.3 thesis: BranchNuX is the verification layer in the 6-NUX framework — the branch that reads from rootnux + trunknux, verifies, and produces leafnux + fruitnux. v0.3 completes the fruit set (attestation, compliance packages, vendor-DD responses) and hardens the leaf layer (multi-framework adapters, eval expansion, environment orchestration).
-
-**New artifact verbs (fruits — stages 3 and 4 of the audit journey):**
-- `branchnux attest <claim>` — attestation workflow not tied to a test plan. HMAC-chained, PDF output, useful for SOC 2 / NYDFS / ISO 27001 control narratives.
-- `branchnux comply <industry>` — scaffolds a regulator-ready compliance package from any industry bundle. Control coverage + evidence pointers + signoff blocks + OSCAL emission. Audit-submission-ready.
-- `branchnux respond <questionnaire>` — vendor due-diligence response generator. Reads SIG / CAIQ formats, drafts from existing SCA + signoff log, marks every cell `[VERIFY]` for legal review.
-
-**Infrastructure to support the branch:**
-- Eval harness expansion: 10+ real customer pages, regression CI gate before any LLM prompt change ships.
-- Cypress + Vitest adapter support (today: Playwright only).
-- Additional `--industry` bundles for emerging regulatory jurisdictions (UK FCA, EU DORA, India RBI candidates).
-- Optional `/branchnux` skill for the gstack catalog — one distribution channel for users already on gstack; the underlying CLI is unchanged.
-
----
-
-## FAQ
-
-**Can I trust the output enough to skip human review?**  
-No. Every BranchNuX output — LLM-drafted test plans, codified Playwright specs, signoff PDFs, SCAs, OSCAL exports — is a starting point for human review, not a final answer. The disclaimer block near the top of this README covers this in detail. The short version: `[VERIFY]` markers are not decoration; they mean a qualified human has not yet attested to that content. Removing a `[VERIFY]` marker without reading and validating the underlying content is the one thing that will make your evidence package fail under audit.
-
-**Does BranchNuX cost anything?**  
-The CLI is free (Apache 2.0). The v0.2 LLM agents call Claude's API — approximately **$0.30–$0.50 per page** for a full pass (Sonnet-class) with `--max-spend` to cap a batch. See [docs/costs.md](docs/costs.md) for empirical per-page burn rates and recommended working patterns.
-
-**Do I need an Anthropic API key?**  
-Not for the deterministic core. `branchnux report`, `branchnux validate`, `branchnux rtm`, `branchnux sca`, `branchnux run`/`compare`, `branchnux visual baseline`/`compare`, and the entire signoff suite work without any LLM. A `CLAUDE_API_KEY` is required only for the v0.2 LLM agents (`discover`, `plan`, `codify`, `enrich`, `batch-plan`, and the optional `sign --justify-with-llm`).
+If you want the roadmap to prioritize a specific artifact type, [open an issue](https://github.com/StillNotBald/branchnux/issues).
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
-Quick version:
-- All contributors must sign off commits with `git commit -s` (DCO — no CLA paperwork)
-- Every PR must ship with tests
-- Open an issue before a large PR so we can align on design
+Quick version: sign commits with `git commit -s` (DCO, no CLA), ship tests with every PR, open an issue before a large change.
 
 ---
 
-## Credits
-
-The three-track discipline (`requirements/` + `sprint-log/` + `testing-log/`) and the multi-agent dispatch patterns are inspired by [gstack](https://github.com/garrytan/gstack) by Garry Tan. BranchNuX is a standalone CLI — gstack is not a runtime dependency, just an inspiration for the workflow shape. Other credits: Playwright (evidence capture), IBM Trestle (OSCAL validation), NIST OSCAL (standards schema), Anthropic Claude (v0.2 LLM agents). Full attribution at [docs/credit.md](docs/credit.md). Upstream patterns we plan to contribute back live in [CONTRIBUTING.md](CONTRIBUTING.md).
-
----
-
-## License and trademark
+## License
 
 Apache 2.0. See [LICENSE](LICENSE).
 
-"BranchNuX™" is a trademark of Chu Ling. See [NOTICE](NOTICE) for trademark terms. The Apache 2.0 license covers the code; the trademark covers the name.
+"BranchNuX™" and "LeapNuX™" are trademarks of Chu Ling. See [NOTICE](NOTICE) for trademark terms. The Apache 2.0 license covers the code; the trademark covers the name.
 
----
+## Author
 
-## Contact
+Chu Ling ([StillNotBald](https://github.com/StillNotBald)) — ccling1998@gmail.com
 
-Single point of contact for all matters (security, premium, partnerships, contributions): **ccling1998@gmail.com**
-
-For security vulnerabilities, please use [GitHub Private Vulnerability Reporting](https://github.com/StillNotBald/branchnux/security/advisories/new) (preferred — gives us a private collaboration channel + CVE assignment workflow). Email is the fallback.
+Security reports: [GitHub Private Vulnerability Reporting](https://github.com/StillNotBald/branchnux/security/advisories/new) (preferred) or email.

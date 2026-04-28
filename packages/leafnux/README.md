@@ -8,9 +8,9 @@ Continuous-internal-health layer of the 6-NUX taxonomy.
 
 The package name is reserved in the `@leapnux` scope, but the verb surface is intentionally undecided. Building leafnux without:
 
-1. A cross-check against prior PM-platform features (autopsy of bloat),
-2. Pull from at least one production adopter,
-3. Clarity on which leaf-layer signals are OSS vs premium (hosted dashboards, multi-project rollups, account-bound alerting all naturally fit 6-NUX premium),
+1. Pull from at least one real adopter running 5-NUX in production,
+2. Clarity on which leaf-layer signals are OSS vs premium (hosted dashboards, multi-project rollups, account-bound alerting all naturally fit 6-NUX premium),
+3. A first-principles design that doesn't import assumptions from any specific industry,
 
 …would risk re-creating the bloat that motivated 5-NUX in the first place.
 
@@ -29,3 +29,7 @@ See [docs/6-NUX.md](https://github.com/StillNotBald/branchnux/blob/main/docs/6-N
 ## License
 
 Apache-2.0 (c) 2026 Chu Ling
+
+## Part of the 5-NUX family
+
+Sibling packages: [rootnux](../rootnux), [trunknux](../trunknux), [branchnux](../branchnux), [leafnux](../leafnux), [fruitnux](../fruitnux), [6nux-core](../6nux-core), [5nux meta](../5nux). See the [root README](../../README.md) for the full taxonomy and install instructions.

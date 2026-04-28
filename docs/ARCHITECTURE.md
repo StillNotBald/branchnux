@@ -257,17 +257,17 @@ The dogfood discipline is **load-bearing for credibility**. Every time we ship a
 | 4 | `rootnux kb-init` — knowledge base scaffold | **fresh design needed** — sections (objective, owner, lessons, stakeholders) are universal, but the KB schema must be authored from first principles | rootnux | S |
 | 5 | `branchnux gate-new` — gate checkpoint artifact | **fresh design needed** — file-native gate schema with approver list + state is portable; reject any "live voting UI" temptation (premium territory) | branchnux | M |
 
-**Discipline:** "fresh design needed" means the candidate's *idea* survived a critical review of prior PM-platform implementations, but the prior implementation itself is unsuitable for direct porting (it carries domain assumptions, audience-specific UX, or architectural compromises that 5-NUX must not inherit). The OSS verb gets designed from first principles + adopter pull, not lifted.
+**Discipline:** "fresh design needed" means the candidate's *idea* survived critical review, but no prior implementation is suitable for direct porting (any reviewed source carries domain assumptions, audience-specific UX, or architectural compromises that 5-NUX must not inherit). The OSS verb gets designed from first principles + adopter pull, not lifted.
 
 **Note on leafnux + fruitnux:** the skeleton packages remain reserved. `leafnux critical-path` is the only pre-vetted leafnux candidate; everything else is undecided. fruitnux remains deferred indefinitely; branchnux already covers the OSS-CLI portion of audit evidence (`sca`, `sca-oscal`, `sign`, `sign-pdf`), and most other deliverable workflows (multi-party sign-off, immutable evidence stores, regulator portals) are inherently 6-NUX premium.
 
-### Anti-patterns to avoid (lessons from prior PM-platform work)
+### Anti-patterns to avoid
 
-These all came from a critical autopsy of a previous all-in-one PM platform that suffered from feature-driven (not user-driven) growth. Every item below is a real failure mode with concrete prior-art evidence:
+These come from critical reviews of products that suffered feature-driven (not user-driven) growth. Each is a real failure mode worth designing around:
 
 **Strategic anti-patterns:**
 
-- **Audience generalization on a narrow product** — calling something "all-in-one PMO" while the data model is shaped for one specific team's ceremony. If the source code mentions a specific industry phase or vendor, the product is not generic.
+- **Audience generalization on a narrow product** — calling something "all-in-one X" while the data model is shaped for one specific team's ceremony. If the source code mentions a specific industry phase or vendor, the product is not generic.
 - **Demo-driven UX** — auto-redirecting roles to specific routes because that's what the demo script needs (vs what the role actually does day-to-day).
 - **Decorative dashboards** — homepage charts that exist to impress, not to inform. If the chart can't drive a working-session decision, it's art, not product.
 - **Burying the killer feature** — when the one workflow that would have made the product valuable is nav-item 5 of 8, the product is being marketed as something it isn't.
@@ -284,7 +284,7 @@ These all came from a critical autopsy of a previous all-in-one PM platform that
 **UX anti-patterns:**
 
 - **`window.confirm` while a custom modal exists** — destructive actions handled by browser dialogs in a codebase that already has a `ConfirmationModal` component sitting unused. Use what you built or delete it.
-- **Domain-opaque modules in a generic product** — features whose names ("Dry Run", "Cutover") only make sense to one specific industry. Either the product is for that industry (label it) or the feature shouldn't be in the nav.
+- **Domain-opaque modules in a generic product** — features whose names only make sense to one specific industry (war-room ceremonies, deployment rehearsals, etc). Either the product is for that industry (label it) or the feature shouldn't be in the nav.
 - **Subtraction failures** — UI elements that exist because they're "what you'd expect" rather than because they earn their pixels. If you can't explain what a chart causes a user to *do*, cut it.
 - **Deprecated types living in the live schema** — leftover types/columns marked `@deprecated` but still referenced by data flowing through the app. Either complete the deprecation or revert the rename.
 

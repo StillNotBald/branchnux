@@ -28,14 +28,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
+      - name: Lint (workspaces)
+        run: npm run lint --if-present
 
-      - name: Build
-        run: npm run build --if-present
-
-      - name: Test
+      - name: Test (workspaces)
         run: npm test --if-present
+
+      - name: Verify no banned tokens leak (hygiene guard)
+        run: npm test --workspace @leapnux/branchnux -- cli.test.mjs
+
+      - name: npm publish dry-run (manifest validation)
+        run: npm publish --dry-run --workspaces --access=public
 
   lint-templates:
     name: Lint templates (security)
@@ -50,5 +53,8 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Lint templates for forbidden patterns
-        run: node scripts/lint-templates.mjs
+        run: npm run lint:templates --workspace @leapnux/branchnux

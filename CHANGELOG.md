@@ -5,19 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.0-alpha.1] - 2026-04-27
-
-### Changed
-- **Brand: TrunkNuX → BranchNuX.** Renamed to align with the 6-NUX framework where this tool is the *branch* that verifies trunk + root and produces leaf + fruit, not the trunk itself. The metaphor sharpened: BranchNuX literally runs on a git branch, verifies its claims, and produces audit-ready evidence before merge.
-- Package renamed `trunknux` → `branchnux` (npm, GitHub repo, CLI binary).
-- Repo: github.com/StillNotBald/trunknux → github.com/StillNotBald/branchnux
-
-### Migration
-- Users who installed `trunknux` (never published to npm): install `branchnux` instead. CLI surface unchanged.
-- Users on `testnux@*` (predecessor, last published as `testnux@0.2.0-alpha.1`): install `branchnux`.
-
----
-
 ## [Unreleased]
 
 ### Added — dogfood pass (2026-04-27)
@@ -34,6 +21,123 @@ BranchNuX is the tool that produces audit-defensible evidence chains. As of v0.2
 PDF render not produced this pass: `puppeteer-core` is not a dependency. To render `sca/branchnux-cli.pdf` and the signoff PDF locally, run `npm install puppeteer-core` and re-run `branchnux sca pdf branchnux-cli` and `branchnux sign pdf branchnux-cli`. The markdown SCA and JSONL ledger are the canonical source of truth.
 
 The dogfood pass surfaced real gaps. They are tracked openly in the SCA's "Gaps" section. We chose to publish the gaps rather than hide them — that's the audit-defensibility thesis applied to ourselves.
+
+---
+
+## [0.4.3-alpha.1] - 2026-04-28
+
+**Hygiene sanitization + leafnux/fruitnux deferral.**
+
+Two parallel audits (hygiene+leak, workflow+structure) identified 4 RED hygiene findings. This release applies those fixes and formalizes the deferral of leafnux and fruitnux.
+
+### Changed
+
+- `docs/6-NUX.md` — replaced internal-project structure references with generic project layout; replaced specific auditor / KYC vendor names with role-level placeholders.
+- `packages/branchnux/src/commands/doctor.mjs` — removed dated incident references; comments are now behavior-explaining and generic.
+- `packages/branchnux/templates/spec.ts` — `mfa-tester` → `totp-user`; replaced internal memory key reference with OWASP citation. This template ships in the npm tarball.
+- `testing-log/2026-04-27_trunknux-cli/spec.ts` — same fixes as the template above.
+- `@leapnux/6nux-core` VERSION constant updated to read runtime version (was 3 releases stale). STATUS changed from `'skeleton'` to `'active'`.
+- `@leapnux/leafnux` and `@leapnux/fruitnux` READMEs, CLI stubs, and roadmap section updated to **DEFERRED — future sprint, no committed timeline**.
+
+### Removed
+
+- `NEXT_STEPS_FOR_USER.md` — contained author-local Windows path; one-time post-rename content.
+- `examples/demo-dashboard/output/login-execution-report.html.bak` — stale backup artifact.
+- `*.bak` added to `.gitignore`.
+
+### Fixed
+
+- 22 structure/workflow findings identified and scoped for v0.4.4+ (README rewrite, CHANGELOG retrofill, ADR generation, CLAUDE.md updates, archive of v0.2/v0.3-era docs).
+
+---
+
+## [0.4.2-alpha.1] - 2026-04-28
+
+**6nux-core extraction + 8 MEDIUM/LOW polish findings + ARCHITECTURE.md.**
+
+### Added
+
+- **`@leapnux/6nux-core`** — promoted from placeholder to active. Exports: `PATHS`, `SCHEMAS`, `KEBAB_RE`, `DATE_SLUG_RE`, `VALID_DATE_RE`, `STATUSES` (conventions); `RXX_PATTERN`, `todayISO()`, `slugify()`, `isValidSlug()` (ids); `parseMarkdownFrontmatter()`, `yamlQuote()`, `readFileWithSizeCap()`, `assertDateFormat()` (utils). 8 consumer files across rootnux and trunknux migrated to import from core.
+- **`docs/ARCHITECTURE.md`** — comprehensive implementation spec (~400 lines) covering brand hierarchy, monorepo layout, package contracts, 6nux-core API, security threat model, testing strategy, and extension guide.
+- **`docs/6-NUX.md`** — taxonomy doc now in the public OSS repo.
+- 55 new tests for `@leapnux/6nux-core`.
+
+### Fixed
+
+- DoS guard: `readFileWithSizeCap()` (10 MB cap) applied to all lint readers; trunknux warns at >1000 sprint folders.
+- Secret-pattern scan in `summarize` commit subjects (patterns: `ghp_`, `AKIA`, `password=`, and 3 others; warns, never blocks).
+- `risks.md` created with mode `0o640` (not world-readable).
+- YAML quoting in `adr-new` — titles containing `:`, `[`, or `"` no longer corrupt frontmatter.
+- `summarize` now distinguishes git-not-installed vs not-a-repo vs other errors.
+- `risk-add` errors at R-99 overflow; `appendFileSync` gains error guard.
+- `lint` strips fenced code blocks before counting R-XX (no more false positives from `R-99` in code samples).
+- `rootnux lint --json` output normalized to `{status, errors, warnings, rxx_count}`.
+
+---
+
+## [0.4.1-alpha.1] - 2026-04-28
+
+**rootnux + trunknux MVPs + hardening + motto lock.**
+
+### Added
+
+- **rootnux** MVP verbs: `init` (scaffold REQUIREMENTS.md + TRACEABILITY.md + risks register + docs/adr/), `lint` (validate R-XX schema, cross-links, status values), `adr-new` (scaffold ADR with sequential NNNN numbering), `risk-add` (append templated row to risk register), `status` (DONE/BLOCKED/PARTIAL/... counts + percentages, `--json` mode).
+- **trunknux** MVP verbs: `new-sprint` (date-prefixed sprint-log folder), `summarize` (SPRINT_SUMMARY.md from git log, conventional-commit grouped), `lint` (verify sprint folder structure conventions).
+- **`docs/MOTTO.md`** — locks OSS/Premium split: entire PM tool chain in the CLI is OSS (Apache 2.0); onboarding, hosting, multi-user, and account management belong in the premium tier.
+- Self-dogfood evidence: `trunknux new-sprint v0-4-1-rootnux-trunknux-mvp` + `trunknux summarize` from 32 commits.
+- 18 hardening regression tests added (458 total, up from 440).
+
+### Fixed
+
+- **CRITICAL** — command injection in `summarize`: `execSync` string interpolation replaced with `spawnSync` array form; date inputs validated against `/^\d{4}-\d{2}-\d{2}$/`.
+- **HIGH** — TOCTOU + symlink attack in `init`: `existsSync`+`writeFile` replaced with atomic `openSync('wx')`.
+- **HIGH** — path traversal defense-in-depth in `adr-new`: `path.resolve` + `startsWith` assertion.
+- **HIGH** — ADR numbering race: exclusive create blocks parallel-call overwrites.
+- **HIGH** — `summarize` pipe delimiter changed to `\x1f`; commit subjects containing `|` now parse correctly.
+- **HIGH** — `trunknux --version` reads `package.json` instead of returning hardcoded string.
+- **HIGH** — `rootnux status` regex made column-position-independent.
+- **HIGH** — empty-slug guard in `adr-new` (prevents `0001-.md` on special-chars-only titles).
+- **HIGH** — `mkdir`/`write` wrapped in try/catch with path-aware error messages in `init` + `new-sprint`.
+
+---
+
+## [0.4.0-alpha.1] - 2026-04-28
+
+**Monorepo migration + scoped packages.**
+
+Restructured from a single-package layout into the **5-NUX monorepo** under the **LeapNuX** umbrella. No functional changes to branchnux behavior.
+
+### Added
+
+- npm workspaces configuration at repo root; all 7 packages under `packages/`.
+- `@leapnux/6nux-core` — skeleton placeholder for shared schemas, conventions, validators.
+- `@leapnux/rootnux` — skeleton; verbs shipped in v0.4.1.
+- `@leapnux/trunknux` — skeleton; verbs shipped in v0.4.1.
+- `@leapnux/leafnux` — reserved skeleton (deferred, see roadmap).
+- `@leapnux/fruitnux` — reserved skeleton (deferred, see roadmap).
+- `@leapnux/5nux` — meta-package that installs the full OSS stack.
+
+### Changed
+
+- `branchnux` package renamed to `@leapnux/branchnux`; lockstep versioning at `0.4.0-alpha.1` across all 7 packages.
+- Distribution model documented: ESM-only `.mjs` source, no build step, lockstep releases.
+
+### Fixed
+
+- `plan` test date-rollover bug — hardcoded `'2026-04-27'` in test helper replaced with `todayISO()`.
+
+---
+
+## [0.3.0-alpha.1] - 2026-04-27
+
+### Changed
+- **Brand: TrunkNuX → BranchNuX.** Renamed to align with the 6-NUX framework where this tool is the *branch* that verifies trunk + root and produces leaf + fruit, not the trunk itself. The metaphor sharpened: BranchNuX literally runs on a git branch, verifies its claims, and produces audit-ready evidence before merge.
+- Package renamed `trunknux` → `branchnux` (npm, GitHub repo, CLI binary).
+- Repo: github.com/StillNotBald/trunknux → github.com/StillNotBald/branchnux
+
+### Migration
+- Users who installed `trunknux` (never published to npm): install `branchnux` instead. CLI surface unchanged.
+- Users on `testnux@*` (predecessor, last published as `testnux@0.2.0-alpha.1`): install `branchnux`.
 
 ---
 
@@ -114,7 +218,7 @@ The "v0.2 capability-parity" stable release. Wires up the LLM agent suite (`plan
 - Replaced the hand-crafted sample at `examples/demo-dashboard/output/login-execution-report.html` with a real `testnux report` output (from a live Playwright run against the demo-dashboard project — 13 PASS / 2 BLOCKED-CONFIG out of 15 TCs, 13 embedded screenshots).
 
 **Signoff suite (S1-S5):**
-- `testnux sign pdf <surface>` (S1) — renders the UAT signoff ledger to PDF via puppeteer-core. Includes hash-chain verification badge (green ✓ or red CHAIN BROKEN banner) + per-entry block with reviewer name/role/timestamp + truncated signature hash + canonical disclaimer footer.
+- `testnux sign pdf <surface>` (S1) — renders the UAT signoff ledger to PDF via puppeteer-core. Includes hash-chain verification badge (green check or red CHAIN BROKEN banner) + per-entry block with reviewer name/role/timestamp + truncated signature hash + canonical disclaimer footer.
 - `testnux sign stale-check <surface> --threshold 90d [--strict]` (S2) — flags signoff entries older than threshold. CI gate via `--strict` (exits 1 on any stale).
 - OSCAL `assessment-log` integration (S3) — `testnux sca oscal` now populates `responsible-parties` (from uat-log reviewers, UUID v5 derived) + `assessments[].assessment-log.entries` (from uat-log entries) + `assessments[].subjects[]` (per TC). Validated against OSCAL 1.1.2 schema.
 - `testnux sign --justify-with-llm` (S4) — optional Claude API call drafts justification text from TC result + control mapping + evidence summary. Reviewer edits the draft; `[VERIFY] LLM-drafted, reviewer-confirmed:` prefix is auto-applied. Graceful degrade if `CLAUDE_API_KEY` or `@anthropic-ai/sdk` missing.
@@ -145,7 +249,7 @@ The "v0.2 capability-parity" stable release. Wires up the LLM agent suite (`plan
 
 ### Documentation
 
-- README — added `### ⚠️ Important` disclaimer block making it explicit that TestNUX reduces manual workload but does not replace human judgment. Every output (LLM-drafted artifacts, test plans, specs, reports, SCAs, signoff PDFs, OSCAL exports) is a starting point requiring human review. Auditors hold the user's organization accountable, not the tool.
+- README — added `### Important` disclaimer block making it explicit that TestNUX reduces manual workload but does not replace human judgment. Every output (LLM-drafted artifacts, test plans, specs, reports, SCAs, signoff PDFs, OSCAL exports) is a starting point requiring human review. Auditors hold the user's organization accountable, not the tool.
 - README — new "Which output do I read?" section mapping each artifact to its primary audience (engineering lead, QA engineer, external auditor, UAT reviewer, CISO, legal, GRC platform).
 - README — TL;DR reframed: TestNUX is a multi-phase test discipline (DISCOVER → PLAN → CODIFY → EXECUTE → REPORT → DOC), not just a report generator. Honest scope on headcount reduction (administrative half only — does not replace QA exploration or compliance interpretation).
 - README — flipped alpha → stable framing throughout (install, roadmap, FAQ).
@@ -214,8 +318,15 @@ The "v0.2 capability-parity" stable release. Wires up the LLM agent suite (`plan
 ### Added
 - Initial project scaffold: CLI entry point, command structure, templates, schemas, and docs. (Internal pre-publish version; not on npm.)
 
-[Unreleased]: https://github.com/StillNotBald/testnux/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/StillNotBald/testnux/releases/tag/v0.2.0
-[0.1.1]: https://github.com/StillNotBald/testnux/releases/tag/v0.1.1
-[0.1.0]: https://github.com/StillNotBald/testnux/releases/tag/v0.1.0
-[0.0.1]: https://github.com/StillNotBald/testnux/releases/tag/v0.0.1
+[Unreleased]: https://github.com/StillNotBald/branchnux/compare/v0.4.3-alpha.1...HEAD
+[0.4.3-alpha.1]: https://github.com/StillNotBald/branchnux/releases/tag/v0.4.3-alpha.1
+[0.4.2-alpha.1]: https://github.com/StillNotBald/branchnux/releases/tag/v0.4.2-alpha.1
+[0.4.1-alpha.1]: https://github.com/StillNotBald/branchnux/releases/tag/v0.4.1-alpha.1
+[0.4.0-alpha.1]: https://github.com/StillNotBald/branchnux/releases/tag/v0.4.0-alpha.1
+[0.3.0-alpha.1]: https://github.com/StillNotBald/branchnux/releases/tag/v0.3.0-alpha.1
+[0.2.2]: https://github.com/StillNotBald/branchnux/releases/tag/v0.2.2
+[0.2.1]: https://github.com/StillNotBald/branchnux/releases/tag/v0.2.1
+[0.2.0]: https://github.com/StillNotBald/branchnux/releases/tag/v0.2.0
+[0.1.1]: https://github.com/StillNotBald/branchnux/releases/tag/v0.1.1
+[0.1.0]: https://github.com/StillNotBald/branchnux/releases/tag/v0.1.0
+[0.0.1]: https://github.com/StillNotBald/branchnux/releases/tag/v0.0.1

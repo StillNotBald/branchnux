@@ -1,0 +1,32 @@
+#!/usr/bin/env sh
+# LeapNuX pre-commit hook — keep CI fast by catching common issues locally.
+#
+# Enable once:
+#   git config core.hooksPath .githooks
+#
+# Skip explicitly (rare):
+#   git commit --no-verify
+#
+# What this runs:
+#   1. Run the hygiene-guard test (catches banned-token leaks) — branchnux package
+#   2. Lint changed files (per-workspace)
+
+set -e
+
+echo "→ pre-commit: hygiene-guard test"
+npm test --workspace @leapnux/branchnux -- cli.test.mjs --silent || {
+  echo ""
+  echo "✗ Hygiene guard failed. The commit contains banned tokens."
+  echo "  Edit the offending file or update packages/branchnux/test/.banned-tokens.json"
+  echo "  Skip this hook with --no-verify ONLY if you have a real reason."
+  exit 1
+}
+
+echo "→ pre-commit: lint (workspaces, --if-present)"
+npm run lint --if-present --silent || {
+  echo ""
+  echo "✗ Lint failed. Run 'npm run lint:fix --workspaces' to auto-fix."
+  exit 1
+}
+
+echo "✓ pre-commit checks passed"

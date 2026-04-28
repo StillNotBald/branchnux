@@ -21,7 +21,7 @@ leafnux v${version}
 
   This package is reserved in the @leapnux scope but not actively developed.
   Verb scope is intentionally undecided pending real-world signal:
-    - cross-check against prior PMO-platform features
+    - input from real adopters running 5-NUX in production
     - pull from at least one production adopter
     - clarity on which leaf-layer signals are OSS vs premium (6-NUX hosted)
 

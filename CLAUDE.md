@@ -1,54 +1,92 @@
-# CLAUDE.md — BranchNuX
+# CLAUDE.md — LeapNuX 5-NUX
 
-BranchNuX is a CLI that produces audit-defensible test evidence chains for regulated software. OSS, git-native, all artifacts live in this repo. See `README.md` for the pitch; see `docs/ai-assistant-guide.md` for the long-form workflow guide (recipes, pitfalls, file conventions).
+This is an OSS PM tool chain. 7 packages in a monorepo, one per node of the 6-NUX taxonomy plus a shared core and a meta-package. ESM-only, Node 20+, Apache 2.0. Anchor not revenue (premium = future 6-NUX, see `docs/MOTTO.md`).
 
-## 5 non-negotiable rules
+If you're an AI assistant arriving fresh, read [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for the full implementation spec and [docs/6-NUX.md](./docs/6-NUX.md) for the taxonomy. This file is the short list of things you must NOT do.
 
-1. **`[VERIFY]` markers stay until human-attested.** Every LLM-generated cell renders with `[VERIFY]`. Do not remove in bulk (no `sed -i 's/\[VERIFY\]//g'`). Each removal is a human attestation.
+## Repo shape
 
-2. **Never edit `uat-log.jsonl` directly.** It is HMAC-chained. Use `branchnux sign` to append, `branchnux sign --revoke` to revoke, `branchnux sign --verify` to confirm chain.
+```
+packages/
+├── 6nux-core/        → @leapnux/6nux-core   (shared lib — schemas, conventions, IDs, utils)
+├── rootnux/          → @leapnux/rootnux     (5 verbs: init/lint/adr-new/risk-add/status)
+├── trunknux/         → @leapnux/trunknux    (3 verbs: new-sprint/summarize/lint)
+├── branchnux/        → @leapnux/branchnux   (15+ verbs: plan/codify/report/sca/...)
+├── leafnux/          → @leapnux/leafnux     (skeleton — DEFERRED, no committed timeline)
+├── fruitnux/         → @leapnux/fruitnux    (skeleton — DEFERRED, no committed timeline)
+└── 5nux/             → @leapnux/5nux        (meta-package; installs the 5 active NUX packages)
+```
 
-3. **Three-track structure.** `requirements/` + `sprint-log/` + `testing-log/`. R-IDs are sequential (`R-01`, not `R-CMD-01`) as h2 headings: `## R-01 — title`. The parser regex requires digits directly after `R-`.
+Run `npm install` at the workspace root. Run `npm test` at the workspace root (executes per-workspace test script for each package that has one).
 
-4. **Honesty over polish.** PARTIAL means PARTIAL. Gaps stay visible in the SCA. Do not pad coverage. Do not invent R-IDs that aren't in `requirements/REQUIREMENTS.md`.
+## 6 non-negotiable rules
 
-5. **Cost gates on LLM commands.** Always `--dry-run` first to see cost. Always `--max-spend <usd>` on batches. Affects `discover`, `plan`, `codify`, `enrich`, `batch-plan`, `sign --justify-with-llm`.
+1. **Hygiene guard.** No employer / client / project / customer names anywhere in OSS source, docs, or commit messages. The hygiene-guard test (`packages/branchnux/test/cli.test.mjs`) loads its banned list from a gitignored config — keep it that way. If you find an internal-context reference anywhere in the tree, sanitize it before commit.
 
-## Common AI pitfalls (full list in docs/ai-assistant-guide.md)
+2. **Cross-package contract.** NUX packages do NOT import each other. They communicate via file-system conventions encoded in `@leapnux/6nux-core`. If you find yourself wanting `import { foo } from '../trunknux/...'`, stop — move the shared piece into `6nux-core` instead.
 
-- Inventing R-IDs not in `REQUIREMENTS.md` → `branchnux rtm` silently drops the row.
-- Wrong heading format (`## R-CMD-01`) → parser doesn't match; use `## R-01`.
-- Bulk-removing `[VERIFY]` markers → forfeits audit-defensibility.
-- Signing TCs without running tests → false attestation; always `npm test` first.
-- Skipping `branchnux validate` before `branchnux report` → broken cross-references.
+3. **Lockstep versioning.** All 8 package.jsons share one version (root + 7 packages). Version bumps touch every file. Don't bump one package independently.
+
+4. **ESM-only, no build step.** `.mjs` source files are the published artifact. No TypeScript transpile, no bundler, no `dist/`. Add neither without a strong consumer-driven reason.
+
+5. **`[VERIFY]` markers stay until human-attested** (branchnux specifically). Every LLM-generated cell renders with `[VERIFY]`. Never bulk-strip them — each removal is a human attestation.
+
+6. **Honesty over polish.** PARTIAL means PARTIAL. Gaps stay visible. Don't pad coverage. Don't invent R-IDs or ADR numbers that don't exist.
+
+## Common AI pitfalls
+
+- **Adding new packages** without updating the root `package.json` workspaces array, the `@leapnux/5nux` meta deps, and `docs/ARCHITECTURE.md`.
+- **Bulk-removing `[VERIFY]`** markers in branchnux output — forfeits audit-defensibility.
+- **Wrong heading format** in REQUIREMENTS.md (`## R-CMD-01`) → `rootnux lint` and `branchnux rtm` silently drop the row. Use `R-NN` (digits directly after the dash).
+- **Importing across NUX packages** — see rule 2.
+- **Touching `uat-log.jsonl` directly** — it's HMAC-chained. Use `branchnux sign` to append, `--revoke` to revoke, `--verify` to confirm chain.
+- **Cost-gate forgetting** on LLM commands. `branchnux discover/plan/codify/enrich/sign --justify-with-llm` all hit the Anthropic API. Always `--dry-run` first; always `--max-spend <usd>` on batches.
 
 ## Workflow quick-ref
 
+Active verbs across the 3 mature packages:
+
 ```
-branchnux init <slug>             scaffold testing-log/<date>_<slug>/
-branchnux validate <folder>       lint frontmatter (always before report)
-branchnux report <folder>         XLSX + HTML
-branchnux sign <folder>           HMAC signoff (interactive)
-branchnux rtm                     regenerate requirements/TRACEABILITY.md
-branchnux sca generate <surface>  fill SCA from test results
-branchnux sca oscal <surface>     emit NIST OSCAL 1.1.2 JSON
+# Intent layer (rootnux)
+rootnux init                    scaffold REQUIREMENTS.md + TRACEABILITY.md + risks/ + docs/adr/
+rootnux lint                    validate R-XX schema, cross-links, status values
+rootnux adr-new <title>         scaffold a sequential ADR
+rootnux risk-add                append a templated row to the risk register
+rootnux status [--json]         show DONE/BLOCKED/PARTIAL/... counts
+
+# Build layer (trunknux)
+trunknux new-sprint <slug>      create date-prefixed sprint-log/<date>_<slug>/
+trunknux summarize              SPRINT_SUMMARY.md from git log
+trunknux lint                   validate sprint folder structure conventions
+
+# Verification layer (branchnux)
+branchnux init <slug>           scaffold testing-log/<date>_<slug>/
+branchnux validate <folder>     lint frontmatter (always before report)
+branchnux report <folder>       XLSX + HTML
+branchnux sign <folder>         HMAC signoff (interactive)
+branchnux rtm                   regenerate requirements/TRACEABILITY.md
+branchnux sca generate <surface>   fill SCA from test results
+branchnux sca oscal <surface>      emit NIST OSCAL 1.1.2 JSON
 ```
 
-Full surface: `branchnux --help`. Per-command flags: `branchnux <cmd> --help`.
+Per-verb help: `<verb> --help`.
 
-## How this repo dogfoods
+## Self-dogfood
 
-Live evidence chain in this repo:
+Live evidence chain in this repo (5-NUX uses its own tools to manage its own development):
 
-- `requirements/REQUIREMENTS.md` (58 R-IDs)
-- `requirements/TRACEABILITY.md` (100% test coverage)
-- `testing-log/2026-04-27_branchnux-cli/` (60 TCs, vitest results)
-- `sca/branchnux-cli.md` (7 honest gaps documented)
-- `testing-log/2026-04-27_branchnux-cli/uat-log.jsonl` (60 HMAC-chained attestations)
-- `requirements/validations/branchnux-cli/v1.0.oscal.json` (NIST OSCAL 1.1.2)
+- `requirements/REQUIREMENTS.md` — branchnux requirement set (rootnux/trunknux additions tracked separately)
+- `requirements/TRACEABILITY.md` — generated by `branchnux rtm`
+- `requirements/risks/risks.md` — scaffolded by `rootnux init`
+- `docs/adr/` — populated by `rootnux adr-new` (7 locked architectural decisions documented)
+- `sprint-log/<date>_<slug>/` — created by `trunknux new-sprint`
+- `sprint-log/<date>_<slug>/SPRINT_SUMMARY.md` — generated by `trunknux summarize`
+- `testing-log/<date>_branchnux-cli/` — branchnux's own test evidence
+- `sca/branchnux-cli.md` — branchnux's own SCA
+- `requirements/validations/branchnux-cli/v1.0.oscal.json` — NIST OSCAL 1.1.2
 
-Contributor workflow: update `REQUIREMENTS.md` when adding features; re-run `branchnux rtm` and `branchnux report` before each release; re-sign in `uat-log.jsonl`; re-emit OSCAL.
+If a verb gets shipped or changed, the dogfood gets re-run.
 
----
+## When unsure
 
-*Auto-loaded by Claude Code on every conversation in this repo. For recipes, pitfalls, file-edit conventions, and per-command details: `docs/ai-assistant-guide.md`.*
+Read `docs/ARCHITECTURE.md` for the implementation spec, `docs/6-NUX.md` for the taxonomy, `docs/MOTTO.md` for the OSS / Premium boundary, `docs/CONTRIBUTING.md` for contributor workflow, `CHANGELOG.md` for release history.

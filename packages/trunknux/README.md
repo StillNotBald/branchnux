@@ -58,3 +58,7 @@ npm install -g @leapnux/5nux           # full 5-NUX OSS stack
 ## License
 
 Apache-2.0 (c) 2026 Chu Ling
+
+## Part of the 5-NUX family
+
+Sibling packages: [rootnux](../rootnux), [trunknux](../trunknux), [branchnux](../branchnux), [leafnux](../leafnux), [fruitnux](../fruitnux), [6nux-core](../6nux-core), [5nux meta](../5nux). See the [root README](../../README.md) for the full taxonomy and install instructions.

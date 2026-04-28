@@ -23,7 +23,7 @@ fruitnux v${version}
   branchnux already covers the OSS-CLI portion of audit-evidence
   generation (sca, sca-oscal, rtm, sign, sign-pdf). fruitnux's separate
   scope is intentionally undecided pending:
-    - cross-check against prior PMO-platform features
+    - input from real adopters running 5-NUX in production
     - clarity on which deliverable-layer features belong to OSS vs
       6-NUX premium (regulator-facing portals, signed evidence chains
       with account-bound access, hosted attestation workflows)
