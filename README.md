@@ -1,6 +1,6 @@
 # 5-NUX
 
-**A full project-management tool chain in your CLI — purpose-built for regulated software, with auto-generated Requirements Traceability Matrix (RTM) out of the box.**
+**A regulated-software artifact + audit-evidence toolchain in your CLI — AI-agent native, with auto-generated Requirements Traceability Matrix (RTM) out of the box.**
 
 > 5-NUX gives you a whole tree. You provide the soil and you ship yourself.
 
@@ -8,12 +8,16 @@
 [![Node: >=20](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](https://nodejs.org/)
 [![Tests: 587 passing](https://img.shields.io/badge/tests-587%20passing-brightgreen.svg)]()
 [![Version: v0.5.0-alpha.1](https://img.shields.io/badge/version-v0.5.0--alpha.1-orange.svg)](CHANGELOG.md)
+[![AI-agent native](https://img.shields.io/badge/AI--agent-native-9333ea.svg)]()
 
 ## What 5-NUX does for your project
 
-5-NUX runs the **complete project lifecycle — requirement → sprint → test → validation → audit handoff** — entirely from the CLI, using plain files in your git repo. No SaaS. No login. No vendor lock-in.
+5-NUX runs the **regulated-software artifact + evidence chain — requirement → sprint → test → validation → audit handoff** — entirely from the CLI, using plain files in your git repo. No SaaS. No login. No vendor lock-in.
 
-What makes it different from every other OSS PM tool: **it's purpose-built for regulated software, and it auto-generates the artifacts regulators ask for.**
+Two things make it different from every other OSS project tool:
+
+1. **Purpose-built for regulated software.** It auto-generates the artifacts regulators actually ask for (RTM, SCA, OSCAL, signed evidence packages).
+2. **AI-agent native.** Designed in the LLM era — every artifact is a plain file, every action is a CLI verb, every output has a `--json` mode. An LLM agent operates 5-NUX the same way a human does. No custom SDK integration, no proprietary API, no auth dance.
 
 If you ship under SOC 2, ISO 27001, NYDFS, GDPR, OSCAL, SOX, or HIPAA, every regulator asks for the same artifact: a **Requirements Traceability Matrix (RTM)** that maps each requirement → sprint → code commit → test case → audit evidence. Today your two real options are bad ones:
 
@@ -31,6 +35,42 @@ If you ship under SOC 2, ISO 27001, NYDFS, GDPR, OSCAL, SOX, or HIPAA, every reg
 | `branchnux sign-pdf <surface>` | Signed PDF with hash-chain badge for legal/compliance handoff |
 
 **This is the gap 5-NUX fills.** Most OSS PM tools stop at "kanban board." Most compliance tools live behind a paywall and a SaaS portal. **5-NUX is the missing middle:** regulated-grade evidence generation, end-to-end, in plain files, free.
+
+## AI-agent native — human + LLM as partners
+
+5-NUX was designed in the era where Claude, GPT, or another LLM is your daily collaborator — not a tool you bolt AI onto later.
+
+**The competitive angle:** enterprise compliance tools (DOORS, Polarion, Jama, codeBeamer) were built pre-LLM. Their data lives in proprietary databases. Their UIs are click-driven. Their APIs require custom SDK integration per agent. **5-NUX is plain files + CLI verbs.** An LLM agent operates 5-NUX the same way a human does — by reading the markdown, running a verb, parsing the output.
+
+| Why agents thrive on 5-NUX |
+|---|
+| **Plain-file artifacts** — Markdown, YAML, JSON. Agents read, write, and grep your project state directly. No proprietary schema. |
+| **CLI-first interface** — every verb is one shell call. Agents already know how to run shell. |
+| **File-system convention contract** — cross-cutting actions ("find every R-XX without test coverage") are a single grep, not a custom integration. |
+| **`[VERIFY]` markers on every LLM-drafted cell** — explicit AI/human boundary built into the file format. Agents author, humans attest. |
+| **Cost gates on every LLM verb** — `--max-spend`, `--dry-run`, `--json` throughout. Predictable cost + structured output in agent-driven workflows. |
+| **HMAC-chained sign-off** — tamper-evident attestation works the same whether a human or agent appended the entry. |
+| **MCP integration on the roadmap** (v0.3+) — Claude Code will invoke 5-NUX verbs as native tools. |
+
+**The same person runs `branchnux rtm` in their terminal in the morning, and has a Claude Code agent run it in a CI pipeline that afternoon.** Same artifact, same evidence chain, same sign-off ledger. The agent isn't "integrating with" 5-NUX — it's USING 5-NUX, the same way you do.
+
+If your team treats AI as a partner (Claude Code, Cursor, Aider, Cline, MCP-enabled tooling), 5-NUX is built for that workflow. Most regulated-software tooling isn't.
+
+## What 5-NUX is *not*
+
+To set expectations clearly — 5-NUX does **not** replace these, by design:
+
+| You still need | For |
+|---|---|
+| **GitHub Issues / Linear / Jira** | Active task tracking, kanban boards, multi-user assignment, comments, real-time collaboration |
+| **GitHub Projects / Asana / Trello** | Visual workflow boards, drag-and-drop prioritization |
+| **Productboard / Aha! / roadmap.io** | Roadmap visualization, OKR tracking, theme management |
+| **CircleCI / GitHub Actions / Jenkins** | Build, test, and deploy pipelines |
+| **Slack / Teams** | Real-time team chat, notifications |
+
+**5-NUX pairs with these tools, not against them.** The kanban board lives in GitHub Projects; the RTM lives in 5-NUX. The deploy pipeline lives in GitHub Actions; the audit-evidence lives in 5-NUX. The right shape is "5-NUX + your existing PM/CI stack" — not "5-NUX instead of."
+
+If you're shopping for "Jira-in-CLI," 5-NUX isn't it. If you're shopping for "DOORS/Polarion-replaced-with-OSS-files-and-an-LLM-friendly-CLI," **5-NUX is exactly that.**
 
 ## What this is (the bigger picture)
 
