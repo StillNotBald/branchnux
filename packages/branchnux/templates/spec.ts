@@ -45,7 +45,7 @@ try {
 
 // Find specific test users by email — update email patterns to match your seed
 const mainTester = SEEDED.find((u) => u.email.includes('tester'));
-const mfaTester = SEEDED.find((u) => u.email.includes('mfa-tester'));
+const mfaTester = SEEDED.find((u) => u.email.includes('totp-user'));
 const TOTP_AVAILABLE = Boolean(mfaTester?.totpSecret);
 
 // ── Per-test XFF rate-limit isolation ────────────────────────────────────────
@@ -62,7 +62,8 @@ const TOTP_AVAILABLE = Boolean(mfaTester?.totpSecret);
 //
 // CRITICAL: your rate-limiter must trust LAST-HOP XFF, not FIRST-HOP.
 // First-hop trust is trivially bypassable (spoofable by the client).
-// See: feedback_xff_trust_pattern — never trust first XFF value.
+// Never trust the FIRST X-Forwarded-For value — it is client-controllable.
+// Take the LAST proxy hop (your trusted infra appended it). See OWASP IP-spoofing guidance.
 function xffForTest(title: string): string {
   let hash = 0;
   for (let i = 0; i < title.length; i++) {

@@ -63,7 +63,7 @@ The `NuX` suffix denotes "node in the taxonomy" (root-NuX, trunk-NuX, etc.). Bra
 **Definition:** What was actually grown. The substance of the product.
 
 **What lives here:**
-- `claims-portal/src/` — production code
+- `<your-app>/src/` — production code
 - `sprint-log/<date>_<title>/` — sprint summaries, commit narratives
 - Design system applied (Apex / Apple-Apex ports in code)
 - Schemas, migrations, generated types
@@ -85,8 +85,8 @@ The `NuX` suffix denotes "node in the taxonomy" (root-NuX, trunk-NuX, etc.). Bra
 
 **What lives here:**
 - `testing-log/<date>_<surface>/` — per-page test docs
-- `claims-portal/e2e/` — Playwright suites
-- `claims-portal/src/**/*.test.ts` — Vitest unit tests
+- `<your-app>/e2e/` — Playwright suites
+- `<your-app>/src/**/*.test.ts` — Vitest unit tests
 - `requirements/TRACEABILITY.md` — RTM (also connective tissue)
 - `/qa`, `/qa-only`, `/review`, `/codex` — verification workflows
 - The **BranchNuX OSS tool** itself — runs on a git branch, verifies its claims, produces evidence
@@ -135,7 +135,7 @@ The `NuX` suffix denotes "node in the taxonomy" (root-NuX, trunk-NuX, etc.). Bra
 - SOC 2 Type II attestation (when shipped)
 - KPI dashboard exports for investors
 - Regulator-facing PDFs (NYDFS, GDPR, OWASP citations)
-- UAT sign-off packets (Project Lead + CISO + General Counsel + EY)
+- UAT sign-off packets (Project Lead + CISO + General Counsel + Auditor)
 - DR plan documents, on-call playbooks, runbooks (the docs)
 - Pilot runbooks, go-live checklists (R-90, R-91)
 - Multi-AZ architecture documentation
@@ -158,7 +158,7 @@ The `NuX` suffix denotes "node in the taxonomy" (root-NuX, trunk-NuX, etc.). Bra
 - Supabase (Auth, Postgres, Storage)
 - Upstash Redis (rate-limit + future queue)
 - AWS (KMS, S3, SES, CloudFront)
-- Sentry account, Sumsub vendor relationship, EY operational links
+- Sentry account, KYC-vendor relationship, auditor operational links
 - IaC (Terraform, when added)
 - Migration discipline (versioned, reversible, staging-tested)
 - Feature flags (the system, not individual flag decisions)
@@ -266,11 +266,11 @@ If a future session asks "where does CLAUDE.md live in 6-NUX?" — the correct a
 
 If you can put each in the right node without ambiguity, you understand 6-NUX.
 
-1. `claims-portal/src/lib/rates/engine.ts`
+1. `<your-app>/src/lib/rates/engine.ts`
 2. `requirements/REQUIREMENTS.md` row R-12
 3. `testing-log/2026-04-25_login-23-tc/test-plan.md`
 4. The Sentry account at `your-org.sentry.io`
-5. `claims-portal/src/lib/rate-limit.ts` (the source file)
+5. `<your-app>/src/lib/rate-limit.ts` (the source file)
 6. The Upstash Redis instance + token
 7. `requirements/validations/login/v1.0_2026-04-26.md`
 8. The `.github/workflows/secrets-scan.yml` running per-push
@@ -298,29 +298,24 @@ If you got 10+ on first try, the model holds. If you got <8, the most common con
 
 ---
 
-## Mapping to existing FirstLeap structure
+## Mapping to a typical project layout
 
 | File / folder | Node |
 |---|---|
 | `requirements/REQUIREMENTS.md` | rootnux |
-| `requirements/MASTER_BACKLOG.md` | rootnux (intent — what remains) |
 | `requirements/TRACEABILITY.md` | branchnux + connective tissue |
 | `requirements/validations/<surface>/` | fruitnux |
-| `requirements/risks/` *(future)* | rootnux |
-| `docs/adr/` *(future)* | rootnux |
-| `docs/governance/{vendors,data-classification,threat-model}.md` *(future)* | rootnux |
-| `docs/SHIPPING_SUITE.md` | meta (the playbook) |
+| `requirements/risks/` | rootnux |
+| `docs/adr/` | rootnux |
+| `docs/governance/{vendors,data-classification,threat-model}.md` | rootnux |
 | `docs/6-NUX.md` (this file) | meta (the schema) |
 | `sprint-log/<date>_<title>/` | trunknux |
 | `testing-log/<date>_<surface>/` | branchnux |
-| `claims-portal/src/` | trunknux |
-| `claims-portal/e2e/`, `*.test.ts` | branchnux |
-| Sentry, Vercel, Supabase, Upstash, AWS | soilnux |
-| `/cso`, `/health`, `/benchmark` outputs | leafnux |
+| `<your-app>/src/` | trunknux |
+| `<your-app>/e2e/`, `*.test.ts` | branchnux |
+| Hosting + DBs + queues + observability vendors | soilnux |
 | Pen test, SOC 2, SCA PDFs | fruitnux |
-| `~/.claude/projects/<slug>/memory/` | meta (out of scope) |
-| `CLAUDE.md` files | meta (out of scope) |
-| gstack skills, gbrain, /graphify | meta (out of scope) |
+| Project memory / AI assistant guides | meta (out of scope) |
 
 ---
 
@@ -328,7 +323,7 @@ If you got 10+ on first try, the model holds. If you got <8, the most common con
 
 1. **Backlog routing** — every gap in MASTER_BACKLOG has a clear owner-node. "Is this a trunk fix or a soil fix" stops being a debate.
 2. **Investor packets** — fruitnux is the section you send. Everything else is "how we got here."
-3. **Auditor onboarding** — when EY arrives, hand them a fruitnux folder + an RTM and they self-serve for ~80% of their first-day questions.
+3. **Auditor onboarding** — when your auditors arrive, hand them a fruitnux folder + an RTM and they self-serve for ~80% of their first-day questions.
 4. **Status hygiene** — a requirement marked DONE in rootnux must have evidence in trunk + branch + (optionally) fruit. The RTM enforces it.
 5. **Maturity gaps** — SHIPPING_SUITE.md §8's four maturity categories map cleanly: Governance = rootnux, Security = leafnux+fruitnux, Infra = soilnux, Operations = soilnux+fruitnux. Easier to track which node is under-invested.
 

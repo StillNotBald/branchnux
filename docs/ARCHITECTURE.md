@@ -242,9 +242,30 @@ The dogfood discipline is **load-bearing for credibility**. Every time we ship a
 |---|---|---|
 | v0.4.0-alpha.1 | Monorepo migration | shipped 2026-04-28 |
 | v0.4.1-alpha.1 | rootnux + trunknux MVPs + 1 CRITICAL + 9 HIGH hardening + motto lock | shipped 2026-04-28 |
-| v0.4.2-alpha.1 | 6nux-core extraction + 8 MEDIUM/LOW polish + ARCHITECTURE.md | in progress |
-| v0.5.0 | leafnux + fruitnux scaffolds | planned |
+| v0.4.2-alpha.1 | 6nux-core extraction + 8 MEDIUM/LOW polish + ARCHITECTURE.md | shipped 2026-04-28 |
+| v0.4.3-alpha.1 | leafnux+fruitnux deferral formalized | shipped 2026-04-28 |
+| v0.5+ | 5 ports identified, scoped from production-PM-tool feedback | scoped, not started |
 | v1.0.0 | Stability + leapnux.com landing page + 6-NUX commercial spec | planned |
+
+### v0.5+ candidate verbs (ranked)
+
+| # | Port | Package | Effort |
+|---|---|---|---|
+| 1 | `trunknux log` — weekly narrative log | trunknux | S |
+| 2 | `rootnux kb-init` — knowledge base scaffold | rootnux | S |
+| 3 | `leafnux health` — RAG status + transition linter (un-defers leafnux with concrete value) | leafnux | S |
+| 4 | `branchnux gate-new` — gate checkpoint artifact | branchnux | M |
+| 5 | `leafnux critical-path` — CPM dependency analysis | leafnux | M |
+
+**Note on leafnux + fruitnux:** the skeleton packages remain reserved. Two concrete `leafnux` verbs are scoped (`health` and `critical-path`) — both originate from pure-logic patterns proven in production PM tooling. fruitnux remains deferred indefinitely; branchnux already covers the OSS-CLI portion of audit evidence (`sca`, `sca-oscal`, `sign`, `sign-pdf`), and most other deliverable workflows (multi-party sign-off, immutable evidence stores, regulator portals) are inherently 6-NUX premium.
+
+### Anti-patterns to avoid (lessons from prior PM-platform work)
+
+- Interactive visual Gantt chart (data model is the value, not the bars)
+- Slide / PPTX export (anticipatory library that never wires to a workflow)
+- In-memory bulletin / announcement board (infrastructure for a static string)
+- Live-clock projection / war-room TV dashboard view (narrow-audience theatre)
+- Frontend stub permission service that always returns `true` (avoiding a refactor by lying in code)
 
 ---
 

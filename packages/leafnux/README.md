@@ -1,18 +1,30 @@
 # @leapnux/leafnux
 
-Continuous-internal-health CLI for the 6-NUX taxonomy.
+Continuous-internal-health layer of the 6-NUX taxonomy.
 
-**Status:** v0.4.0-alpha.1 — package skeleton. Planned for **v0.5.0**.
+**Status:** v0.4.2-alpha.1 — package skeleton. **DEFERRED** to a future sprint with no committed timeline.
 
-## Where this fits
+## Why deferred
 
-leafnux is the **continuous internal health layer** of the 6-NUX taxonomy:
+The package name is reserved in the `@leapnux` scope, but the verb surface is intentionally undecided. Building leafnux without:
+
+1. A cross-check against prior PM-platform features (autopsy of bloat),
+2. Pull from at least one production adopter,
+3. Clarity on which leaf-layer signals are OSS vs premium (hosted dashboards, multi-project rollups, account-bound alerting all naturally fit 6-NUX premium),
+
+…would risk re-creating the bloat that motivated 5-NUX in the first place.
+
+The OSS line is intentionally tight. Many "obvious" leafnux features may not belong here at all.
+
+## Where this fits in 6-NUX
 
 ```
-root → trunk → branch → LEAF (leafnux)  → fruit → soil
+root → trunk → branch → LEAF (leafnux) → fruit → soil
 ```
 
-Photosynthesis. The signals that keep the system alive day-to-day: observability, CI/CD gates, dependabot alerts, performance trends, audit-log integrity.
+leafnux is the **continuous health** layer — observability signals, CI/CD gates, dependabot, secrets-scan, performance trends, audit-log integrity. The day-to-day vital signs that keep the tree alive.
+
+See [docs/6-NUX.md](https://github.com/StillNotBald/branchnux/blob/main/docs/6-NUX.md) for the artifact taxonomy and [docs/MOTTO.md](https://github.com/StillNotBald/branchnux/blob/main/docs/MOTTO.md) for the OSS/Premium product split.
 
 ## License
 

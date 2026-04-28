@@ -176,7 +176,7 @@ function checkEnv() {
     issues.push(
       'SUPABASE_MANAGEMENT_TOKEN looks too short — ' +
       'verify the token value (real sbp_ tokens are 50+ chars). ' +
-      'CRITICAL: a 2-char typo broke prod rate-limit silently (Upstash token incident 2026-04-26)',
+      'A typo in a similar Upstash token can silently break rate-limiting; verify exact length.',
     );
   }
 
@@ -252,7 +252,7 @@ async function checkSupabase(projectRef) {
   // The critical lesson: Supabase Dashboard sometimes only exposes the Verify toggle.
   // Enroll and Verify are SEPARATE flags. If Enroll=false but Verify=true, users with
   // existing factors can still log in but NEW factors cannot be enrolled — seed scripts
-  // will silently fail to create mfa-tester without an error that says "MFA disabled".
+  // will silently fail to create totp-user without an error that says "MFA disabled".
   if (enrollEnabled === false && verifyEnabled === true) {
     return {
       level: 'error',
@@ -261,7 +261,7 @@ async function checkSupabase(projectRef) {
         'Seed scripts will silently fail to enroll new test factors.',
       detail:
         'Root cause: Supabase Dashboard may only show the Verify toggle. ' +
-        'Enroll is a separate flag (discovered 2026-04-26: mfa-tester factor destroyed during re-seed).',
+        'Enroll is a separate flag — disabling Enroll while Verify is on prevents new factor enrollment without raising an error.',
       fix:
         `curl -X PATCH https://api.supabase.com/v1/projects/${projectRef}/config/auth ` +
         `-H "Authorization: Bearer $SUPABASE_MANAGEMENT_TOKEN" ` +

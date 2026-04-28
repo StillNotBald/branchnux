@@ -1,6 +1,6 @@
 {
   "name": "@leapnux/5nux",
-  "version": "0.4.2-alpha.1",
+  "version": "0.4.3-alpha.1",
   "description": "5-NUX — meta-package for the LeapNuX OSS stack. Installs rootnux + trunknux + branchnux + leafnux + fruitnux together.",
   "license": "Apache-2.0",
   "author": "Chu Ling",
@@ -23,11 +23,11 @@
     "access": "public"
   },
   "dependencies": {
-    "@leapnux/rootnux": "0.4.2-alpha.1",
-    "@leapnux/trunknux": "0.4.2-alpha.1",
-    "@leapnux/branchnux": "0.4.2-alpha.1",
-    "@leapnux/leafnux": "0.4.2-alpha.1",
-    "@leapnux/fruitnux": "0.4.2-alpha.1"
+    "@leapnux/rootnux": "0.4.3-alpha.1",
+    "@leapnux/trunknux": "0.4.3-alpha.1",
+    "@leapnux/branchnux": "0.4.3-alpha.1",
+    "@leapnux/leafnux": "0.4.3-alpha.1",
+    "@leapnux/fruitnux": "0.4.3-alpha.1"
   },
   "keywords": [
     "leapnux",
