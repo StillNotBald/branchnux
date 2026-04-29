@@ -16,9 +16,9 @@
 |---|---|---|
 | **rootnux** | Why the product is what it is — specs, decisions, governance | active OSS |
 | **trunknux** | What was built — sprint-log, code, design system applied | active OSS |
-| **branchnux** | How we verify — testing-log, the BranchNuX OSS tool, RTM | active OSS |
+| **branchnux** | How we verify — testing-log, test plans, reports, LLM-assisted planning | active OSS (~14 verbs; audit deliverables moved to fruitnux in v0.6) |
 | **leafnux** | Continuous internal health — observability, security gates, perf trends | active OSS (`health` verb in v0.5.0) |
-| **fruitnux** | What we hand to outsiders — SCAs, audit packages, sign-off packets | active OSS scope (verbs in design; `pack` is first candidate) |
+| **fruitnux** | What we hand to outsiders — SCAs, audit packages, sign-off packets | active OSS (AP-F7, v0.6): `sca`, `sca oscal`, `sign`, `sign pdf`, `sign stale-check`, `br`, `rtm` (11 verbs) |
 | **soilnux** | What the tree grows in — infra, vendors, runtime ops | **premium** — 6-NUX commercial product |
 
 Connecting tissue: **RTM** (`requirements/TRACEABILITY.md`) — the cambium that wires nodes together.
@@ -130,16 +130,19 @@ The `NuX` suffix denotes "node in the taxonomy" (root-NuX, trunk-NuX, etc.). Bra
 
 **Definition:** What outsiders consume. The harvest the tree exists to produce.
 
+**Status: Active OSS — promoted in v0.6 (AP-F7).** `sca`, `sca oscal`, `sign`, `sign pdf`, `sign stale-check`, `br init`, `br link`, `br rtm`, `rtm` (11 verbs transferred from branchnux).
+
 **What lives here:**
 - `requirements/validations/<surface>/` — Security Control Assessments (SCAs)
+- `requirements/validations/<surface>/v*.oscal.json` — NIST OSCAL 1.1.2 evidence
+- `<surface>/uat-log.jsonl` — HMAC-chained tamper-evident attestation ledger
+- `requirements/TRACEABILITY.md` — Requirements Traceability Matrix
+- `requirements/BUSINESS_REQUIREMENTS.md` + `UAT_TRACEABILITY.md` — BR-XX cross-reference
 - Pen test reports
 - SOC 2 Type II attestation (when shipped)
 - KPI dashboard exports for investors
 - Regulator-facing PDFs (NYDFS, GDPR, OWASP citations)
-- UAT sign-off packets (Project Lead + CISO + General Counsel + Auditor)
 - DR plan documents, on-call playbooks, runbooks (the docs)
-- Pilot runbooks, go-live checklists (R-90, R-91)
-- Multi-AZ architecture documentation
 
 **Role:** Why the tree exists. Roots, trunk, branches, leaves all serve to grow audit-ready harvest.
 

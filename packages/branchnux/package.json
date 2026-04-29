@@ -1,7 +1,7 @@
 {
   "name": "@leapnux/branchnux",
   "version": "0.5.0-alpha.1",
-  "description": "Generate auditor-ready test artifacts from markdown test plans and Playwright evidence. OSS evidence-chain for regulated software (test plans → RTM → SCA).",
+  "description": "BranchNuX — verification node of the 6-NUX taxonomy. Structured test-pass documentation: test plans, reports, LLM-assisted planning, visual regression, env-diff. Audit deliverables (SCA, OSCAL, RTM, sign) moved to @leapnux/fruitnux in v0.6.",
   "private": false,
   "license": "Apache-2.0",
   "author": "Chu Ling",

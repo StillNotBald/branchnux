@@ -6,9 +6,9 @@ Meta-package that installs all 5 active 5-NUX CLIs in one command. Each NUX node
 |---|---|---|
 | [@leapnux/rootnux](https://www.npmjs.com/package/@leapnux/rootnux) | Intent (specs, ADRs, risks, KB) | active |
 | [@leapnux/trunknux](https://www.npmjs.com/package/@leapnux/trunknux) | Build (sprint scaffolding, summaries, log) | active |
-| [@leapnux/branchnux](https://www.npmjs.com/package/@leapnux/branchnux) | Verification (test plans, RTM, SCA, OSCAL, sign) | active |
+| [@leapnux/branchnux](https://www.npmjs.com/package/@leapnux/branchnux) | Verification (test plans, reports, LLM planning) | active (~14 verbs) |
+| [@leapnux/fruitnux](https://www.npmjs.com/package/@leapnux/fruitnux) | External deliverables (SCA, OSCAL, sign, RTM, BR) | active (promoted in v0.6, 11 verbs) |
 | [@leapnux/leafnux](https://www.npmjs.com/package/@leapnux/leafnux) | Continuous health (RAG-status snapshot) | active |
-| [@leapnux/fruitnux](https://www.npmjs.com/package/@leapnux/fruitnux) | External deliverables (audit handoff packets) | active scope (verbs in design) |
 | [@leapnux/6nux-core](https://www.npmjs.com/package/@leapnux/6nux-core) | Shared library (conventions, IDs, utils) | active |
 
 ## Install
@@ -31,8 +31,11 @@ After install, five working CLIs land on your `PATH`:
 rootnux init                    # scaffold REQUIREMENTS.md / TRACEABILITY.md / risks/ / docs/adr/
 trunknux new-sprint <slug>      # date-prefixed sprint folder
 branchnux init <surface>        # testing-log/<date>_<surface>/ scaffold
+branchnux plan <surface>        # AI-drafted test plan with [VERIFY] markers
+fruitnux rtm                    # regenerate requirements/TRACEABILITY.md
+fruitnux sca generate <surface> # fill SCA evidence rows from test results
+fruitnux sign <surface>         # HMAC-chained UAT sign-off
 leafnux health                  # RAG-status snapshot of project state
-fruitnux --help                 # external-deliverable verbs (pack + signing handoff verbs in design)
 ```
 
 Plus 10+ more verbs across the chain. Run `<verb> --help` for full surface or see [docs/reference.md](https://github.com/leapnux/5nux/blob/main/docs/reference.md).

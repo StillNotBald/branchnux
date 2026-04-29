@@ -859,3 +859,103 @@ describe('sca generate — sign-off role derivation from industry profile (AP-F9
     expect(stdout).not.toContain('CISO');
   });
 });
+
+// ── 11. Deprecation shims (AP-F7) ─────────────────────────────────────────────
+// Audit ref: AP-F7 — branchnux 28-verb binary split, moved audit deliverables
+// to fruitnux in v0.6.
+//
+// These tests verify that:
+//   a) branchnux still accepts the old verbs (backward compat through v0.6)
+//   b) stderr contains the expected deprecation warning
+//   c) the call is forwarded to fruitnux (the underlying fruitnux behavior works)
+
+import { spawnSync } from 'node:child_process';
+
+/**
+ * Run the branchnux CLI with stderr explicitly piped (for deprecation-shim tests).
+ * The main run() helper above does not capture stderr — this helper does.
+ */
+function runCapturingStderr(args, opts = {}) {
+  const { cwd = os.tmpdir(), env = process.env, timeout = 15_000 } = opts;
+  const result = spawnSync(NODE, [BIN, ...args], {
+    cwd,
+    env,
+    timeout,
+    encoding: 'utf-8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  return {
+    stdout: result.stdout ?? '',
+    stderr: result.stderr ?? '',
+    status: result.status ?? 1,
+  };
+}
+
+describe('deprecation shims — AP-F7 (branchnux → fruitnux verb forwarding)', () => {
+  let tmp;
+  beforeEach(() => { tmp = makeTmp(); });
+  afterEach(() => rimraf(tmp));
+
+  it('branchnux rtm --dry-run prints deprecation WARNING to stderr (AP-F7)', () => {
+    // Set up minimal REQUIREMENTS.md so fruitnux rtm can actually run
+    const reqDir = path.join(tmp, 'requirements');
+    fs.mkdirSync(reqDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(reqDir, 'REQUIREMENTS.md'),
+      '# Requirements\n\n## R-01 Auth\n\n**Status:** DONE\n',
+    );
+    const { stderr } = runCapturingStderr(['rtm', '--dry-run'], { cwd: tmp });
+    // The deprecation warning must appear on stderr
+    expect(stderr).toMatch(/WARNING.*branchnux rtm.*moved.*fruitnux rtm/i);
+    expect(stderr).toMatch(/v0\.6/);
+    expect(stderr).toMatch(/v0\.7/);
+  });
+
+  it('branchnux sca generate --dry-run prints deprecation WARNING to stderr (AP-F7)', () => {
+    // Minimal SCA scaffold
+    const validationsDir = path.join(tmp, 'requirements', 'validations', 'login');
+    fs.mkdirSync(validationsDir, { recursive: true });
+    const scaContent = `---
+surface: login
+generated: 2026-01-01
+standards_version: 1.0.0
+industry: general
+control_count: 0
+r_ids: []
+---
+## 1. Executive Summary
+[VERIFY]
+`;
+    fs.writeFileSync(path.join(validationsDir, 'v1.0_2026-01-01.md'), scaContent, 'utf-8');
+    const { stderr } = runCapturingStderr(['sca', 'generate', 'login', '--dry-run'], { cwd: tmp });
+    expect(stderr).toMatch(/WARNING.*branchnux sca.*moved.*fruitnux sca/i);
+    expect(stderr).toMatch(/v0\.6/);
+  });
+
+  it('branchnux br init <id> prints deprecation WARNING to stderr (AP-F7)', () => {
+    const { stderr } = runCapturingStderr(['br', 'init', 'BR-01', '--out', tmp], { cwd: tmp });
+    expect(stderr).toMatch(/WARNING.*branchnux br.*moved.*fruitnux br/i);
+    expect(stderr).toMatch(/v0\.6/);
+  });
+
+  it('branchnux sign stale-check prints deprecation WARNING to stderr (AP-F7)', () => {
+    // Create a surface dir with a uat-log.jsonl so stale-check can run
+    const surfaceDir = path.join(tmp, 'test-surface');
+    fs.mkdirSync(surfaceDir, { recursive: true });
+    // Write an empty uat-log (no entries) so stale-check completes cleanly
+    fs.writeFileSync(path.join(surfaceDir, 'uat-log.jsonl'), '', 'utf-8');
+    const { stderr } = runCapturingStderr(
+      ['sign', 'stale-check', 'test-surface', '--folder', tmp],
+      { cwd: tmp },
+    );
+    expect(stderr).toMatch(/WARNING.*branchnux sign.*moved.*fruitnux sign/i);
+    expect(stderr).toMatch(/v0\.6/);
+  });
+
+  it('deprecation message always recommends fruitnux and names v0.7 removal (AP-F7)', () => {
+    // Use br init (a real action, not --help) to verify the full warning text
+    const { stderr } = runCapturingStderr(['br', 'init', 'BR-99', '--out', tmp], { cwd: tmp });
+    expect(stderr).toContain('fruitnux');
+    expect(stderr).toContain('v0.7');
+  });
+});

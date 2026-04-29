@@ -1,0 +1,239 @@
+{
+  "_comment": "Copyright 2026 Chu Ling - SPDX-License-Identifier: Apache-2.0",
+  "version": "0.2.0",
+  "industry": "healthcare",
+  "description": "Healthcare industry standards bundle. Covers HIPAA Security Rule (Administrative, Physical, Technical Safeguards), HITECH Breach Notification, NIST SP 800-66r2, and 21 CFR Part 11 for clinical software. Shipped in BranchNuX v0.2.",
+  "signOffRoles": ["Project Lead", "Privacy Officer", "Clinical Lead", "External Auditor"],
+  "standards": [
+    {
+      "id": "HIPAA-164.308-a1",
+      "name": "HIPAA — Security Management Process",
+      "description": "Implement policies and procedures to prevent, detect, contain, and correct security violations. Required implementation specifications include: Risk Analysis (assess the potential risks and vulnerabilities to the confidentiality, integrity, and availability of ePHI), Risk Management (implement security measures sufficient to reduce risks and vulnerabilities), Sanction Policy (apply appropriate sanctions against workforce members who fail to comply), and Information System Activity Review (regularly review records of information system activity).",
+      "family": "HIPAA Security Rule — 164.308: Administrative Safeguards",
+      "references": [
+        "45 CFR §164.308(a)(1)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.308-a3",
+      "name": "HIPAA — Workforce Security",
+      "description": "Implement policies and procedures to ensure that all members of the workforce have appropriate access to ePHI, and to prevent those workforce members who do not have access from obtaining access. Required specifications include Authorization and/or Supervision, Workforce Clearance Procedure, and Termination Procedures.",
+      "family": "HIPAA Security Rule — 164.308: Administrative Safeguards",
+      "references": [
+        "45 CFR §164.308(a)(3)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.308-a4",
+      "name": "HIPAA — Information Access Management",
+      "description": "Implement policies and procedures for authorizing access to ePHI that are consistent with the applicable requirements of the Privacy Rule. Addressable specifications include Isolating Health Care Clearinghouse Functions, Access Authorization, and Access Establishment and Modification. Role-based access control aligned to minimum necessary principle is required.",
+      "family": "HIPAA Security Rule — 164.308: Administrative Safeguards",
+      "references": [
+        "45 CFR §164.308(a)(4)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.308-a5",
+      "name": "HIPAA — Security Awareness and Training",
+      "description": "Implement a security awareness and training program for all members of the workforce (including management). Addressable specifications include: Security Reminders (periodic security updates), Protection from Malicious Software (procedures for guarding against, detecting, and reporting malicious software), Log-in Monitoring (procedures for monitoring log-in attempts and reporting discrepancies), and Password Management.",
+      "family": "HIPAA Security Rule — 164.308: Administrative Safeguards",
+      "references": [
+        "45 CFR §164.308(a)(5)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.308-a6",
+      "name": "HIPAA — Security Incident Procedures",
+      "description": "Implement policies and procedures to address security incidents. Required specification: Response and Reporting — identify and respond to suspected or known security incidents; mitigate, to the extent practicable, harmful effects of known security incidents; and document security incidents and their outcomes.",
+      "family": "HIPAA Security Rule — 164.308: Administrative Safeguards",
+      "references": [
+        "45 CFR §164.308(a)(6)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.308-a7",
+      "name": "HIPAA — Contingency Plan",
+      "description": "Establish and implement policies and procedures for responding to an emergency or other occurrence that damages systems that contain ePHI. Required specifications: Data Backup Plan, Disaster Recovery Plan, Emergency Mode Operation Plan. Addressable: Testing and Revision Procedures, Applications and Data Criticality Analysis.",
+      "family": "HIPAA Security Rule — 164.308: Administrative Safeguards",
+      "references": [
+        "45 CFR §164.308(a)(7)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.310-a",
+      "name": "HIPAA — Facility Access Controls",
+      "description": "Implement policies and procedures to limit physical access to electronic information systems and the facilities in which they are housed, while ensuring that properly authorized access is allowed. Addressable: Contingency Operations, Facility Security Plan, Access Control and Validation Procedures, Maintenance Records.",
+      "family": "HIPAA Security Rule — 164.310: Physical Safeguards",
+      "references": [
+        "45 CFR §164.310(a)(1)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.310-b",
+      "name": "HIPAA — Workstation Use Policy",
+      "description": "Implement policies and procedures that specify the proper functions to be performed, the manner in which those functions are to be performed, and the physical attributes of the surroundings of a specific workstation or class of workstation that can access ePHI.",
+      "family": "HIPAA Security Rule — 164.310: Physical Safeguards",
+      "references": [
+        "45 CFR §164.310(b)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.310-c",
+      "name": "HIPAA — Workstation Security",
+      "description": "Implement physical safeguards for all workstations that access ePHI, to restrict access to authorized users only. Workstations must have screen locks, be positioned to prevent shoulder-surfing, and controls must prevent unauthorized removal of ePHI from workstations.",
+      "family": "HIPAA Security Rule — 164.310: Physical Safeguards",
+      "references": [
+        "45 CFR §164.310(c)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.310-d",
+      "name": "HIPAA — Device and Media Controls",
+      "description": "Implement policies and procedures that govern the receipt and removal of hardware and electronic media that contain ePHI into and out of a facility and the movement of these items within the facility. Required: Disposal (final disposal of ePHI and/or hardware on which ePHI was stored), Media Re-Use (procedures for removal of ePHI from electronic media before reuse). Addressable: Accountability, Data Backup and Storage.",
+      "family": "HIPAA Security Rule — 164.310: Physical Safeguards",
+      "references": [
+        "45 CFR §164.310(d)(1)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.312-a",
+      "name": "HIPAA — Technical Access Control",
+      "description": "Implement technical policies and procedures for electronic information systems that maintain ePHI to allow access only to those persons or software programs that have been granted access rights. Required: Unique User Identification (unique name/number for identifying and tracking user identity). Addressable: Emergency Access Procedure, Automatic Logoff, Encryption and Decryption.",
+      "family": "HIPAA Security Rule — 164.312: Technical Safeguards",
+      "references": [
+        "45 CFR §164.312(a)(1)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.312-b",
+      "name": "HIPAA — Audit Controls",
+      "description": "Implement hardware, software, and/or procedural mechanisms that record and examine activity in information systems that contain or use ePHI. Audit logs shall capture sufficient detail to reconstruct access events: who accessed ePHI, what they accessed, when, from which system, and whether the action succeeded.",
+      "family": "HIPAA Security Rule — 164.312: Technical Safeguards",
+      "references": [
+        "45 CFR §164.312(b)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.312-c",
+      "name": "HIPAA — Integrity Controls",
+      "description": "Implement policies and procedures to protect ePHI from improper alteration or destruction. Addressable: Mechanism to Authenticate ePHI — implement electronic mechanisms to corroborate that ePHI has not been altered or destroyed in an unauthorized manner (e.g. digital signatures, checksums, hash validation).",
+      "family": "HIPAA Security Rule — 164.312: Technical Safeguards",
+      "references": [
+        "45 CFR §164.312(c)(1)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.312-d",
+      "name": "HIPAA — Person or Entity Authentication",
+      "description": "Implement procedures to verify that a person or entity seeking access to ePHI is the one claimed. Authentication mechanisms must prevent unauthenticated access to ePHI. Multi-factor authentication is strongly recommended for remote access to systems containing ePHI.",
+      "family": "HIPAA Security Rule — 164.312: Technical Safeguards",
+      "references": [
+        "45 CFR §164.312(d)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HIPAA-164.312-e",
+      "name": "HIPAA — Transmission Security",
+      "description": "Implement technical security measures to guard against unauthorized access to ePHI that is being transmitted over an electronic communications network. Addressable: Encryption — implement a mechanism to encrypt ePHI whenever deemed appropriate. TLS 1.2+ is the minimum standard for transmission over public networks.",
+      "family": "HIPAA Security Rule — 164.312: Technical Safeguards",
+      "references": [
+        "45 CFR §164.312(e)(1)",
+        "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+      ]
+    },
+    {
+      "id": "HITECH-164.402",
+      "name": "HITECH — Breach Notification — Definition and Threshold",
+      "description": "A breach is an acquisition, access, use, or disclosure of protected health information in a manner not permitted which compromises the security or privacy of the PHI. The presumption is that every impermissible use or disclosure is a breach unless the covered entity or business associate can demonstrate that there is a low probability that the PHI has been compromised based on a four-factor risk assessment.",
+      "family": "HITECH Breach Notification Rule — 164.402-414",
+      "references": [
+        "45 CFR §164.402",
+        "https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html"
+      ]
+    },
+    {
+      "id": "HITECH-164.404",
+      "name": "HITECH — Notification to Individuals Following a Breach",
+      "description": "A covered entity shall, without unreasonable delay and in no case later than 60 calendar days after discovery of a breach of unsecured PHI, notify each individual whose PHI has been, or is reasonably believed to have been, accessed, acquired, used, or disclosed as a result of such breach.",
+      "family": "HITECH Breach Notification Rule — 164.402-414",
+      "references": [
+        "45 CFR §164.404",
+        "https://www.hhs.gov/hipaa/for-professionals/breach-notification/index.html"
+      ]
+    },
+    {
+      "id": "NIST-800-66r2-3.1",
+      "name": "NIST 800-66r2 — Risk Analysis Implementation",
+      "description": "Organizations shall conduct an accurate and thorough assessment of the potential risks and vulnerabilities to the confidentiality, integrity, and availability of ePHI. The risk analysis SHALL identify the scope of the analysis, data collection, identify and document potential threats and vulnerabilities, assess current security measures, determine the likelihood and impact of threat occurrence, and determine the level of risk.",
+      "family": "NIST SP 800-66r2 — Implementing the HIPAA Security Rule",
+      "references": [
+        "NIST SP 800-66 Rev. 2 §3.1",
+        "https://csrc.nist.gov/publications/detail/sp/800-66/rev-2/final"
+      ]
+    },
+    {
+      "id": "NIST-800-66r2-3.3",
+      "name": "NIST 800-66r2 — Addressable vs Required Implementation",
+      "description": "Organizations must assess whether each addressable implementation specification is a reasonable and appropriate safeguard in its environment. If the specification is reasonable and appropriate, the organization must implement it. If not, the organization must document why it is not reasonable and appropriate and implement an equivalent alternative measure, or document that the risks are sufficiently low that the standard can be met without implementing the specification.",
+      "family": "NIST SP 800-66r2 — Implementing the HIPAA Security Rule",
+      "references": [
+        "NIST SP 800-66 Rev. 2 §3.3",
+        "https://csrc.nist.gov/publications/detail/sp/800-66/rev-2/final"
+      ]
+    },
+    {
+      "id": "21CFR11-11.10-a",
+      "name": "21 CFR Part 11 — Validation of Electronic Systems",
+      "description": "Persons who use closed systems to create, modify, maintain, or transmit electronic records shall employ procedures and controls including validation of systems to ensure accuracy, reliability, consistent intended performance, and the ability to discern invalid or altered records.",
+      "family": "21 CFR Part 11 — Electronic Records; Electronic Signatures",
+      "references": [
+        "21 CFR §11.10(a)",
+        "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11"
+      ]
+    },
+    {
+      "id": "21CFR11-11.10-e",
+      "name": "21 CFR Part 11 — Audit Trail for Clinical Records",
+      "description": "Persons who use closed systems shall use computer-generated, time-stamped audit trails to independently record the date and time of operator entries and actions that create, modify, or delete electronic records. Record changes shall not obscure previously recorded information. Audit trail documentation shall be retained for a period at least as long as that required for the subject electronic records.",
+      "family": "21 CFR Part 11 — Electronic Records; Electronic Signatures",
+      "references": [
+        "21 CFR §11.10(e)",
+        "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11"
+      ]
+    },
+    {
+      "id": "21CFR11-11.50",
+      "name": "21 CFR Part 11 — Electronic Signature Manifestations",
+      "description": "Signed electronic records shall contain information associated with the signing that clearly indicates: the printed name of the signer, the date and time when the signature was executed, and the meaning (e.g., review, approval, responsibility, authorship) associated with the signature.",
+      "family": "21 CFR Part 11 — Electronic Records; Electronic Signatures",
+      "references": [
+        "21 CFR §11.50",
+        "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11"
+      ]
+    },
+    {
+      "id": "21CFR11-11.300",
+      "name": "21 CFR Part 11 — Electronic Signature — Controls for Identification Codes",
+      "description": "Persons using electronic signatures based upon use of identification codes in combination with passwords shall employ controls to ensure their security and integrity, including maintaining uniqueness of each combined identification code and password, ensuring that identification code and password issuances are periodically checked, revised, or recalled, and using transaction safeguards to prevent unauthorized use.",
+      "family": "21 CFR Part 11 — Electronic Records; Electronic Signatures",
+      "references": [
+        "21 CFR §11.300",
+        "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11"
+      ]
+    }
+  ]
+}

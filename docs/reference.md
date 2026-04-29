@@ -1,5 +1,20 @@
 # CLI Reference
 
+**v0.6 note:** Audit-deliverable verbs (`sca`, `sign`, `br`, `rtm`) moved from branchnux → fruitnux in v0.6 (AP-F7). Branchnux retains deprecation shims through v0.6.x. See [Deprecated Paths](#deprecated-paths) at the bottom of this page.
+
+---
+
+## Package split (AP-F7)
+
+| Package | Verbs | Role |
+|---|---|---|
+| `branchnux` | `init`, `plan`, `codify`, `enrich`, `discover`, `batch-plan`, `report`, `validate`, `run`, `compare`, `visual`, `doctor`, `demo` | Verification — test planning, reports, LLM-assisted planning |
+| `fruitnux` | `rtm`, `sca`, `sca oscal`, `sign`, `sign pdf`, `sign stale-check`, `br init`, `br link`, `br rtm` | Deliverables — SCA, OSCAL, sign-off, RTM, BR-attestations |
+
+---
+
+## branchnux commands
+
 All commands follow the pattern: `branchnux <command> [arguments] [flags]`
 
 ---
@@ -601,3 +616,32 @@ export default {
 ```
 
 All paths in the config are relative to the config file's directory (normally the repo root).
+
+---
+
+## Deprecated paths
+
+The following `branchnux` paths were moved to `fruitnux` in v0.6 (AP-F7). Branchnux v0.6.x retains deprecation shims that print a warning and forward to fruitnux. **Shims will be removed in v0.7.0.**
+
+| Old (branchnux, removed in v0.7) | New (fruitnux) |
+|---|---|
+| `branchnux rtm` | `fruitnux rtm` |
+| `branchnux sca init <surface>` | `fruitnux sca init <surface>` |
+| `branchnux sca generate <surface>` | `fruitnux sca generate <surface>` |
+| `branchnux sca pdf <surface>` | `fruitnux sca pdf <surface>` |
+| `branchnux sca oscal <surface>` | `fruitnux sca oscal <surface>` |
+| `branchnux sign <surface>` | `fruitnux sign <surface>` |
+| `branchnux sign pdf <surface>` | `fruitnux sign pdf <surface>` |
+| `branchnux sign stale-check <surface>` | `fruitnux sign stale-check <surface>` |
+| `branchnux br init <id>` | `fruitnux br init <id>` |
+| `branchnux br link <br-id> <r-ids>` | `fruitnux br link <br-id> <r-ids>` |
+| `branchnux br rtm` | `fruitnux br rtm` |
+
+### Why the split
+
+branchnux had 28 verbs spanning six separable user jobs (PMO A-08 threshold: 15). The 6-NUX taxonomy defines:
+
+- **branchnux** = active verification: running, validating, comparing — things done by engineers during the build cycle.
+- **fruitnux** = external deliverables: SCAs, OSCAL evidence, sign-off ledgers, RTMs, BR-attestations — artifacts that leave the team and go to auditors, regulators, and compliance reviewers.
+
+Aligning the verb surface to the taxonomy makes each binary's scope self-documenting and keeps both packages at or below the 15-verb PMO threshold.

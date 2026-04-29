@@ -12,11 +12,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SEC-F5: `validateSurface()` extracted to `src/lib/validate-surface.mjs` and imported by `sign`, `sign-pdf`, `sca`, and `sca-oscal` — blocks path-traversal attacks (`../foo`, `..\\foo`, `foo/bar`, `foo bar`) before any `path.resolve()` occurs.
 - SEC-F6: Puppeteer launch in `sign-pdf` and `sca pdf` now tries sandboxed mode first; falls back to `--no-sandbox` only if the initial launch fails (rootless container / CI) and emits a prominent `stderr` warning explaining the trade-off.
 - **AP-F2 CLOSED — `@leapnux/6nux-core` schemas + validators v1**: five JSON Schema Draft 2020-12 files under `packages/6nux-core/src/schemas/v1/` ({rxx, adr, sprint-folder, test-plan, rtm}) and five Ajv-backed validator functions under `packages/6nux-core/src/validators/` (`validateRxx`, `validateAdr`, `validateSprintFolder`, `validateTestPlan`, `validateRtm`). All five are now exported from the `@leapnux/6nux-core` barrel. Schemas are also importable as raw objects from `@leapnux/6nux-core/schemas/v1`. Adds `ajv@^8` as the only runtime dep in `6nux-core`. 37 new tests; total 6nux-core test count 55 → 92.
+- **AP-F7 — `@leapnux/fruitnux` promoted from scaffold to ACTIVE with 11 verbs**: `sca init`, `sca generate`, `sca pdf`, `sca oscal`, `sign`, `sign pdf`, `sign stale-check`, `br init`, `br link`, `br rtm`, `rtm` moved from branchnux → fruitnux. Aligns verb structure to the 6-NUX taxonomy: branchnux = verification node (test plans, reports, LLM planning); fruitnux = deliverable node (SCA, OSCAL, sign-off, RTM, BR-attestations). branchnux verb count 28 → ~14; fruitnux verb count 0 → 11.
 
 ### Changed
 
 - **BREAKING — SEC-F7:** `_emptyHash` sentinel in `uat-log.mjs` and `br-attestations.mjs` is now domain-separated by the JSONL file basename: `HMAC(secret, 'chain-init:<basename>')` instead of `HMAC(secret, '')`. This prevents two projects sharing the same `UAT_SECRET` from producing identical genesis hashes, which would allow cross-project chain replay. **Existing chains written before this version will fail `verifyChain()` / `verifyAttestationChain()` at the first entry.** Re-create or re-sign existing chains to adopt the new sentinel.
 - **`@leapnux/6nux-core` version bumped to `0.6.0-alpha.1`**: schema + validator API constitutes the breaking-compatible addition that warrants a minor version bump. The `./validators` subpath export now points to `src/validators/index.mjs` (the real implementations) rather than the old stub `src/validators.mjs`. The `./schemas/v1` subpath export is new.
+- **BREAKING — AP-F7:** `branchnux sca`, `branchnux sign`, `branchnux br`, `branchnux rtm` moved to `fruitnux`. Branchnux retains deprecation shims through v0.6.x that print a warning and forward to fruitnux. Shims will be removed in v0.7.0.
+
+  Migration for adopters:
+  ```
+  Old:  branchnux sca generate <surface>
+  New:  fruitnux sca generate <surface>
+
+  Old:  branchnux rtm
+  New:  fruitnux rtm
+
+  Old:  branchnux sign <surface>
+  New:  fruitnux sign <surface>
+
+  Old:  branchnux br init <id>
+  New:  fruitnux br init <id>
+  ```
 
 ### Fixed
 

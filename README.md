@@ -25,13 +25,14 @@ What you get, concretely:
 
 | You run | You get |
 |---|---|
-| `branchnux rtm` | Requirements Traceability Matrix regenerated from REQUIREMENTS.md + sprint folders + source-code annotations + test files |
-| `branchnux sca <surface>` | Security Control Assessment (8 standard sections, regulator-ready) |
-| `branchnux sca oscal <surface>` | NIST OSCAL 1.1.2 JSON — the format FedRAMP auditors and SOC 2 examiners prefer |
-| `branchnux sign <surface>` | HMAC-chained tamper-evident attestation; signed PDF for handoff |
+| `fruitnux rtm` | Requirements Traceability Matrix regenerated from REQUIREMENTS.md + sprint folders + source-code annotations + test files |
+| `fruitnux sca generate <surface>` | Security Control Assessment (8 standard sections, regulator-ready) |
+| `fruitnux sca oscal <surface>` | NIST OSCAL 1.1.2 JSON — the format FedRAMP auditors and SOC 2 examiners prefer |
+| `fruitnux sign <surface>` | HMAC-chained tamper-evident attestation; signed PDF for handoff |
 | `rootnux adr-new <title>` | Sequentially numbered ADR scaffold |
 | `rootnux risk-add` | Risk register entry |
 | `trunknux new-sprint <slug>` | Date-prefixed sprint folder with scaffolded README + LOG |
+| `branchnux plan <slug>` | AI-drafted test plan with `[VERIFY]` markers |
 | `leafnux health` | RAG-status snapshot of your whole project (requirements, risks, ADRs, sprint freshness) |
 
 > **Is 5-NUX OSS alone enough to ship + pass audits?** Yes. Adjacent tools (kanban, chat, dashboards, build pipelines) are optional pairings, not requirements.
@@ -119,9 +120,9 @@ For the full "what's enough" breakdown, comparison vs DOORS / Polarion / Jama / 
 |---|---|---|---|
 | `@leapnux/rootnux` | intent (specs, ADRs, risks, KB) | active | `init`, `lint`, `adr-new`, `risk-add`, `status`, `kb-init` |
 | `@leapnux/trunknux` | build (sprint scaffolding) | active | `new-sprint`, `summarize`, `lint`, `log` |
-| `@leapnux/branchnux` | verification (test plans, RTM, SCA, OSCAL, sign) | active | `init`, `plan`, `codify`, `report`, `validate`, `sca`, `sca oscal`, `rtm`, `sign`, `sign pdf`, `visual`, `discover`, `enrich`, `br`, `doctor` (15+) |
+| `@leapnux/branchnux` | verification (test plans, reports, LLM planning) | active | `init`, `plan`, `codify`, `enrich`, `discover`, `batch-plan`, `report`, `validate`, `run`, `compare`, `visual baseline`, `visual compare`, `doctor`, `demo` (~14 verbs) |
+| `@leapnux/fruitnux` | external deliverables (SCAs, OSCAL, sign-offs, RTM) | active | `sca init`, `sca generate`, `sca pdf`, `sca oscal`, `sign`, `sign pdf`, `sign stale-check`, `br init`, `br link`, `br rtm`, `rtm` (~11 verbs) |
 | `@leapnux/leafnux` | continuous health | active | `health` |
-| `@leapnux/fruitnux` | external deliverables | scoped — CLI scaffold only; verbs in design | (`pack` candidate for v0.5.1+) |
 | `@leapnux/6nux-core` | shared library | active | (no CLI; shared schemas, conventions, IDs, utils) |
 | `@leapnux/5nux` | meta-package | active | (no CLI; installs all 5 active NUX CLIs + 6nux-core) |
 
@@ -159,10 +160,11 @@ rootnux kb-init                                       # Knowledge Base scaffold 
 trunknux new-sprint v1-launch                         # date-prefixed sprint folder
 trunknux summarize                                    # SPRINT_SUMMARY.md from git log
 branchnux plan login                                  # AI-drafted test plan with [VERIFY] markers
-branchnux rtm                                         # regenerate TRACEABILITY.md
-branchnux sca login                                   # 8-section Security Control Assessment
-branchnux sca oscal login                             # NIST OSCAL 1.1.2 JSON
-branchnux sign login                                  # HMAC-chained sign-off
+fruitnux rtm                                          # regenerate TRACEABILITY.md (moved from branchnux in v0.6)
+fruitnux sca init login                               # scaffold 8-section Security Control Assessment
+fruitnux sca generate login                           # fill SCA evidence rows from test results
+fruitnux sca oscal login                              # NIST OSCAL 1.1.2 JSON
+fruitnux sign login                                   # HMAC-chained sign-off
 leafnux health                                        # GREEN/AMBER/RED snapshot of project state
 ```
 
@@ -180,7 +182,7 @@ Each NUX node serves a different stakeholder, with a different relationship to A
 | **trunknux** | Development | Dev / Eng | Summarizes git log, drafts narrative |
 | **branchnux** | Test + validation | QA / Test lead | Discovers test scenarios, generates plans (with `[VERIFY]` markers) |
 | **leafnux** | Continuous health | Eng / SRE | Reads artifacts, computes RAG status |
-| **fruitnux** | Audit handoff | Compliance / Legal / external auditor | Bundles regulator-ready packets *(verbs in design)* |
+| **fruitnux** | Audit handoff | Compliance / Legal / external auditor | Generates SCA, OSCAL, HMAC sign-off ledgers, RTM, BR-attestations |
 
 Where the AI/human boundary sits at each stage, the four collab patterns (drafted-by-AI/attested-by-human, append-only enrichment, one-agent-per-slug, cost-gated automation), and the typical end-to-end cycle — see [`docs/collaboration.md`](docs/collaboration.md).
 

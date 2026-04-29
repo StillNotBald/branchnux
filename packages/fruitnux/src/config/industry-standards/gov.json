@@ -1,0 +1,257 @@
+{
+  "_comment": "Copyright 2026 Chu Ling - SPDX-License-Identifier: Apache-2.0",
+  "version": "0.3.0",
+  "industry": "gov",
+  "description": "Government / public sector standards bundle. Covers FedRAMP Moderate baseline (NIST 800-53 Rev 5 core controls), FISMA reporting, OMB Circular A-130, StateRAMP, CIS Benchmarks key controls, and Section 508 accessibility. Shipped in BranchNuX v0.3.",
+  "signOffRoles": ["Project Lead", "Authorizing Official", "System Owner", "External Auditor"],
+  "standards": [
+    {
+      "id": "NIST-800-53r5-AC-2",
+      "name": "Account Management",
+      "description": "Manage system accounts, including establishing, activating, modifying, reviewing, disabling, and removing accounts. The organization must: define account types; assign account managers; establish conditions for group and role membership; specify authorized users of the system; require appropriate approvals for account creation; create, enable, modify, disable, and remove accounts in accordance with procedures; monitor the use of accounts; notify account managers when accounts are no longer required or when users are terminated or transferred; authorize access based on valid authorization from designated officials.",
+      "family": "AC",
+      "references": [
+        "NIST SP 800-53 Rev. 5 AC-2",
+        "FedRAMP Moderate Baseline AC-2",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    },
+    {
+      "id": "NIST-800-53r5-AC-3",
+      "name": "Access Enforcement",
+      "description": "Enforce approved authorizations for logical access to information and system resources in accordance with applicable access control policies. The system shall implement role-based access controls (RBAC), mandatory access controls (MAC), or discretionary access controls (DAC) as appropriate. Access shall be granted based on the principle of least privilege.",
+      "family": "AC",
+      "references": [
+        "NIST SP 800-53 Rev. 5 AC-3",
+        "FedRAMP Moderate Baseline AC-3",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    },
+    {
+      "id": "NIST-800-53r5-AC-17",
+      "name": "Remote Access",
+      "description": "Establish and document usage restrictions, configuration and connection requirements, and implementation guidance for each type of remote access allowed. Authorize each type of remote access prior to allowing such connections. Employ cryptographic mechanisms to protect the confidentiality and integrity of remote access sessions. Route remote access through managed network access control points.",
+      "family": "AC",
+      "references": [
+        "NIST SP 800-53 Rev. 5 AC-17",
+        "FedRAMP Moderate Baseline AC-17",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    },
+    {
+      "id": "NIST-800-53r5-AU-2",
+      "name": "Event Logging",
+      "description": "Identify the types of events that the system is capable of logging in support of the audit function. Coordinate the event logging function with other organizations requiring audit-related information. Specify the following event types for logging within the system: successful and unsuccessful account logon events, account management events, object access, policy change, privilege functions, process tracking, system events, and application-specific events. Review and update the list of logged events periodically.",
+      "family": "AU",
+      "references": [
+        "NIST SP 800-53 Rev. 5 AU-2",
+        "FedRAMP Moderate Baseline AU-2",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    },
+    {
+      "id": "NIST-800-53r5-AU-3",
+      "name": "Content of Audit Records",
+      "description": "Ensure that audit records contain information that establishes what type of event occurred, when the event occurred, where the event occurred, the source of the event, the outcome of the event, and the identity of any individuals, subjects, or objects/entities associated with the event. The date/time, source address, user identity, success/fail indicator, and affected resource must all be present in each audit record.",
+      "family": "AU",
+      "references": [
+        "NIST SP 800-53 Rev. 5 AU-3",
+        "FedRAMP Moderate Baseline AU-3",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    },
+    {
+      "id": "NIST-800-53r5-AU-9",
+      "name": "Protection of Audit Information",
+      "description": "Protect audit information and audit tools from unauthorized access, modification, and deletion. Restrict access to audit logs to only authorized personnel. Alert designated organizational officials upon detection of unauthorized access, modification, or deletion of audit information.",
+      "family": "AU",
+      "references": [
+        "NIST SP 800-53 Rev. 5 AU-9",
+        "FedRAMP Moderate Baseline AU-9",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    },
+    {
+      "id": "NIST-800-53r5-IA-2",
+      "name": "Identification and Authentication — Organizational Users",
+      "description": "Uniquely identify and authenticate organizational users and associate that unique identification with processes acting on behalf of those users. Implement multi-factor authentication for access to privileged accounts and for non-privileged accounts for remote access. The system SHALL accept and electronically verify Personal Identity Verification (PIV) credentials where applicable.",
+      "family": "IA",
+      "references": [
+        "NIST SP 800-53 Rev. 5 IA-2",
+        "FedRAMP Moderate Baseline IA-2",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    },
+    {
+      "id": "NIST-800-53r5-IA-5",
+      "name": "Authenticator Management",
+      "description": "Manage system authenticators including passwords, tokens, biometrics, PKI certificates, and key cards. Establish and implement administrative procedures for initial authenticator distribution, replacement when authenticators are lost/compromised, and administrative revocation. Enforce minimum password complexity and change requirements. Prohibit password reuse for a defined number of generations. Store and transmit only cryptographically protected passwords.",
+      "family": "IA",
+      "references": [
+        "NIST SP 800-53 Rev. 5 IA-5",
+        "FedRAMP Moderate Baseline IA-5",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    },
+    {
+      "id": "NIST-800-53r5-SC-7",
+      "name": "Boundary Protection",
+      "description": "Monitor and control communications at the external boundary of the system and at key internal boundaries within the system. Implement subnetworks for publicly accessible system components that are physically or logically separated from internal organizational networks. Connect to external networks or systems only through managed interfaces consisting of boundary protection devices arranged in accordance with an organizational security and privacy architecture.",
+      "family": "SC",
+      "references": [
+        "NIST SP 800-53 Rev. 5 SC-7",
+        "FedRAMP Moderate Baseline SC-7",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    },
+    {
+      "id": "NIST-800-53r5-SC-8",
+      "name": "Transmission Confidentiality and Integrity",
+      "description": "Implement cryptographic mechanisms to prevent unauthorized disclosure of information and detect changes to information during transmission. Use FIPS 140-3 validated cryptographic modules. TLS 1.2 at minimum; TLS 1.3 preferred. Prohibit use of deprecated protocols (SSLv3, TLS 1.0, TLS 1.1).",
+      "family": "SC",
+      "references": [
+        "NIST SP 800-53 Rev. 5 SC-8",
+        "FedRAMP Moderate Baseline SC-8",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    },
+    {
+      "id": "NIST-800-53r5-SI-3",
+      "name": "Malicious Code Protection",
+      "description": "Implement malicious code protection mechanisms at system entry and exit points to detect and eradicate malicious code. Update malicious code protection mechanisms whenever new releases are available. Configure malicious code protection mechanisms to perform periodic scans of the system and real-time scans of files from external sources at endpoints and network entry/exit points.",
+      "family": "SI",
+      "references": [
+        "NIST SP 800-53 Rev. 5 SI-3",
+        "FedRAMP Moderate Baseline SI-3",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    },
+    {
+      "id": "NIST-800-53r5-CM-6",
+      "name": "Configuration Settings",
+      "description": "Establish and document configuration settings for components employed within the system that reflect the most restrictive mode consistent with operational requirements. Implement the configuration settings. Identify, document, and approve any deviations from established configuration settings for organizational components based on explicit operational requirements. Monitor and control changes to the configuration settings in accordance with organizational policies and procedures.",
+      "family": "CM",
+      "references": [
+        "NIST SP 800-53 Rev. 5 CM-6",
+        "FedRAMP Moderate Baseline CM-6",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    },
+    {
+      "id": "FISMA-NIST-SP800-37",
+      "name": "FISMA — Risk Management Framework Authorization",
+      "description": "Federal systems must follow the Risk Management Framework (RMF) as defined in NIST SP 800-37. The six-step process requires: Categorize (FIPS 199/200), Select controls (NIST 800-53), Implement controls, Assess controls (NIST 800-53A), Authorize (ATO from Authorizing Official), and Monitor on an ongoing basis. Systems must maintain current Authorization to Operate (ATO) documentation.",
+      "family": "FISMA — Federal Information Security Modernization Act",
+      "references": [
+        "44 USC §3554 (FISMA)",
+        "NIST SP 800-37 Rev. 2",
+        "https://csrc.nist.gov/publications/detail/sp/800-37/rev-2/final"
+      ]
+    },
+    {
+      "id": "FISMA-NIST-SP800-137",
+      "name": "FISMA — Continuous Monitoring",
+      "description": "Federal agencies must implement an information security continuous monitoring (ISCM) strategy as required by FISMA and OMB policy. ISCM involves maintaining ongoing situational awareness of hardware assets, software assets, vulnerabilities, configurations, network connections, and external connections. Agencies must report security status to OMB via CyberScope or equivalent reporting mechanism.",
+      "family": "FISMA — Federal Information Security Modernization Act",
+      "references": [
+        "44 USC §3554(b)(2)(D) (FISMA)",
+        "NIST SP 800-137",
+        "https://csrc.nist.gov/publications/detail/sp/800-137/final"
+      ]
+    },
+    {
+      "id": "OMB-A130-7a",
+      "name": "OMB Circular A-130 — Responsibilities for Protecting Federal Information Resources",
+      "description": "Agencies shall plan for security and privacy in all phases of the system development life cycle, determine the risk to organizational operations and assets resulting from operation of the system, authorize systems prior to operation and periodically thereafter, and comply with applicable requirements for the security and privacy of federal information and information systems.",
+      "family": "OMB Circular A-130 — Managing Federal Information Resources",
+      "references": [
+        "OMB Circular A-130 §7(a)",
+        "https://obamawhitehouse.archives.gov/sites/default/files/omb/assets/OMB/circulars/a130/a130revised.pdf"
+      ]
+    },
+    {
+      "id": "StateRAMP-MODERATE-AC-2",
+      "name": "StateRAMP — Account Management (Moderate)",
+      "description": "StateRAMP Moderate baseline requires all SaaS providers processing state government data to implement account management controls equivalent to FedRAMP Moderate AC-2. This includes automated account lifecycle management, periodic access reviews no less than annually, and role-based access controls aligned to state workforce functions.",
+      "family": "StateRAMP — Moderate Baseline",
+      "references": [
+        "StateRAMP Security Requirements v2.0 AC-2",
+        "https://stateramp.org/security-requirements/"
+      ]
+    },
+    {
+      "id": "CIS-L1-1.1",
+      "name": "CIS Benchmark — Inventory and Control of Enterprise Assets",
+      "description": "Actively manage (inventory, track, and correct) all enterprise assets (end-user devices, network devices, IoT devices, and servers) connected to the infrastructure physically, virtually, remotely, and those within cloud environments, to accurately know the totality of assets that need to be monitored and protected within the enterprise. CIS Control 1 is the foundation for all other CIS controls.",
+      "family": "CIS Controls v8 — Implementation Group 1",
+      "references": [
+        "CIS Controls v8 Control 1",
+        "https://www.cisecurity.org/controls/v8"
+      ]
+    },
+    {
+      "id": "CIS-L1-4.1",
+      "name": "CIS Benchmark — Establish and Maintain a Secure Configuration Process",
+      "description": "Establish and maintain a secure configuration process for enterprise assets (end-user devices, including portable and mobile; non-computing/IoT devices; and servers) and software (operating systems and applications). Review and update documentation annually, or when significant enterprise changes occur that could impact this safeguard.",
+      "family": "CIS Controls v8 — Implementation Group 1",
+      "references": [
+        "CIS Controls v8 Control 4.1",
+        "https://www.cisecurity.org/controls/v8"
+      ]
+    },
+    {
+      "id": "CIS-L1-6.1",
+      "name": "CIS Benchmark — Establish an Access Granting Process",
+      "description": "Establish and follow a process, preferably automated, for granting access to enterprise assets upon new hire, rights grant, or role change of a user. Review all accounts and their associated privileges to validate that the access is appropriate and still needed. Remove or disable access, as appropriate, to any assets or data repositories that no longer require it.",
+      "family": "CIS Controls v8 — Implementation Group 1",
+      "references": [
+        "CIS Controls v8 Control 6.1",
+        "https://www.cisecurity.org/controls/v8"
+      ]
+    },
+    {
+      "id": "SECTION-508-1194.22",
+      "name": "Section 508 — Web-Based Intranet and Internet Information and Applications",
+      "description": "All federal agencies must ensure that electronic and information technology (EIT) developed, procured, maintained, or used by the agency allows federal employees with disabilities and members of the public with disabilities to have access to and use of information and data that is comparable to the access and use by individuals without disabilities. Web content must meet WCAG 2.0 AA as required by the Revised 508 Standards (2018), which incorporates WCAG 2.0 Level A and Level AA success criteria by reference.",
+      "family": "Section 508 — Rehabilitation Act Amendments (29 USC §794d)",
+      "references": [
+        "29 USC §794d",
+        "36 CFR Part 1194",
+        "https://www.access-board.gov/ict/"
+      ]
+    },
+    {
+      "id": "SECTION-508-WCAG-2.1.1",
+      "name": "Section 508 — Keyboard Accessibility",
+      "description": "All functionality of the web content must be operable through a keyboard interface without requiring specific timings for individual keystrokes. This is a Level A success criterion under WCAG 2.0 and is mandatory under the Revised Section 508 Standards for all federal agency web applications and EIT procurements.",
+      "family": "Section 508 — Rehabilitation Act Amendments (29 USC §794d)",
+      "references": [
+        "WCAG 2.0 SC 2.1.1",
+        "36 CFR Part 1194",
+        "https://www.access-board.gov/ict/"
+      ]
+    },
+    {
+      "id": "NIST-800-53r5-IR-4",
+      "name": "Incident Handling",
+      "description": "Implement an incident handling capability for security incidents that includes preparation, detection and analysis, containment, eradication, and recovery. Coordinate incident handling activities with contingency planning activities. Employ automated mechanisms to support the incident handling process. Report security incidents to designated authorities within organization-defined time periods.",
+      "family": "IR",
+      "references": [
+        "NIST SP 800-53 Rev. 5 IR-4",
+        "FedRAMP Moderate Baseline IR-4",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    },
+    {
+      "id": "NIST-800-53r5-SA-11",
+      "name": "Developer Testing and Evaluation",
+      "description": "Require the developer of the system, system component, or system service to implement a plan for ongoing security and privacy control assessments; perform unit, integration, system, and regression testing/evaluation at defined depth and coverage; produce evidence of the execution of the assessment plan and the results of the testing; implement a verifiable flaw remediation process; and correct flaws identified during testing.",
+      "family": "SA",
+      "references": [
+        "NIST SP 800-53 Rev. 5 SA-11",
+        "FedRAMP Moderate Baseline SA-11",
+        "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+      ]
+    }
+  ]
+}

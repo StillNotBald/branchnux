@@ -1,0 +1,250 @@
+{
+  "_comment": "Copyright 2026 Chu Ling - SPDX-License-Identifier: Apache-2.0",
+  "version": "0.3.0",
+  "industry": "ecommerce",
+  "description": "E-commerce industry standards bundle. Covers PCI DSS v4.0 (SAQ A / SAQ A-EP / SAQ D), GDPR Articles 6/7/13/14/17/30/32, CCPA/CPRA (California), ePrivacy Directive cookie consent, OWASP ASVS 4.0 e-commerce-relevant controls, and WCAG 2.2 AA (ADA post-Domino's). Shipped in BranchNuX v0.3.",
+  "signOffRoles": ["Project Lead", "Data Protection Officer", "External Auditor"],
+  "standards": [
+    {
+      "id": "PCI-DSS-v4-SAQ-A-6.4.3",
+      "name": "PCI DSS — Payment Page Script Integrity (SAQ A-EP / SAQ D)",
+      "description": "All payment page scripts that are loaded and executed in the consumer's browser are managed as follows: a method is implemented to confirm that each script is authorized, a method is implemented to assure the integrity of each script, and an inventory of all scripts is maintained with written business/technical justification for why each is necessary. Applies to merchant-hosted payment pages; use Subresource Integrity (SRI) hashes and Content Security Policy (CSP) to comply.",
+      "family": "PCI DSS v4.0 — Requirement 6: Secure Systems and Software",
+      "references": [
+        "PCI DSS v4.0 Requirement 6.4.3",
+        "https://www.pcisecuritystandards.org/document_library/"
+      ]
+    },
+    {
+      "id": "PCI-DSS-v4-3.3.1",
+      "name": "PCI DSS — Prohibition on Storing Sensitive Authentication Data Post-Auth",
+      "description": "Sensitive authentication data (SAD) — including full track data from the magnetic stripe or chip, card verification codes (CVV2/CVC2/CID), and PINs/PIN blocks — must not be stored after authorization, even if encrypted. This applies to all e-commerce merchants regardless of SAQ level. Verify that no SAD is written to logs, databases, or error messages.",
+      "family": "PCI DSS v4.0 — Requirement 3: Protect Stored Account Data",
+      "references": [
+        "PCI DSS v4.0 Requirement 3.3.1",
+        "https://www.pcisecuritystandards.org/document_library/"
+      ]
+    },
+    {
+      "id": "PCI-DSS-v4-4.2.1-ecom",
+      "name": "PCI DSS — TLS for Cardholder Data Transmission",
+      "description": "Strong cryptography (TLS 1.2+) is used to safeguard PAN during transmission over open, public networks. All e-commerce checkout pages must enforce HTTPS, include HSTS headers, and reject connections that do not meet the minimum TLS version. Mixed-content warnings must be absent from all payment flows.",
+      "family": "PCI DSS v4.0 — Requirement 4: Protect Cardholder Data in Transit",
+      "references": [
+        "PCI DSS v4.0 Requirement 4.2.1",
+        "https://www.pcisecuritystandards.org/document_library/"
+      ]
+    },
+    {
+      "id": "PCI-DSS-v4-8.3.6",
+      "name": "PCI DSS — Multi-Factor Authentication for CDE Access",
+      "description": "Multi-factor authentication (MFA) is implemented for all access into the cardholder data environment (CDE). For e-commerce merchants, this includes all administrative interfaces, order management systems, and back-office tools that access stored payment data or cardholder records. MFA must also be applied to all remote access by vendors and employees.",
+      "family": "PCI DSS v4.0 — Requirement 8: Identify Users and Authenticate Access",
+      "references": [
+        "PCI DSS v4.0 Requirement 8.3.6",
+        "https://www.pcisecuritystandards.org/document_library/"
+      ]
+    },
+    {
+      "id": "PCI-DSS-v4-11.6.1",
+      "name": "PCI DSS — Change and Tamper Detection for Payment Pages",
+      "description": "A mechanism is deployed to detect unauthorized modification (including addition, deletion, and changes) to the HTTP headers and the contents of payment pages as received by the consumer browser. Alerts must be generated and reviewed by personnel in response to detected changes. This requirement applies to merchants who use redirect or iframe approaches as well as direct post.",
+      "family": "PCI DSS v4.0 — Requirement 11: Test Security Regularly",
+      "references": [
+        "PCI DSS v4.0 Requirement 11.6.1",
+        "https://www.pcisecuritystandards.org/document_library/"
+      ]
+    },
+    {
+      "id": "GDPR-Art6-ecom",
+      "name": "GDPR — Lawful Basis for Processing Customer Data",
+      "description": "E-commerce operators processing personal data of EU customers must identify and document a lawful basis for each processing activity: contract performance (order fulfilment), legal obligation (tax records), legitimate interests (fraud prevention, analytics — subject to balancing test), or consent (marketing emails). A blanket reliance on consent for all processing is insufficient; operators must match the correct lawful basis to each purpose.",
+      "family": "GDPR — Article 6: Lawful Basis",
+      "references": [
+        "GDPR Article 6",
+        "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32016R0679"
+      ]
+    },
+    {
+      "id": "GDPR-Art7-consent",
+      "name": "GDPR — Conditions for Consent",
+      "description": "Where processing is based on consent, the controller must be able to demonstrate that the data subject has consented. The request for consent must be presented in a clear and plain language, distinguishable from other matters, in an intelligible and easily accessible form. The data subject shall have the right to withdraw consent at any time. Withdrawal must be as easy as giving consent. Pre-ticked boxes and bundled consent are prohibited.",
+      "family": "GDPR — Article 7: Consent",
+      "references": [
+        "GDPR Article 7",
+        "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32016R0679"
+      ]
+    },
+    {
+      "id": "GDPR-Art13-ecom-notice",
+      "name": "GDPR — Privacy Notice at Point of Data Collection",
+      "description": "At the point of collecting personal data (account registration, checkout), the controller must provide: identity and contact details of the controller and DPO; purposes and legal basis of each processing activity; legitimate interests pursued where applicable; third-party recipients; any intended transfers outside the EEA and safeguards; retention periods; and all data subject rights (access, rectification, erasure, restriction, portability, objection). The notice must be provided before data collection, not buried in terms.",
+      "family": "GDPR — Article 13: Transparency",
+      "references": [
+        "GDPR Article 13",
+        "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32016R0679"
+      ]
+    },
+    {
+      "id": "GDPR-Art17-erasure",
+      "name": "GDPR — Right to Erasure (Right to be Forgotten)",
+      "description": "The data subject shall have the right to obtain from the controller the erasure of personal data without undue delay where: the data is no longer necessary for the purpose collected, consent is withdrawn and no other legal ground exists, the data subject objects and no overriding legitimate grounds exist, the data has been unlawfully processed, or erasure is required to comply with a legal obligation. E-commerce platforms must implement account deletion that removes all personal data not subject to legal retention obligations.",
+      "family": "GDPR — Article 17: Right to Erasure",
+      "references": [
+        "GDPR Article 17",
+        "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32016R0679"
+      ]
+    },
+    {
+      "id": "GDPR-Art30-records",
+      "name": "GDPR — Records of Processing Activities",
+      "description": "Each controller shall maintain a record of processing activities under its responsibility containing: name and contact details of the controller; purposes of processing; categories of data subjects and personal data; categories of recipients; third-country transfers and safeguards; envisaged time limits for erasure; and a general description of technical and organisational security measures. The record must be made available to the supervisory authority on request.",
+      "family": "GDPR — Article 30: Records of Processing",
+      "references": [
+        "GDPR Article 30",
+        "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32016R0679"
+      ]
+    },
+    {
+      "id": "GDPR-Art32-security",
+      "name": "GDPR — Security of Processing",
+      "description": "The controller and processor shall implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including: pseudonymisation and encryption of personal data; ability to ensure ongoing confidentiality, integrity, availability and resilience of processing systems; ability to restore availability and access to personal data in a timely manner following a physical or technical incident; and a process for regularly testing, assessing and evaluating the effectiveness of technical and organisational measures.",
+      "family": "GDPR — Article 32: Security of Processing",
+      "references": [
+        "GDPR Article 32",
+        "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32016R0679"
+      ]
+    },
+    {
+      "id": "CCPA-1798.100",
+      "name": "CCPA — Consumer Right to Know",
+      "description": "A consumer has the right to request that a business that collects a consumer's personal information disclose to that consumer the categories and specific pieces of personal information the business has collected about the consumer, the sources from which personal information is collected, the business or commercial purpose for collecting personal information, the categories of third parties with whom the business shares personal information, and the categories of information sold or disclosed.",
+      "family": "CCPA/CPRA — California Consumer Privacy Act (Cal. Civ. Code §1798.100-199)",
+      "references": [
+        "Cal. Civ. Code §1798.100",
+        "https://oag.ca.gov/privacy/ccpa"
+      ]
+    },
+    {
+      "id": "CCPA-1798.120",
+      "name": "CCPA — Right to Opt-Out of Sale or Sharing",
+      "description": "A consumer shall have the right, at any time, to direct a business that sells or shares personal information about the consumer to third parties not to sell or share the consumer's personal information. The business must provide a clear and conspicuous link on the business's website titled 'Do Not Sell or Share My Personal Information' enabling the consumer to opt out of the sale or sharing of the consumer's personal information.",
+      "family": "CCPA/CPRA — California Consumer Privacy Act (Cal. Civ. Code §1798.100-199)",
+      "references": [
+        "Cal. Civ. Code §1798.120",
+        "https://oag.ca.gov/privacy/ccpa"
+      ]
+    },
+    {
+      "id": "CCPA-1798.105",
+      "name": "CCPA — Consumer Right to Deletion",
+      "description": "A consumer shall have the right to request that a business delete any personal information about the consumer which the business has collected from the consumer, subject to certain exceptions. The business must delete the consumer's personal information from its records and direct any service providers to delete the consumer's personal information from their records. The deletion request must be honored within 45 days of receipt.",
+      "family": "CCPA/CPRA — California Consumer Privacy Act (Cal. Civ. Code §1798.100-199)",
+      "references": [
+        "Cal. Civ. Code §1798.105",
+        "https://oag.ca.gov/privacy/ccpa"
+      ]
+    },
+    {
+      "id": "CCPA-1798.135",
+      "name": "CCPA — Methods for Submitting Opt-Out Requests",
+      "description": "A business that is required to provide the right to opt-out shall designate one or more methods by which a consumer may submit a request to opt-out, including at minimum a clear and conspicuous link on the business's internet homepage titled 'Do Not Sell or Share My Personal Information.' The business must implement and maintain reasonable security procedures and practices to protect consumers' personal information and privacy rights.",
+      "family": "CCPA/CPRA — California Consumer Privacy Act (Cal. Civ. Code §1798.100-199)",
+      "references": [
+        "Cal. Civ. Code §1798.135",
+        "https://oag.ca.gov/privacy/ccpa"
+      ]
+    },
+    {
+      "id": "EPRIVACY-Art5-3",
+      "name": "ePrivacy Directive — Cookie Consent (EU)",
+      "description": "Member States shall ensure that the storing of information, or the gaining of access to information already stored, in the terminal equipment of a subscriber or user is only allowed on condition that the subscriber or user concerned has given his or her consent, having been provided with clear and comprehensive information, in accordance with Directive 95/46/EC. Pre-ticked boxes do not constitute valid consent. Strictly necessary cookies are exempt. The consent mechanism must be equally easy to withdraw as to give.",
+      "family": "ePrivacy Directive — Directive 2002/58/EC Article 5(3)",
+      "references": [
+        "Directive 2002/58/EC Article 5(3)",
+        "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32002L0058"
+      ]
+    },
+    {
+      "id": "ASVS-V2.1.1-ecom",
+      "name": "ASVS — Secure Account Authentication",
+      "description": "Verify that user-set passwords are at least 12 characters in length. Verify that 64-character or longer passwords are permitted. Verify that password truncation is not performed. For e-commerce accounts holding saved payment methods, apply enhanced requirements: MFA enrollment prompt after first order, re-authentication before changing email/payment methods.",
+      "family": "OWASP ASVS 4.0 — V2: Authentication",
+      "references": [
+        "OWASP ASVS 4.0 §2.1.1",
+        "NIST SP 800-63B §5.1.1"
+      ]
+    },
+    {
+      "id": "ASVS-V4.3.2",
+      "name": "ASVS — Admin Interface Restriction",
+      "description": "Verify that directory browsing is disabled unless deliberately desired. Verify that applications do not allow discovery or disclosure of file or directory metadata, such as Thumbs.db, .DS_Store, .git, or .svn folders. Admin and order management consoles must not be accessible from the public internet without VPN or explicit IP allowlisting.",
+      "family": "OWASP ASVS 4.0 — V4: Access Control",
+      "references": [
+        "OWASP ASVS 4.0 §4.3.2",
+        "CWE-548"
+      ]
+    },
+    {
+      "id": "ASVS-V5.3.4",
+      "name": "ASVS — SQL Injection Prevention for Order Data",
+      "description": "Verify that data selection or database queries (e.g. SQL, HQL, ORM, NoSQL) use parameterized queries, ORMs, entity frameworks, or are otherwise protected from SQL injection attacks. E-commerce product search, order lookup, and customer account endpoints are frequent targets for injection attacks and must use parameterized statements exclusively.",
+      "family": "OWASP ASVS 4.0 — V5: Validation, Sanitization and Encoding",
+      "references": [
+        "OWASP ASVS 4.0 §5.3.4",
+        "CWE-89"
+      ]
+    },
+    {
+      "id": "ASVS-V8.3.2",
+      "name": "ASVS — Order History and PII Data Access Control",
+      "description": "Verify that users can only access their own order history, account details, and saved addresses. Insecure Direct Object References (IDOR) must be prevented by server-side authorization checks on all order, account, and address endpoints. Do not rely on obscurity of sequential order IDs — verify ownership server-side on every request.",
+      "family": "OWASP ASVS 4.0 — V8: Data Protection",
+      "references": [
+        "OWASP ASVS 4.0 §8.3.2",
+        "CWE-639"
+      ]
+    },
+    {
+      "id": "ASVS-V13.2.3",
+      "name": "ASVS — RESTful API Verb Validation for Checkout APIs",
+      "description": "Verify that RESTful web services that utilize cookies for session management have adequate protection against Cross-Site Request Forgery (CSRF). Checkout, cart update, and payment submission APIs must validate CSRF tokens or use SameSite=Strict cookie attributes in addition to Origin/Referer header validation.",
+      "family": "OWASP ASVS 4.0 — V13: API and Web Service",
+      "references": [
+        "OWASP ASVS 4.0 §13.2.3",
+        "CWE-352"
+      ]
+    },
+    {
+      "id": "WCAG-2.2-AA-2.5.3",
+      "name": "WCAG 2.2 A — Label in Name (Accessible Button Labels)",
+      "description": "For user interface components with labels that include text or images of text, the accessible name contains the text that is presented visually. E-commerce add-to-cart, checkout, and payment buttons must have accessible names that match their visible label, so voice-control users can activate them by speaking the visible text. Relevant post-Domino's v. Robles for ADA compliance in e-commerce.",
+      "family": "WCAG 2.2 A — Operable",
+      "references": [
+        "WCAG 2.2 SC 2.5.3",
+        "https://www.w3.org/WAI/WCAG22/Understanding/label-in-name",
+        "Domino's Pizza LLC v. Robles, No. 18-1539 (S.Ct. 2019)"
+      ]
+    },
+    {
+      "id": "WCAG-2.2-AA-3.3.4",
+      "name": "WCAG 2.2 AA — Error Prevention for Legal and Financial Transactions",
+      "description": "For web pages that cause legal commitments or financial transactions for the user to occur, submissions that modify or delete user-controllable data in data storage systems, or that submit user test responses, the submission is: reversible (submissions can be checked and corrected before final confirmation), checked (data entered by the user is checked for input errors and the user is provided an opportunity to correct them), and confirmed (a mechanism is available for reviewing, confirming, and correcting information before finalizing the submission). Applies to checkout and order confirmation flows.",
+      "family": "WCAG 2.2 AA — Understandable",
+      "references": [
+        "WCAG 2.2 SC 3.3.4",
+        "https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-legal-financial-data"
+      ]
+    },
+    {
+      "id": "WCAG-2.2-AA-1.3.5",
+      "name": "WCAG 2.2 AA — Identify Input Purpose (Autocomplete)",
+      "description": "The purpose of each input field collecting information about the user can be programmatically determined when the field collects information about the user and the content is implemented using technologies with support for identifying the expected meaning for form input data. Checkout forms must use HTML autocomplete attributes (name, email, street-address, postal-code, cc-name, cc-number) to assist users with cognitive disabilities and to enable browser autofill.",
+      "family": "WCAG 2.2 AA — Perceivable",
+      "references": [
+        "WCAG 2.2 SC 1.3.5",
+        "https://www.w3.org/WAI/WCAG22/Understanding/identify-input-purpose"
+      ]
+    }
+  ]
+}

@@ -1,7 +1,8 @@
 {
   "name": "@leapnux/fruitnux",
   "version": "0.5.0-alpha.1",
-  "description": "fruitnux — external-deliverables CLI for the 6-NUX taxonomy. SCAs, audit packages, sign-off packets. Status: skeleton; planned for v0.5.0.",
+  "description": "fruitnux — active: audit deliverables: SCA, OSCAL, sign, RTM, BR-attestations. External-deliverables layer of the 6-NUX taxonomy.",
+  "private": false,
   "license": "Apache-2.0",
   "author": "Chu Ling",
   "repository": {
@@ -12,15 +13,28 @@
   "bugs": {
     "url": "https://github.com/leapnux/5nux/issues"
   },
-  "scripts": {
-    "test": "echo 'fruitnux: skeleton — no tests yet' && exit 0"
-  },
+  "keywords": [
+    "leapnux",
+    "fruitnux",
+    "6nux",
+    "sca",
+    "oscal",
+    "audit",
+    "compliance",
+    "evidence",
+    "rtm",
+    "sign",
+    "uat",
+    "nist",
+    "soc2"
+  ],
   "type": "module",
   "bin": {
     "fruitnux": "bin/fruitnux.mjs"
   },
   "files": [
     "bin/",
+    "src/",
     "LICENSE",
     "NOTICE",
     "README.md"
@@ -31,16 +45,33 @@
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {
-    "@leapnux/6nux-core": "0.5.0-alpha.1"
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src/ bin/ test/ --ignore-pattern '*.test.mjs'"
   },
-  "keywords": [
-    "leapnux",
-    "fruitnux",
-    "6nux",
-    "sca",
-    "audit",
-    "compliance",
-    "evidence"
-  ]
+  "dependencies": {
+    "commander": "^14.0.3",
+    "glob": "^13.0.6",
+    "gray-matter": "^4.0.3",
+    "isomorphic-dompurify": "^3.10.0",
+    "marked": "^18.0.2",
+    "uuid": "^14.0.0"
+  },
+  "optionalDependencies": {
+    "puppeteer-core": "*"
+  },
+  "peerDependencies": {
+    "@anthropic-ai/sdk": "^0.91.1"
+  },
+  "peerDependenciesMeta": {
+    "@anthropic-ai/sdk": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.5",
+    "vitest": "^4.1.5"
+  }
 }

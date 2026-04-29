@@ -1,10 +1,14 @@
 # @leapnux/branchnux
 
-Verification + audit-evidence layer of the 6-NUX taxonomy. The most-developed CLI in the 5-NUX stack — 15+ verbs covering test plans, RTM, SCA, OSCAL, HMAC-signed evidence, and more.
+Verification layer of the 6-NUX taxonomy. Active testing + validation CLI in the 5-NUX stack — ~14 verbs covering test plan discovery, LLM-assisted planning, report generation, validation, visual regression, and env-diff.
 
-**Status: v0.5.0-alpha.1 — active.** Production-tested against 587+ vitest cases. Every verb has `--json` mode for agent-driven workflows.
+**Status: v0.5.0-alpha.1 — active.** Production-tested against 435+ vitest cases. Every verb has `--json` mode for agent-driven workflows.
 
-branchnux turns the verification stage of regulated software into a CLI: discover what to test → draft test plans → codify into Playwright spec.ts → run reports → validate hygiene → produce SCA, OSCAL, and HMAC-signed evidence. Plain Markdown / XLSX / JSON / PDF outputs land in your repo.
+**v0.6 note:** Audit-deliverable verbs (`sca`, `sign`, `br`, `rtm`) have moved to `@leapnux/fruitnux` — the external-deliverables node. Branchnux retains deprecation shims through v0.6.x. See [migration](#migration-from-v05) below.
+
+branchnux turns the verification stage of regulated software into a CLI: discover what to test → draft test plans → codify into Playwright spec.ts → run reports → validate hygiene → compare results across environments. Plain Markdown / XLSX / JSON outputs land in your repo.
+
+Audit deliverables (SCA, OSCAL, HMAC sign-off ledgers, RTM, BR-attestations) are now in `@leapnux/fruitnux`.
 
 ## Install
 
@@ -12,7 +16,7 @@ branchnux turns the verification stage of regulated software into a CLI: discove
 npm install -g @leapnux/branchnux
 ```
 
-Or install the full 5-NUX family:
+Or install the full 5-NUX family (includes fruitnux):
 
 ```sh
 npm install -g @leapnux/5nux
@@ -27,18 +31,51 @@ npm install -g @leapnux/5nux
 | `branchnux plan <surface>` | Draft `test-plan.md` with `[VERIFY]` markers on every TC (LLM-powered). |
 | `branchnux codify <surface>` | Generate Playwright `spec.ts` from `test-plan.md` (LLM-powered). Vanilla output by default — use `--test-conventions <name>` for stack-specific patterns. |
 | `branchnux enrich <surface>` | Append-only enrichment passes — security gaps, accessibility, edge cases (LLM-powered). |
+| `branchnux batch-plan` | Parallel LLM agents: discover→plan→codify→enrich for multiple pages. |
 | `branchnux report <surface>` | Merge `test-plan.md` + execution log → XLSX matrix + standalone HTML execution report. |
 | `branchnux validate <surface>` | Lint a testing-log folder against the schema. |
-| `branchnux rtm` | Regenerate `requirements/TRACEABILITY.md` from REQUIREMENTS.md + sprint folders + source code annotations + test files. |
-| `branchnux sca <surface>` | Generate Security Control Assessment (8 standard sections, regulator-ready). |
-| `branchnux sca oscal <surface>` | Emit NIST OSCAL 1.1.2 JSON for FedRAMP / SOC 2 / GRC platform ingest. |
-| `branchnux sign <surface>` | HMAC-chained tamper-evident attestation; appends to `uat-log.jsonl`. |
-| `branchnux sign pdf <surface>` | PDF rendering of the signed attestation packet. |
-| `branchnux visual <surface>` | Visual regression diff against baseline screenshots. |
-| `branchnux br <id>` | Cross-link Business Requirements (BR-XX) ↔ R-XX in the RTM. |
+| `branchnux run <slug>` | Env-aware test-pass scaffold + report in one command. |
+| `branchnux compare <slug> <env-a> <env-b>` | Diff TC results across two environment passes. |
+| `branchnux visual baseline <surface>` | Capture full-page baseline screenshots for all TCs. |
+| `branchnux visual compare <surface>` | Pixel-diff current screenshots against baseline. |
 | `branchnux doctor` | Diagnose installed dependencies (Node, Playwright, optional peer deps). |
+| `branchnux demo` | Open the bundled demo execution report in your browser. |
 
 Run `<verb> --help` for the full flag surface, or see [docs/reference.md](https://github.com/leapnux/5nux/blob/main/docs/reference.md).
+
+## Audit deliverables — use fruitnux
+
+The following verbs are now in `@leapnux/fruitnux`:
+
+| Verb | What it does |
+|---|---|
+| `fruitnux rtm` | Regenerate `requirements/TRACEABILITY.md` |
+| `fruitnux sca init <surface>` | Scaffold 8-section Security Control Assessment |
+| `fruitnux sca generate <surface>` | Fill SCA evidence rows from test results |
+| `fruitnux sca pdf <surface>` | Render SCA to PDF |
+| `fruitnux sca oscal <surface>` | Emit NIST OSCAL 1.1.2 JSON |
+| `fruitnux sign <surface>` | HMAC-chained tamper-evident attestation |
+| `fruitnux sign pdf <surface>` | Render sign-off ledger to PDF |
+| `fruitnux sign stale-check <surface>` | Flag stale attestation entries |
+| `fruitnux br init <id>` | Scaffold BR-XX business requirement |
+| `fruitnux br link <br-id> <r-ids>` | Add BR-XX → R-ID mapping |
+| `fruitnux br rtm` | Render UAT traceability matrix |
+
+## Migration from v0.5
+
+```sh
+# Old (v0.5, still works via deprecation shim in v0.6):
+branchnux rtm
+branchnux sca generate login
+branchnux sign login
+
+# New (v0.6+):
+fruitnux rtm
+fruitnux sca generate login
+fruitnux sign login
+```
+
+Deprecation shims in branchnux v0.6 print a warning and forward to fruitnux. Shims will be **removed in v0.7.0**.
 
 ## Test-conventions profiles
 
@@ -56,13 +93,13 @@ Author your own profile at `src/config/test-conventions/<name>.json` — see [`d
 
 ## Cost-gated LLM verbs
 
-`discover`, `plan`, `codify`, `enrich`, `sca` (with `--justify-with-llm`) call the Anthropic API via `@anthropic-ai/sdk` (an **optional peer dependency** — only installed when you use those verbs). Cost-control flags on every LLM verb:
+`discover`, `plan`, `codify`, `enrich` call the Anthropic API via `@anthropic-ai/sdk` (an **optional peer dependency** — only installed when you use those verbs). Cost-control flags on every LLM verb:
 
 - `--dry-run` — print planned LLM calls and estimated cost; mandatory first run for any new project.
 - `--max-spend <USD>` — abort mid-run if cost exceeds the cap.
 - `--json` — structured output for downstream agent processing.
 
-Set `CLAUDE_API_KEY` environment variable to enable. Deterministic-core verbs (`init`, `report`, `validate`, `rtm`, `sca oscal`, `sign`, `sign pdf`, `visual`, `br`, `doctor`) make zero network calls and require no API key.
+Set `CLAUDE_API_KEY` environment variable to enable. Deterministic-core verbs (`init`, `report`, `validate`, `run`, `compare`, `visual`, `doctor`) make zero network calls and require no API key.
 
 ## The `[VERIFY]` marker contract
 
@@ -74,28 +111,10 @@ LLM-drafted cells in `test-plan.md` ship with `[VERIFY]` markers. Removing a mar
 root → trunk → BRANCH (branchnux) → leaf → fruit → soil
 ```
 
-branchnux is the verification + evidence layer. Upstream: `rootnux` produces R-XX requirements; `trunknux` records what was built. Downstream: `leafnux` watches health; `fruitnux` bundles audit handoff packets.
+branchnux is the **verification** layer. Upstream: `rootnux` produces R-XX requirements; `trunknux` records what was built. Downstream: `leafnux` watches health; `fruitnux` produces audit-deliverable packages (SCA, OSCAL, sign-offs, RTM).
 
 NUX packages do **not** import each other — they communicate via file-system conventions in `@leapnux/6nux-core`. See [`docs/ARCHITECTURE.md`](https://github.com/leapnux/5nux/blob/main/docs/ARCHITECTURE.md) for the implementation spec.
 
-## OSS / Premium boundary
+## Sibling packages
 
-Everything in branchnux runs **locally**, single-user, file-native. No network call beyond the optional LLM API. No account, no usage cap.
-
-The following belong in the **6-NUX premium tier** (commercial), not branchnux:
-- Hosted Playwright execution (no local browser setup)
-- Cloud evidence vault with multi-machine sync + 7-year retention
-- Auditor portal with read-only seats and per-engagement scoping
-- Multi-tenant RBAC + SSO/SCIM
-
-See [`docs/MOTTO.md`](https://github.com/leapnux/5nux/blob/main/docs/MOTTO.md) for the full split.
-
-## License
-
-Apache-2.0 (c) 2026 Chu Ling
-
-"BranchNuX™" is a trademark of Chu Ling. See [NOTICE](https://github.com/leapnux/5nux/blob/main/NOTICE) for trademark terms.
-
-## Part of the 5-NUX family
-
-Sibling packages: [rootnux](https://www.npmjs.com/package/@leapnux/rootnux), [trunknux](https://www.npmjs.com/package/@leapnux/trunknux), [branchnux](https://www.npmjs.com/package/@leapnux/branchnux), [leafnux](https://www.npmjs.com/package/@leapnux/leafnux), [fruitnux](https://www.npmjs.com/package/@leapnux/fruitnux), [6nux-core](https://www.npmjs.com/package/@leapnux/6nux-core), [5nux meta](https://www.npmjs.com/package/@leapnux/5nux). See the [root README](https://github.com/leapnux/5nux#readme) for the full taxonomy and install instructions.
+[rootnux](https://www.npmjs.com/package/@leapnux/rootnux), [trunknux](https://www.npmjs.com/package/@leapnux/trunknux), [branchnux](https://www.npmjs.com/package/@leapnux/branchnux), [leafnux](https://www.npmjs.com/package/@leapnux/leafnux), [fruitnux](https://www.npmjs.com/package/@leapnux/fruitnux), [6nux-core](https://www.npmjs.com/package/@leapnux/6nux-core), [5nux meta](https://www.npmjs.com/package/@leapnux/5nux). See the [root README](https://github.com/leapnux/5nux#readme) for the full taxonomy and install instructions.

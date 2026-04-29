@@ -27,11 +27,11 @@
   "dependencies": {
     "@leapnux/rootnux": "0.5.0-alpha.1",
     "@leapnux/trunknux": "0.5.0-alpha.1",
-    "@leapnux/branchnux": "0.5.0-alpha.1"
+    "@leapnux/branchnux": "0.5.0-alpha.1",
+    "@leapnux/fruitnux": "0.5.0-alpha.1"
   },
   "optionalDependencies": {
-    "@leapnux/leafnux": "0.5.0-alpha.1",
-    "@leapnux/fruitnux": "0.5.0-alpha.1"
+    "@leapnux/leafnux": "0.5.0-alpha.1"
   },
   "keywords": [
     "leapnux",

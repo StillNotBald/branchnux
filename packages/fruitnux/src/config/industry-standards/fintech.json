@@ -1,0 +1,320 @@
+{
+  "_comment": "Copyright 2026 Chu Ling - SPDX-License-Identifier: Apache-2.0",
+  "version": "0.2.0",
+  "industry": "fintech",
+  "description": "Fintech industry standards bundle. Covers NIST SP 800-63B Digital Identity, NYDFS 23 NYCRR 500, PCI DSS v4.0, FFIEC IT Handbook, PSD2 RTS on SCA, and OWASP ASVS 4.0 finance-relevant controls. Shipped in BranchNuX v0.2.",
+  "signOffRoles": ["Project Lead", "CISO", "General Counsel", "External Auditor"],
+  "standards": [
+    {
+      "id": "NIST-800-63B-5.1.1",
+      "name": "Memorized Secret Authenticators — Minimum Length",
+      "description": "Memorized secrets (passwords) chosen by subscribers SHALL be at least 8 characters in length. Verifiers SHOULD permit subscriber-chosen passwords up to 64 characters or more. All printing ASCII characters as well as the space character SHOULD be acceptable; Unicode characters SHOULD be accepted.",
+      "family": "NIST SP 800-63B — 5.1: Authenticator Types",
+      "references": [
+        "NIST SP 800-63B §5.1.1",
+        "https://pages.nist.gov/800-63-3/sp800-63b.html#memsecret"
+      ]
+    },
+    {
+      "id": "NIST-800-63B-5.1.1-breach",
+      "name": "Memorized Secret — Compromised Credential Check",
+      "description": "When processing requests to establish or change memorized secrets, verifiers SHALL compare the prospective secrets against a list of known commonly-used, expected, or compromised values and reject any passwords found on that list.",
+      "family": "NIST SP 800-63B — 5.1: Authenticator Types",
+      "references": [
+        "NIST SP 800-63B §5.1.1.2",
+        "https://pages.nist.gov/800-63-3/sp800-63b.html#memsecret"
+      ]
+    },
+    {
+      "id": "NIST-800-63B-5.1.3",
+      "name": "Look-Up Secrets — Randomness and Single-Use",
+      "description": "Look-up secrets SHALL have at least 112 bits of entropy if chosen by the CSP, or have at least 20 bits of entropy if the look-up secrets are randomly chosen by the CSP. Look-up secrets SHALL be used only once; once they are used, they SHALL be invalidated.",
+      "family": "NIST SP 800-63B — 5.1: Authenticator Types",
+      "references": [
+        "NIST SP 800-63B §5.1.2",
+        "https://pages.nist.gov/800-63-3/sp800-63b.html#lookupsecrets"
+      ]
+    },
+    {
+      "id": "NIST-800-63B-5.1.5",
+      "name": "Out-of-Band Authenticators — Binding and Expiry",
+      "description": "Out-of-band authenticators (e.g. SMS OTP, push notification) SHALL expire within 10 minutes. The out-of-band authenticator SHALL establish a separate channel with the verifier to retrieve the authentication code or respond to the authentication request, and that channel SHALL be considered out-of-band with respect to the primary communication channel.",
+      "family": "NIST SP 800-63B — 5.1: Authenticator Types",
+      "references": [
+        "NIST SP 800-63B §5.1.3",
+        "https://pages.nist.gov/800-63-3/sp800-63b.html#out-of-band"
+      ]
+    },
+    {
+      "id": "NIST-800-63B-5.1.7",
+      "name": "Time-Based OTPs — Validity Period",
+      "description": "Time-based OTP authenticators SHALL only be usable once within the validity period. The authenticator SHALL display the time remaining until the OTP expires. Verifiers SHOULD accept OTPs during a time period of up to 30 seconds on each side of the current time to account for clock drift.",
+      "family": "NIST SP 800-63B — 5.1: Authenticator Types",
+      "references": [
+        "NIST SP 800-63B §5.1.4.2",
+        "RFC 6238",
+        "https://pages.nist.gov/800-63-3/sp800-63b.html#totp"
+      ]
+    },
+    {
+      "id": "NIST-800-63B-5.2.2",
+      "name": "Rate Limiting — Authentication Attempt Throttling",
+      "description": "Verifiers SHALL implement a rate-limiting mechanism that effectively limits the number of failed authentication attempts that can be made on the subscriber's account. Accounts SHALL be locked after no more than 100 consecutive failed attempts, and lockout SHALL require administrative or subscriber-initiated action to unlock.",
+      "family": "NIST SP 800-63B — 5.2: Authenticator Assurance",
+      "references": [
+        "NIST SP 800-63B §5.2.2",
+        "https://pages.nist.gov/800-63-3/sp800-63b.html#throttle"
+      ]
+    },
+    {
+      "id": "NIST-800-63B-5.2.3",
+      "name": "Verifier Throttling — Delay Mechanisms",
+      "description": "The verifier or CSP SHALL employ rate-limiting mechanisms that includes temporary account lockout, CAPTCHA, or other techniques to limit automated attempts. Delays SHALL increase with successive failed attempts.",
+      "family": "NIST SP 800-63B — 5.2: Authenticator Assurance",
+      "references": [
+        "NIST SP 800-63B §5.2.2",
+        "https://pages.nist.gov/800-63-3/sp800-63b.html#throttle"
+      ]
+    },
+    {
+      "id": "NIST-800-63B-5.2.5",
+      "name": "Verifier Compromise Resistance",
+      "description": "Verifiers SHALL store memorized secrets in a form that is resistant to offline attacks. Secrets SHALL be salted and hashed using a suitable one-way key derivation function (e.g., PBKDF2, bcrypt, or Argon2id). Work factors SHALL be set to make brute-force attacks impractical on current hardware.",
+      "family": "NIST SP 800-63B — 5.2: Authenticator Assurance",
+      "references": [
+        "NIST SP 800-63B §5.1.1.2",
+        "https://pages.nist.gov/800-63-3/sp800-63b.html#memsecretver"
+      ]
+    },
+    {
+      "id": "NIST-800-63B-7.1",
+      "name": "Session Management — Reauthentication",
+      "description": "Reauthentication of the subscriber SHOULD be repeated following any period of inactivity lasting 30 minutes or longer. The session (at AAL2) SHALL be terminated and the subscriber required to authenticate again if the session has been inactive for more than 30 minutes.",
+      "family": "NIST SP 800-63B — 7: Session Management",
+      "references": [
+        "NIST SP 800-63B §7.2",
+        "https://pages.nist.gov/800-63-3/sp800-63b.html#sessionreauthn"
+      ]
+    },
+    {
+      "id": "NYDFS-500.02",
+      "name": "NYDFS — Cybersecurity Program",
+      "description": "Each Covered Entity shall maintain a cybersecurity program designed to protect the confidentiality, integrity and availability of the Covered Entity's Information Systems. The program must include identification and assessment of cybersecurity risks, protective controls, detection of cybersecurity events, and response and recovery.",
+      "family": "NYDFS 23 NYCRR 500 — Program Requirements",
+      "references": [
+        "23 NYCRR 500.02",
+        "https://www.dfs.ny.gov/industry_guidance/cybersecurity"
+      ]
+    },
+    {
+      "id": "NYDFS-500.03",
+      "name": "NYDFS — Cybersecurity Policy",
+      "description": "Each Covered Entity shall implement and maintain a written cybersecurity policy setting forth the Covered Entity's policies and procedures for the protection of its Information Systems and Nonpublic Information stored on those Systems. The policy must be approved by a Senior Officer or the board of directors.",
+      "family": "NYDFS 23 NYCRR 500 — Program Requirements",
+      "references": [
+        "23 NYCRR 500.03",
+        "https://www.dfs.ny.gov/industry_guidance/cybersecurity"
+      ]
+    },
+    {
+      "id": "NYDFS-500.06",
+      "name": "NYDFS — Audit Trail",
+      "description": "Each Covered Entity shall maintain systems that, to the extent applicable, reconstruct material financial transactions sufficient to support normal operations and obligations of the Covered Entity and include audit trails designed to detect and respond to cybersecurity events that have a reasonable likelihood of materially harming any material part of the normal operations of the Covered Entity.",
+      "family": "NYDFS 23 NYCRR 500 — Operations",
+      "references": [
+        "23 NYCRR 500.06",
+        "https://www.dfs.ny.gov/industry_guidance/cybersecurity"
+      ]
+    },
+    {
+      "id": "NYDFS-500.07",
+      "name": "NYDFS — Access Privileges and Minimum Necessary",
+      "description": "Each Covered Entity shall limit user access privileges to Information Systems that provide access to Nonpublic Information to only those individuals who need such access to perform their job duties. The Covered Entity shall review access privileges at least annually and update or revoke such privileges as appropriate.",
+      "family": "NYDFS 23 NYCRR 500 — Access Management",
+      "references": [
+        "23 NYCRR 500.07",
+        "https://www.dfs.ny.gov/industry_guidance/cybersecurity"
+      ]
+    },
+    {
+      "id": "NYDFS-500.12",
+      "name": "NYDFS — Multi-Factor Authentication",
+      "description": "Each Covered Entity shall use effective controls, which may include multi-factor authentication (MFA), to protect against unauthorized access to Nonpublic Information or Information Systems. MFA shall be used for any individual accessing the Covered Entity's internal networks from an external network.",
+      "family": "NYDFS 23 NYCRR 500 — Access Management",
+      "references": [
+        "23 NYCRR 500.12",
+        "https://www.dfs.ny.gov/industry_guidance/cybersecurity"
+      ]
+    },
+    {
+      "id": "NYDFS-500.13",
+      "name": "NYDFS — Limitations on Data Retention",
+      "description": "Each Covered Entity shall include policies and procedures for the secure disposal of Nonpublic Information in any format whenever such information is no longer necessary for business operations or for other legitimate business purposes, except where such information is otherwise required to be retained by law or regulation.",
+      "family": "NYDFS 23 NYCRR 500 — Data Management",
+      "references": [
+        "23 NYCRR 500.13",
+        "https://www.dfs.ny.gov/industry_guidance/cybersecurity"
+      ]
+    },
+    {
+      "id": "PCI-DSS-v4-1.3.2",
+      "name": "PCI DSS — Network Access Controls — Inbound/Outbound Traffic",
+      "description": "Restrict inbound and outbound traffic to that which is necessary for the cardholder data environment, and deny all other traffic. Firewall and router configurations must be reviewed at least every six months.",
+      "family": "PCI DSS v4.0 — Requirement 1: Network Security Controls",
+      "references": [
+        "PCI DSS v4.0 Requirement 1.3.2",
+        "https://www.pcisecuritystandards.org/document_library/"
+      ]
+    },
+    {
+      "id": "PCI-DSS-v4-2.2.1",
+      "name": "PCI DSS — System Components — Secure Configuration",
+      "description": "All system components are configured and managed securely. Configuration standards must address changing of all vendor-supplied defaults and removal or disabling of unnecessary default accounts before installing a system on the network.",
+      "family": "PCI DSS v4.0 — Requirement 2: Secure Configurations",
+      "references": [
+        "PCI DSS v4.0 Requirement 2.2.1",
+        "https://www.pcisecuritystandards.org/document_library/"
+      ]
+    },
+    {
+      "id": "PCI-DSS-v4-3.5.1",
+      "name": "PCI DSS — Primary Account Number (PAN) Protection",
+      "description": "The primary account number (PAN) is secured wherever it is stored. At minimum, PAN must be rendered unreadable anywhere it is stored (including portable digital media, backup media, and in logs) using strong cryptography, or one-way hashes based on strong cryptography.",
+      "family": "PCI DSS v4.0 — Requirement 3: Protect Stored Account Data",
+      "references": [
+        "PCI DSS v4.0 Requirement 3.5.1",
+        "https://www.pcisecuritystandards.org/document_library/"
+      ]
+    },
+    {
+      "id": "PCI-DSS-v4-4.2.1",
+      "name": "PCI DSS — Strong Cryptography in Transmission",
+      "description": "Strong cryptography is used to safeguard PAN during transmission over open, public networks. Only trusted keys/certificates are accepted and protocols in use do not allow fallback to weak cryptography. TLS 1.2 minimum; TLS 1.3 recommended.",
+      "family": "PCI DSS v4.0 — Requirement 4: Protect Cardholder Data in Transit",
+      "references": [
+        "PCI DSS v4.0 Requirement 4.2.1",
+        "https://www.pcisecuritystandards.org/document_library/"
+      ]
+    },
+    {
+      "id": "PCI-DSS-v4-6.3.2",
+      "name": "PCI DSS — Software Inventory and Vulnerability Management",
+      "description": "An inventory of bespoke and custom software and third-party software components incorporated into bespoke and custom software is maintained to facilitate vulnerability and patch management. Security patches for critical vulnerabilities must be installed within one month of release.",
+      "family": "PCI DSS v4.0 — Requirement 6: Secure Systems and Software",
+      "references": [
+        "PCI DSS v4.0 Requirement 6.3.2",
+        "https://www.pcisecuritystandards.org/document_library/"
+      ]
+    },
+    {
+      "id": "PCI-DSS-v4-8.2.1",
+      "name": "PCI DSS — Unique User IDs",
+      "description": "All users are assigned a unique ID before allowing them to access system components or cardholder data. Generic, shared, or default accounts are not used for authentication or to access cardholder data. Shared IDs are prohibited.",
+      "family": "PCI DSS v4.0 — Requirement 8: Identify Users and Authenticate Access",
+      "references": [
+        "PCI DSS v4.0 Requirement 8.2.1",
+        "https://www.pcisecuritystandards.org/document_library/"
+      ]
+    },
+    {
+      "id": "PCI-DSS-v4-10.2.1",
+      "name": "PCI DSS — Audit Log Implementation",
+      "description": "Audit logs capture all individual user access to cardholder data, all actions taken by any individual with root or administrative privileges, access to all audit trails, invalid logical access attempts, use of and changes to identification and authentication mechanisms including new account creation and privilege escalation, initialization/stopping/pausing of audit logs, and creation/deletion of system-level objects.",
+      "family": "PCI DSS v4.0 — Requirement 10: Log and Monitor All Access",
+      "references": [
+        "PCI DSS v4.0 Requirement 10.2.1",
+        "https://www.pcisecuritystandards.org/document_library/"
+      ]
+    },
+    {
+      "id": "PCI-DSS-v4-11.3.1",
+      "name": "PCI DSS — Penetration Testing — External and Internal",
+      "description": "External penetration testing is performed at least once every 12 months and after any significant infrastructure or application upgrade or change. Internal penetration testing is performed at least once every 12 months. Penetration testing must be conducted by a qualified internal resource or qualified external third party.",
+      "family": "PCI DSS v4.0 — Requirement 11: Test Security Regularly",
+      "references": [
+        "PCI DSS v4.0 Requirement 11.3.1",
+        "https://www.pcisecuritystandards.org/document_library/"
+      ]
+    },
+    {
+      "id": "FFIEC-ISEC-III.A",
+      "name": "FFIEC — Information Security Risk Assessment",
+      "description": "Financial institutions should implement a risk assessment process that identifies threats to and vulnerabilities in the information and technology systems, assesses the likelihood and impact of identified threats exploiting identified vulnerabilities, and identifies appropriate controls to mitigate identified risks. The assessment should be reviewed and updated at least annually.",
+      "family": "FFIEC IT Handbook — Information Security Booklet",
+      "references": [
+        "FFIEC Information Security Booklet (2016) §III.A",
+        "https://ithandbook.ffiec.gov/it-booklets/information-security.aspx"
+      ]
+    },
+    {
+      "id": "FFIEC-ISEC-IV.C",
+      "name": "FFIEC — Incident Response Program",
+      "description": "Financial institutions should implement an incident response program that includes processes for detecting, analyzing, containing, eradicating, recovering from, and reporting security incidents. The program should define roles and responsibilities, communication plans, and evidence preservation procedures.",
+      "family": "FFIEC IT Handbook — Information Security Booklet",
+      "references": [
+        "FFIEC Information Security Booklet (2016) §IV.C",
+        "https://ithandbook.ffiec.gov/it-booklets/information-security.aspx"
+      ]
+    },
+    {
+      "id": "PSD2-RTS-Art5",
+      "name": "PSD2 SCA — Knowledge, Possession, Inherence Elements",
+      "description": "Strong customer authentication (SCA) shall be based on at least two elements categorized as: (a) knowledge — something only the user knows (e.g. a password or PIN); (b) possession — something only the user possesses (e.g. a token-generating device); (c) inherence — something the user is (e.g. biometric). These elements are independent and the breach of one does not compromise the reliability of the others.",
+      "family": "PSD2 RTS on SCA — Article 5: Authentication Elements",
+      "references": [
+        "Commission Delegated Regulation (EU) 2018/389, Article 5",
+        "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32018R0389"
+      ]
+    },
+    {
+      "id": "PSD2-RTS-Art9",
+      "name": "PSD2 SCA — Dynamic Linking",
+      "description": "For payment transactions, payment service providers shall apply SCA that includes elements which dynamically link the transaction to a specific amount and a specific payee. The authentication code must be specific to the amount and payee agreed to by the payer at the time of initiation; any change to those values shall invalidate the code.",
+      "family": "PSD2 RTS on SCA — Article 9: Dynamic Linking",
+      "references": [
+        "Commission Delegated Regulation (EU) 2018/389, Article 9",
+        "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32018R0389"
+      ]
+    },
+    {
+      "id": "ASVS-V2.4.1",
+      "name": "ASVS — Password Storage Using Adaptive Hash",
+      "description": "Verify that passwords are stored using an approved adaptive and salted hashing function with a work factor parameter. Approved functions include bcrypt, scrypt, Argon2id, and PBKDF2. The work factor shall be as large as verification server performance will allow, typically at least 13 for bcrypt.",
+      "family": "OWASP ASVS 4.0 — V2: Authentication",
+      "references": [
+        "OWASP ASVS 4.0 §2.4.1",
+        "NIST SP 800-63B §5.1.1.2"
+      ]
+    },
+    {
+      "id": "ASVS-V3.2.1",
+      "name": "ASVS — Session Token Generation",
+      "description": "Verify the application generates a new session token on user authentication. The session token must have at least 64 bits of entropy. Session token generation SHALL use a cryptographically secure pseudo-random number generator (CSPRNG).",
+      "family": "OWASP ASVS 4.0 — V3: Session Management",
+      "references": [
+        "OWASP ASVS 4.0 §3.2.1",
+        "NIST SP 800-63B §7.1"
+      ]
+    },
+    {
+      "id": "ASVS-V8.2.2",
+      "name": "ASVS — Sensitive Data Anti-Caching",
+      "description": "Verify that the application sets sufficient anti-caching headers so that sensitive data is not cached in modern browsers. Pages containing sensitive financial data shall return Cache-Control: no-store and Pragma: no-cache headers.",
+      "family": "OWASP ASVS 4.0 — V8: Data Protection",
+      "references": [
+        "OWASP ASVS 4.0 §8.2.2",
+        "CWE-524"
+      ]
+    },
+    {
+      "id": "ASVS-V8.3.4",
+      "name": "ASVS — Financial Data Minimization",
+      "description": "Verify that all sensitive data created and processed by the application has been identified, and ensure that a policy exists on how to deal with sensitive data. Sensitive data (e.g. card numbers, account numbers) SHALL be masked in display unless the user explicitly needs to see the full value.",
+      "family": "OWASP ASVS 4.0 — V8: Data Protection",
+      "references": [
+        "OWASP ASVS 4.0 §8.3.4",
+        "PCI DSS v4.0 Requirement 3.3"
+      ]
+    }
+  ]
+}
